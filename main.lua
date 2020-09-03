@@ -30,7 +30,6 @@ end
 -- env.info("Inserting ctld logistic unit...")
 -- table.insert(ctld.logisticUnits, "logistic1")
 -- ctld.activatePickupZone("logizone1")
-ctld.activateDropoffZone("dropoffzone1")
 
 redIADS = SkynetIADS:create('SYRIA')
 redIADS:setUpdateInterval(15)
@@ -111,32 +110,48 @@ SCHEDULER:New( nil, function()
 end, {},300, 900, .8)
 
 
-ContestedBases = {"Aleppo", "Abu al-Duhur", "Taftanaz", "WrongBase" }
-_NumDefenders = 2
-_ZONES = {}
+local ContestedBases = { "Aleppo",  "Taftanaz", "Abu al-Duhur" }
+local _NumDefenders = 2
+local _ZONES = {}
 
+-- For reach numbered group, for each airbase, 
+-- Attempt to find the group, destroying it if the airbase is blue, and activating it 
+--  if the base is red.
 for _, base in pairs(ContestedBases) do
-  local base_obj = AIRBASE:FindbyName(base)
-  if base_obj == nil then
-    MESSAGE:New("Invalid airbase name: " .. base)
-    goto continue
+  table.insert(_ZONES, base)
+  _ZONES[base] = {}
+  local base_obj = AIRBASE:FindByName(base)
+  base_obj:HandleEvent(EVENTS.BaseCaptured)
+  function base_obj:OnEventBaseCaptured( EventData )
+    MESSAGE:NewType( "Base was captured", MESSAGE.Type.Information ):ToAll()
   end
 
-  local base_blue = base_obj:GetCoalition() == coalition.side.BLUE
-  for i=1,_NumDefenders do
-    local grp_name = base .. "-" .. tostring(i)
-    if base_blue then
-      env.info('Destroying group ' .. grp_name)
-      local grp = GROUP:FindByName(grp_name)
-      if grp != nil then
-        grp:Destroy()
+  if base_obj == nil then
+    MESSAGE:New("Invalid airbase name in main.lua: " .. base, 25):ToCoalition( coalition.side.BLUE )
+  else
+    local base_color = base_obj:GetCoalition()
+    for i=1,_NumDefenders do
+      local grp_name = base .. "-" .. tostring(i)
+      if base_color == coalition.side.BLUE then
+        local grp = GROUP:FindByName(grp_name)
+        if grp ~= nil then
+          env.info('Destroying group ' .. grp_name)
+
+          grp:Destroy()
+        else
+          env.info("Group does not exist: " .. grp)
+        end
       else
-        env.info("Cannot destroy group as it does not exist: " .. grp_name)
+        env.info("Initializing group " .. grp_name)
+        local spawn_grp = SPAWN:New(grp_name)
+        if spawn_grp ~= nil then
+          spawn_grp:InitLimit(8, 1):SpawnScheduled(600,.9)
+          table.insert(_ZONES[base], grp_name)
+        else
+          env.info("ERROR! Spawn was nil for: " .. grp_name)
+        end
+      
       end
-    else
-      env.info("Initializing group " .. grp_name)
-      SPAWN:New(grp_name):InitLimit(8,1):SpawnScheduled(600,.9)
-      _ZONES[base][i] = grp_name
     end
-    ::continue::
+  end
 end
