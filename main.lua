@@ -155,7 +155,7 @@ local function setBaseBlue(baseName, startup)
   local logisticCoordZone = ZONE:FindByName(logZone, false)
   if logisticCoordZone == nil then
     env.info("Zone does not exist for "..logZone..". Creating one...")
-    logisticCoordZone = ZONE_RADIUS:New(logZone, AIRBASE:FindByName(baseName):GetVec2(),1000)
+    logisticCoordZone = ZONE_RADIUS:New(logZone, AIRBASE:FindByName(baseName):GetVec2(),100)
     -- logisticCoordZone = ZONE:FindByName(logZone)
   end
   local logisticCoord = logisticCoordZone:GetPointVec2()
