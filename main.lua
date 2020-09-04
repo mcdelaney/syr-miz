@@ -1,3 +1,4 @@
+
 local function file_exists(name) --check if the file already exists for writing
   if lfs.attributes(name) then
   return true
@@ -15,6 +16,39 @@ local function prune_enemies(Site, name)
       grpObj:Destroy(true)
     end
 end
+
+local function tablefind(tab,el)
+  for index, value in pairs(tab) do
+    if value == el then
+      return index
+    end
+  end
+end
+
+
+local function destroyIfExists(grp_name, is_static)
+  if is_static then
+    local grp = STATIC:FindByName(grp_name, false)
+  else
+    local grp = GROUP:FindByName(grp_name, false)
+  end
+  if grp ~= nil then
+    env.info('Destroying Object ' .. grp_name)
+    grp:Destroy()
+  else
+    env.info("Object does not exist: " .. grp_name)
+  end
+end
+
+-- local function processAirbaseCapture(EVENTDATA)
+
+--   if EVENTDATA.IniCoalition == coalition.side.RED then
+--     env.info("Base captured by Red!")
+--   else
+--     MESSAGE:MessageToAll("Base captured by Blue!").
+--     table.insert(ctld.logisticUnits, "Log")
+--   end
+-- end
 
 local SAMS = {}
 SAMS["SA6sam"] = SET_GROUP:New():FilterPrefixes("SAM-SA6"):FilterActive(true):FilterOnce()
@@ -66,6 +100,10 @@ A2ADispatcher:SetSquadron( "695 Squadron", "An Nasiriyah", { "695 Squadron" }, 2
 A2ADispatcher:SetSquadronGrouping( "695 Squadron", 2 )
 A2ADispatcher:SetSquadronGci( "695 Squadron", 900, 1200 )
 
+A2ADispatcher:SetSquadron( "Beirut-Squadron", "Beirut-Rafic Hariri", { "Beirut-Squadron" }, 4 ) --Su-30
+A2ADispatcher:SetSquadronGrouping( "Beirut-Squadron", 4 )
+A2ADispatcher:SetSquadronGci( "Beirut-Squadron", 900, 1200 )
+
 A2ADispatcher:SetSquadron( "Russia GCI", "Bassel Al-Assad", { "Russia GCI" }, 2 ) --su30
 A2ADispatcher:SetSquadronGrouping( "Russia GCI", 2 )
 A2ADispatcher:SetSquadronGci( "Russia GCI", 900, 1200 )
@@ -110,48 +148,84 @@ SCHEDULER:New( nil, function()
 end, {},300, 900, .8)
 
 
-local ContestedBases = { "Aleppo",  "Taftanaz", "Abu al-Duhur" }
-local _NumDefenders = 2
-local _ZONES = {}
+local function setBaseBlue(baseName, startup)
+  env.info("Setting "..baseName.." as blue...")
+  local logUnitName = "logistic-"..baseName
+  local logZone = 'logizone-'..baseName
+  local logisticCoordZone = ZONE:FindByName(logZone, false)
+  if logisticCoordZone == nil then
+    env.info("Zone does not exist for "..logZone..". Creating one...")
+    logisticCoordZone = ZONE_RADIUS:New(logZone, AIRBASE:FindByName(baseName):GetVec2(),1000)
+    -- logisticCoordZone = ZONE:FindByName(logZone)
+  end
+  local logisticCoord = logisticCoordZone:GetPointVec2()
+  local logisticUnit = SPAWNSTATIC:NewFromStatic("logisticBase", country.id.USA)
+  if logisticUnit == nil then
+    env.info("Could not find base logistic unit")
+  end
+  logisticUnit:SpawnFromCoordinate(logisticCoord, 10, logUnitName)
+  table.insert(ctld.logisticUnits, logUnitName)
+  table.insert(ctld.dropOffZones, {logZone, "blue", 2})
+  table.insert(ctld.pickupZones, { logZone, "blue", -1, "yes", 2 })
+  table.insert(ctld.extractZones, logZone)
 
--- For reach numbered group, for each airbase, 
--- Attempt to find the group, destroying it if the airbase is blue, and activating it 
+  MESSAGE:NewType( baseName.." was captured by Blue!",
+                    MESSAGE.Type.Information ):ToAll()
+end
+
+
+local function removeValueFromTableIfExists(tableRef, value)
+  local key = tablefind(tableRef, value)
+  if key ~= nil then
+      env.info("Removing key for logisticUnit...")
+      table.remove(tableRef, key)
+  end
+end
+
+
+local function setBaseRed(baseName)
+  env.info("Setting "..baseName.." as red...")
+  local logUnitName = "logistic-"..baseName
+  local logZone = 'logizone-'..baseName
+  destroyIfExists(logUnitName, true)
+  MESSAGE:NewType( baseName.." was captured by Red!",
+                   MESSAGE.Type.Information ):ToAll()
+end
+
+local ContestedBases = { "Aleppo",  "Taftanaz", "Abu al-Duhur", "Hatay", "Haifa", "Ramat David",
+                         "Bassel Al-Assad", "Beirut-Rafic Hariri",
+                        "Damascus" }
+local _NumDefenders = 2
+
+-- For reach numbered group, for each airbase,
+-- Attempt to find the group, destroying it if the airbase is blue, and activating it
 --  if the base is red.
 for _, base in pairs(ContestedBases) do
-  table.insert(_ZONES, base)
-  _ZONES[base] = {}
   local base_obj = AIRBASE:FindByName(base)
+
+  if base_obj:GetCoalition() == coalition.side.BLUE then
+    setBaseBlue(base)
+  else
+    setBaseRed(base)
+    for i=1,_NumDefenders do
+      local grp_name = base.."-"..tostring(i)
+      env.info("Initializing group " .. grp_name)
+      local zone_base = ZONE_AIRBASE:New(base, 1500):GetRandomPointVec2()
+      local baseDef = SPAWN:NewWithAlias( "defenseBase", grp_name )
+      baseDef:SpawnFromPointVec2(zone_base)
+    end
+  end
+
   base_obj:HandleEvent(EVENTS.BaseCaptured)
-  function base_obj:OnEventBaseCaptured( EventData )
-    MESSAGE:NewType( "Base was captured", MESSAGE.Type.Information ):ToAll()
+  function base_obj:OnEventBaseCaptured(EventData)
+    if EventData.IniCoalition == coalition.side.RED then
+      setBaseRed(EventData.PlaceName)
+    else
+      setBaseBlue(EventData.PlaceName)
+    end
   end
 
   if base_obj == nil then
     MESSAGE:New("Invalid airbase name in main.lua: " .. base, 25):ToCoalition( coalition.side.BLUE )
-  else
-    local base_color = base_obj:GetCoalition()
-    for i=1,_NumDefenders do
-      local grp_name = base .. "-" .. tostring(i)
-      if base_color == coalition.side.BLUE then
-        local grp = GROUP:FindByName(grp_name)
-        if grp ~= nil then
-          env.info('Destroying group ' .. grp_name)
-
-          grp:Destroy()
-        else
-          env.info("Group does not exist: " .. grp)
-        end
-      else
-        env.info("Initializing group " .. grp_name)
-        local spawn_grp = SPAWN:New(grp_name)
-        if spawn_grp ~= nil then
-          spawn_grp:InitLimit(8, 1):SpawnScheduled(600,.9)
-          table.insert(_ZONES[base], grp_name)
-        else
-          env.info("ERROR! Spawn was nil for: " .. grp_name)
-        end
-      
-      end
-    end
   end
 end

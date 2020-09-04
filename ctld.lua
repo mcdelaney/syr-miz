@@ -41,13 +41,13 @@ ctld.slingLoad = false -- if false, crates can be used WITHOUT slingloading, by 
 ctld.enableSmokeDrop = true -- if false, helis and c-130 will not be able to drop smoke
 
 ctld.maxExtractDistance = 125 -- max distance from vehicle to troops to allow a group extraction
-ctld.maximumDistanceLogistic = 200 -- max distance from vehicle to logistics to allow a loading or spawning operation
+ctld.maximumDistanceLogistic = 2000 -- max distance from vehicle to logistics to allow a loading or spawning operation
 ctld.maximumSearchDistance = 4000 -- max distance for troops to search for enemy
 ctld.maximumMoveDistance = 2000 -- max distance for troops to move from drop point if no enemy is nearby
 
-ctld.minimumDeployDistance = 1000 -- minimum distance from a friendly pickup zone where you can deploy a crate
+ctld.minimumDeployDistance = 0 -- minimum distance from a friendly pickup zone where you can deploy a crate
 
-ctld.numberOfTroops = 10 -- default number of troops to load on a transport heli or C-130 
+ctld.numberOfTroops = 10 -- default number of troops to load on a transport heli or C-130
 							-- also works as maximum size of group that'll fit into a helicopter unless overridden
 ctld.enableFastRopeInsertion = true -- allows you to drop troops by fast rope
 ctld.fastRopeMaximumHeight = 18.28 -- in meters which is 60 ft max fast rope (not rappell) safe height
@@ -76,7 +76,7 @@ ctld.buildTimeFOB = 30 --time in seconds for the FOB to be built
 
 ctld.crateWaitTime = 30 -- time in seconds to wait before you can spawn another crate
 
-ctld.forceCrateToBeMoved = true -- a crate must be picked up at least once and moved before it can be unpacked. Helps to reduce crate spam
+ctld.forceCrateToBeMoved = false -- a crate must be picked up at least once and moved before it can be unpacked. Helps to reduce crate spam
 
 ctld.radioSound = "beacon.ogg" -- the name of the sound file to use for the FOB radio beacons. If this isnt added to the mission BEACONS WONT WORK!
 ctld.radioSoundFC3 = "beaconsilent.ogg" -- name of the second silent radio file, used so FC3 aircraft dont hear ALL the beacon noises... :)
@@ -151,27 +151,27 @@ ctld.JTAC_lock = "all" -- "vehicle" OR "troop" OR "all" forces JTAC to only lock
 
 --pickupZones = { "Zone name or Ship Unit Name", "smoke color", "limit (-1 unlimited)", "ACTIVE (yes/no)", "side (0 = Both sides / 1 = Red / 2 = Blue )", flag number (optional) }
 ctld.pickupZones = {
-    { "pickzone1", "blue", -1, "yes", 2 },
-    { "pickzone2", "blue", -1, "yes", 2 },
-    { "pickzone3", "blue", -1, "yes", 2 },
-    { "pickzone4", "blue", -1, "yes", 2 },
-    { "pickzone5", "blue", -1, "yes", 2 },
-    { "pickzone6", "blue", -1, "yes", 2 },
-    { "pickzone7", "blue", -1, "yes", 2 },
-    { "pickzone8", "blue", -1, "yes", 2 },
-    { "pickzone9", "blue", -1, "yes", 2 }, -- limits pickup zone 9 to 5 groups of soldiers or vehicles, only red can pick up
-    { "pickzone10", "blue", -1, "yes", 2 },  -- limits pickup zone 10 to 10 groups of soldiers or vehicles, only blue can pick up
+    { "pickupzone1", "blue", -1, "yes", 2 },
+    { "pickupzone2", "blue", -1, "yes", 2 },
+    { "pickupzone3", "blue", -1, "yes", 2 },
+    { "pickupzone4", "blue", -1, "yes", 2 },
+    { "pickupzone5", "blue", -1, "yes", 2 },
+    { "pickupzone6", "blue", -1, "yes", 2 },
+    { "pickupzone7", "blue", -1, "yes", 2 },
+    { "pickupzone8", "blue", -1, "yes", 2 },
+    { "pickupzone9", "blue", -1, "yes", 2 }, -- limits pickup zone 9 to 5 groups of soldiers or vehicles, only red can pick up
+    { "pickupzone10", "blue", -1, "yes", 2 },  -- limits pickup zone 10 to 10 groups of soldiers or vehicles, only blue can pick up
 
-    { "pickzone11", "blue", -1, "yes", 2 },  -- limits pickup zone 11 to 20 groups of soldiers or vehicles, only blue can pick up. Zone starts inactive!
-    { "pickzone12", "blue", -1, "yes", 2 },  -- limits pickup zone 11 to 20 groups of soldiers or vehicles, only blue can pick up. Zone starts inactive!
-    { "pickzone13", "blue", -1, "yes", 2 },
-    { "pickzone14", "blue", -1, "yes", 2 },
-    { "pickzone15", "blue", -1, "yes", 2 },
-    { "pickzone16", "blue", -1, "yes", 2 },
-    { "pickzone17", "blue", -1, "yes", 2 },
-    { "pickzone18", "blue", -1, "yes", 2 },
-    { "pickzone19", "blue", -1, "yes", 2 },
-    { "pickzone20", "blue", -1, "yes", 2, 1000 }, -- optional extra flag number to store the current number of groups available in
+    { "pickupzone11", "blue", -1, "yes", 2 },  -- limits pickup zone 11 to 20 groups of soldiers or vehicles, only blue can pick up. Zone starts inactive!
+    { "pickupzone12", "blue", -1, "yes", 2 },  -- limits pickup zone 11 to 20 groups of soldiers or vehicles, only blue can pick up. Zone starts inactive!
+    { "pickupzone13", "blue", -1, "yes", 2 },
+    { "pickupzone14", "blue", -1, "yes", 2 },
+    { "pickupzone15", "blue", -1, "yes", 2 },
+    { "pickupzone16", "blue", -1, "yes", 2 },
+    { "pickupzone17", "blue", -1, "yes", 2 },
+    { "pickupzone18", "blue", -1, "yes", 2 },
+    { "pickupzone19", "blue", -1, "yes", 2 },
+    { "pickupzone20", "blue", -1, "yes", 2, 1000 }, -- optional extra flag number to store the current number of groups available in
 
     { "USA Carrier", "blue", 10, "yes", 2, 1001 }, -- instead of a Zone Name you can also use the UNIT NAME of a ship
 }
@@ -363,6 +363,8 @@ ctld.extractableGroups = {
     "extract8",
     "extract9",
     "extract10",
+
+    "pickupzone9",
 
     "extract11",
     "extract12",
@@ -1413,51 +1415,51 @@ function ctld.spawnCrateStatic(_country, _unitId, _point, _name, _weight,_side)
                 --            ["cargoDisplayName"] = "cargo123",
                 --            ["CargoDisplayName"] = "cargo123",
             }
-        
+
 --[[ Placeholder for different type of cargo containers. Let's say pipes and trunks, fuel for FOB building
                         ["shape_name"] = "ab-212_cargo",
 			["type"] = "uh1h_cargo" --new type for the container previously used
-			
+
 			["shape_name"] = "ammo_box_cargo",
                         ["type"] = "ammo_cargo",
-			
+
 			["shape_name"] = "barrels_cargo",
                         ["type"] = "barrels_cargo",
 
                         ["shape_name"] = "bw_container_cargo",
                         ["type"] = "container_cargo",
-			
+
                         ["shape_name"] = "f_bar_cargo",
                         ["type"] = "f_bar_cargo",
-			
+
 			["shape_name"] = "fueltank_cargo",
                         ["type"] = "fueltank_cargo",
-			
+
 			["shape_name"] = "iso_container_cargo",
 			["type"] = "iso_container",
-			
+
 			["shape_name"] = "iso_container_small_cargo",
 			["type"] = "iso_container_small",
-			
+
 			["shape_name"] = "oiltank_cargo",
                         ["type"] = "oiltank_cargo",
-                        
+
 			["shape_name"] = "pipes_big_cargo",
-                        ["type"] = "pipes_big_cargo",			
-			
+                        ["type"] = "pipes_big_cargo",
+
 			["shape_name"] = "pipes_small_cargo",
 			["type"] = "pipes_small_cargo",
-			
+
 			["shape_name"] = "tetrapod_cargo",
 			["type"] = "tetrapod_cargo",
-			
+
 			["shape_name"] = "trunks_long_cargo",
 			["type"] = "trunks_long_cargo",
-			
+
 			["shape_name"] = "trunks_small_cargo",
 			["type"] = "trunks_small_cargo",
 ]]--
-	else	
+	else
             _crate = {
                 ["shape_name"] = "GeneratorF",
                 ["type"] = "GeneratorF",
