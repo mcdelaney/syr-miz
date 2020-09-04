@@ -4793,6 +4793,7 @@ function ctld.addF10MenuOptions()
                             missionCommands.addCommandForGroup(_groupId, "Drop Blue Smoke", _smokeMenu, ctld.dropSmoke, { _unitName, trigger.smokeColor.Blue })
                             missionCommands.addCommandForGroup(_groupId, "Drop Orange Smoke", _smokeMenu, ctld.dropSmoke, { _unitName, trigger.smokeColor.Orange })
                             missionCommands.addCommandForGroup(_groupId, "Drop Green Smoke", _smokeMenu, ctld.dropSmoke, { _unitName, trigger.smokeColor.Green })
+                            missionCommands.addCommandForGroup(_groupId, "Drop RGB Smoke", _smokeMenu, cltd.dropSmoke, { _unitName, trigger.smokeColor.Red , trigger.smokeColor.Green , trigger.smokeColor.Blue })
                         end
 
                         if ctld.enabledRadioBeaconDrop then
