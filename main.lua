@@ -100,8 +100,8 @@ A2ADispatcher:SetSquadron( "695 Squadron", "An Nasiriyah", { "695 Squadron" }, 2
 A2ADispatcher:SetSquadronGrouping( "695 Squadron", 2 )
 A2ADispatcher:SetSquadronGci( "695 Squadron", 900, 1200 )
 
-A2ADispatcher:SetSquadron( "Beirut-Squadron", "Beirut-Rafic Hariri", { "Beirut-Squadron" }, 4 ) --Su-30
-A2ADispatcher:SetSquadronGrouping( "Beirut-Squadron", 4 )
+A2ADispatcher:SetSquadron( "Beirut-Squadron", "Beirut-Rafic Hariri", { "Beirut-Squadron" }, 2 ) --Su-30
+A2ADispatcher:SetSquadronGrouping( "Beirut-Squadron", 2 )
 A2ADispatcher:SetSquadronGci( "Beirut-Squadron", 900, 1200 )
 
 A2ADispatcher:SetSquadron( "Russia GCI", "Bassel Al-Assad", { "Russia GCI" }, 2 ) --su30
