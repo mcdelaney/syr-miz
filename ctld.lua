@@ -4528,6 +4528,111 @@ function ctld.dropSmoke(_args)
         trigger.action.outTextForCoalition(_heli:getCoalition(), ctld.getPlayerNameOrType(_heli) .. " dropped " .. _colour .. " smoke ", 10)
     end
 end
+--i abandoned this not sure it works or how it works
+--[[function ctld.dropSmoke3color(_args)
+
+    local _heli = ctld.getTransportUnit(_args[1])
+
+    if _heli ~= nil then
+
+        local _colour = ""
+
+        if _args[2] == trigger.smokeColor.Red then
+
+            _colour = "RED"
+        elseif _args[2] == trigger.smokeColor.Blue then
+
+            _colour = "BLUE"
+        elseif _args[2] == trigger.smokeColor.Green then
+
+            _colour = "GREEN"
+        elseif _args[2] == trigger.smokeColor.Orange then
+
+            _colour = "ORANGE"
+        end
+       
+        if _args[3] == trigger.smokeColor.Red then
+    
+             _colour = "RED"
+        elseif _args[3] == trigger.smokeColor.Blue then
+    
+            _colour = "BLUE"
+        elseif _args[3] == trigger.smokeColor.Green then
+    
+            _colour = "GREEN"
+        elseif _args[3] == trigger.smokeColor.Orange then
+    
+            _colour = "ORANGE"
+        end
+
+        if _args[4] == trigger.smokeColor.Red then
+        
+            _colour = "RED"
+        elseif _args[4] == trigger.smokeColor.Blue then
+        
+                _colour = "BLUE"
+        elseif _args[4] == trigger.smokeColor.Green then
+        
+                _colour = "GREEN"
+        elseif _args[4] == trigger.smokeColor.Orange then
+        
+                _colour = "ORANGE"
+        end
+
+        local _point = _heli:getPoint()
+
+        local _pos2 = { x = _point.x, y = _point.z }
+        local _alt = land.getHeight(_pos2)
+        local _pos3 = { x = _point.x, y = _alt, z = _point.z }
+
+        trigger.action.smoke(_pos3, _args[2])
+        trigger.action.smoke(_pos3, _args[3])
+        trigger.action.smoke(_pos3, _args[4])
+
+        trigger.action.outTextForCoalition(_heli:getCoalition(), ctld.getPlayerNameOrType(_heli) .. " dropped " .. _colour .. " smoke ", 10)
+    end
+end
+]]
+--im trying this right now NASA
+function ctld.dropSmokeRGB(_args)
+   
+    local _heli = ctld.getTransportUnit(_args[1])
+    
+    if _heli ~= nil then
+    
+        local _point = _heli:getPoint()
+    
+        local _pos2 = { x = _point.x, y = _point.z }
+        local _alt = land.getHeight(_pos2)
+        local _pos3 = { x = _point.x, y = _alt, z = _point.z }
+           
+        --[[trigger.smokeColor
+                Green   0
+                Red     1
+                White   2
+                Orange  3
+                Blue    4
+        ]]
+    
+        local _colour = ""
+    
+        _colour = "RED"
+    
+        trigger.action.smoke(_pos3, trigger.smokeColor.Red)
+            
+        _colour = "BLUE"
+    
+        trigger.action.smoke(_pos3, trigger.smokeColor.Blue)
+        
+        _colour = "GREEN"
+            
+        trigger.action.smoke(_pos3, trigger.smokeColor.Green)
+    
+        end 
+    
+            trigger.action.outTextForCoalition(_heli:getCoalition(), ctld.getPlayerNameOrType(_heli) .. " dropped RGB smoke!) ", 10)
+end   
+
 
 function ctld.unitCanCarryVehicles(_unit)
 
@@ -4793,7 +4898,7 @@ function ctld.addF10MenuOptions()
                             missionCommands.addCommandForGroup(_groupId, "Drop Blue Smoke", _smokeMenu, ctld.dropSmoke, { _unitName, trigger.smokeColor.Blue })
                             missionCommands.addCommandForGroup(_groupId, "Drop Orange Smoke", _smokeMenu, ctld.dropSmoke, { _unitName, trigger.smokeColor.Orange })
                             missionCommands.addCommandForGroup(_groupId, "Drop Green Smoke", _smokeMenu, ctld.dropSmoke, { _unitName, trigger.smokeColor.Green })
-                            missionCommands.addCommandForGroup(_groupId, "Drop RGB Smoke", _smokeMenu, cltd.dropSmoke, { _unitName, trigger.smokeColor.Red , trigger.smokeColor.Green , trigger.smokeColor.Blue })
+                            missionCommands.addCommandForGroup(_groupId, "Drop RGB Smoke", _smokeMenu, ctld.dropSmokeRGB, { _unitName, trigger.smokeColor.White })
                         end
 
                         if ctld.enabledRadioBeaconDrop then
