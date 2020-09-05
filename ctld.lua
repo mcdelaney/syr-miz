@@ -172,6 +172,13 @@ ctld.pickupZones = {
     { "logizone-Hatay", "blue", -1, "yes", 2 },
     { "logizone-Aleppo", "blue", -1, "yes", 2 },
     { "logizone-Ramat David", "blue", -1, "yes", 2 },
+    { "logizone-Taftanaz", "blue", -1, "yes", 2 },
+    { "logizone-Abu al-Duhur", "blue", -1, "yes", 2 },
+    { "logizone-Bassel Al-Assad", "blue", -1, "yes", 2 },
+    { "logizone-Rene Mouawad", "blue", -1, "yes", 2 },
+    { "logizone-Rayak", "blue", -1, "yes", 2 },
+    { "logizone-Hama", "blue", -1, "yes", 2 },
+    { "logizone-Haifa", "blue", -1, "yes", 2 },
     { "pickupzone19", "blue", -1, "yes", 2 },
     { "pickupzone20", "blue", -1, "yes", 2, 1000 }, -- optional extra flag number to store the current number of groups available in
 
@@ -206,6 +213,8 @@ ctld.dropOffZones = {
     { "dropoffzone10", "blue", 2 },
     { "dropoffzone11", "blue", 2 },
     { "dropoffzone12", "blue", 2 },
+
+    {"logizone-Hatay", "blue", 2},
 }
 
 
@@ -235,6 +244,12 @@ ctld.transportPilotNames = {
     "transportplane5",
     "transportplane6",
     "transportplane7",
+    "transportplane8",
+    "transportplane9",
+    "transportplane10",
+    "transportplane11",
+    "transportplane12",
+    "transportplane13",
     "helicargo1",
     "helicargo2",
     "helicargo3",
@@ -391,6 +406,8 @@ ctld.extractableGroups = {
     "extract23",
     "extract24",
     "extract25",
+
+    "logizone-Hatay",
 }
 
 -- ************** Logistics UNITS FOR CRATE SPAWNING ******************
@@ -424,6 +441,9 @@ ctld.vehicleTransportEnabled = {
     "C-130",
     "C-101CC",
     "TF-51D",
+    "P-51D",
+    "C-101",
+    "L-39C",
 }
 
 
@@ -4345,25 +4365,26 @@ function ctld.inDropoffZone(_heli)
         return false
     end
 
-    local _heliPoint = _heli:getPoint()
+    return true
+    -- local _heliPoint = _heli:getPoint()
 
-    for _, _zoneDetails in pairs(ctld.dropOffZones) do
+    -- for _, _zoneDetails in pairs(ctld.dropOffZones) do
 
-        local _triggerZone = trigger.misc.getZone(_zoneDetails[1])
+    --     local _triggerZone = trigger.misc.getZone(_zoneDetails[1])
 
-        if _triggerZone ~= nil and (_zoneDetails[3] == _heli:getCoalition() or _zoneDetails[3]== 0) then
+    --     if _triggerZone ~= nil and (_zoneDetails[3] == _heli:getCoalition() or _zoneDetails[3]== 0) then
 
-            --get distance to center
+    --         --get distance to center
 
-            local _dist = ctld.getDistance(_heliPoint, _triggerZone.point)
+    --         local _dist = ctld.getDistance(_heliPoint, _triggerZone.point)
 
-            if _dist <= _triggerZone.radius then
-                return true
-            end
-        end
-    end
+    --         if _dist <= _triggerZone.radius then
+    --             return true
+    --         end
+    --     end
+    -- end
 
-    return false
+    -- return false
 end
 
 -- are we in a waypoint zone
