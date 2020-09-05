@@ -169,16 +169,20 @@ ctld.pickupZones = {
     { "pickupzone15", "blue", -1, "yes", 2 },
     { "pickupzone16", "blue", -1, "yes", 2 },
     { "pickupzone17", "blue", -1, "yes", 2 },
-    { "logizone-Hatay", "blue", -1, "yes", 2 },
-    { "logizone-Aleppo", "blue", -1, "yes", 2 },
-    { "logizone-Ramat David", "blue", -1, "yes", 2 },
-    { "logizone-Taftanaz", "blue", -1, "yes", 2 },
-    { "logizone-Abu al-Duhur", "blue", -1, "yes", 2 },
-    { "logizone-Bassel Al-Assad", "blue", -1, "yes", 2 },
-    { "logizone-Rene Mouawad", "blue", -1, "yes", 2 },
-    { "logizone-Rayak", "blue", -1, "yes", 2 },
-    { "logizone-Hama", "blue", -1, "yes", 2 },
-    { "logizone-Haifa", "blue", -1, "yes", 2 },
+    { "logizone-Hatay", "blue", -1, "no", 2 },
+    { "logizone-Aleppo", "blue", -1, "no", 2 },
+    { "logizone-Ramat David", "blue", -1, "no", 2 },
+    { "logizone-Taftanaz", "blue", -1, "no", 2 },
+    { "logizone-Abu al-Duhur", "blue", -1, "no", 2 },
+    { "logizone-Bassel Al-Assad", "blue", -1, "no", 2 },
+    { "logizone-Beirut-Rafic Hariri", "blue", -1, "no", 2 },
+    { "logizone-Rene Mouawad", "blue", -1, "no", 2 },
+    { "logizone-Rayak", "blue", -1, "no", 2 },
+    { "logizone-Hama", "blue", -1, "no", 2 },
+    { "logizone-Haifa", "blue", -1, "no", 2 },
+    { "logizone-Damascus", "blue", -1, "no", 2 },
+    { "logizone-Khalkhalah", "blue", -1, "no", 2 },
+    { "logizone-Kiryat Shmona", "blue", -1, "no", 2 },
     { "pickupzone19", "blue", -1, "yes", 2 },
     { "pickupzone20", "blue", -1, "yes", 2, 1000 }, -- optional extra flag number to store the current number of groups available in
 
@@ -187,35 +191,39 @@ ctld.pickupZones = {
 
 
 -- dropOffZones = {"name","smoke colour",0,side 1 = Red or 2 = Blue or 0 = Both sides}
-ctld.dropOffZones = {
-    { "dropzone1", "blue", 2 },
-    { "dropzone2", "blue", 2 },
-    { "dropzone3", "blue", 2 },
-    { "dropzone4", "blue", 2 },
-    { "dropzone5", "blue", 2 },
-    { "dropzone6", "blue", 2 },
-    { "dropzone7", "blue", 2 },
-    { "dropzone8", "blue", 2 },
-    { "dropzone9", "blue", 2 },
-    { "dropzone10", "blue", 2 },
-    { "dropzone11", "blue", 2 },
-    { "dropzone12", "blue", 2 },
+ctld.dropOffZones = {}
+for _, elem in pairs(ctld.pickupZones) do
+    table.insert(ctld.dropOffZones, { elem[1], "blue", 2} )
+end
+-- ctld.dropOffZones = {
+--     { "dropzone1", "blue", 2 },
+--     { "dropzone2", "blue", 2 },
+--     { "dropzone3", "blue", 2 },
+--     { "dropzone4", "blue", 2 },
+--     { "dropzone5", "blue", 2 },
+--     { "dropzone6", "blue", 2 },
+--     { "dropzone7", "blue", 2 },
+--     { "dropzone8", "blue", 2 },
+--     { "dropzone9", "blue", 2 },
+--     { "dropzone10", "blue", 2 },
+--     { "dropzone11", "blue", 2 },
+--     { "dropzone12", "blue", 2 },
 
-    { "dropoffzone1", "blue", 2 },
-    { "dropoffzone2", "blue", 2 },
-    { "dropoffzone3", "blue", 2 },
-    { "dropoffzone4", "blue", 2 },
-    { "dropoffzone5", "blue", 2 },
-    { "dropoffzone6", "blue", 2 },
-    { "dropoffzone7", "blue", 2 },
-    { "dropoffzone8", "blue", 2 },
-    { "dropoffzone9", "blue", 2 },
-    { "dropoffzone10", "blue", 2 },
-    { "dropoffzone11", "blue", 2 },
-    { "dropoffzone12", "blue", 2 },
+--     { "dropoffzone1", "blue", 2 },
+--     { "dropoffzone2", "blue", 2 },
+--     { "dropoffzone3", "blue", 2 },
+--     { "dropoffzone4", "blue", 2 },
+--     { "dropoffzone5", "blue", 2 },
+--     { "dropoffzone6", "blue", 2 },
+--     { "dropoffzone7", "blue", 2 },
+--     { "dropoffzone8", "blue", 2 },
+--     { "dropoffzone9", "blue", 2 },
+--     { "dropoffzone10", "blue", 2 },
+--     { "dropoffzone11", "blue", 2 },
+--     { "dropoffzone12", "blue", 2 },
 
-    {"logizone-Hatay", "blue", 2},
-}
+--     {"logizone-Hatay", "blue", 2},
+-- }
 
 
 --wpZones = { "Zone name", "smoke color",  "ACTIVE (yes/no)", "side (0 = Both sides / 1 = Red / 2 = Blue )", }
@@ -406,8 +414,6 @@ ctld.extractableGroups = {
     "extract23",
     "extract24",
     "extract25",
-
-    "logizone-Hatay",
 }
 
 -- ************** Logistics UNITS FOR CRATE SPAWNING ******************

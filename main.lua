@@ -3,12 +3,7 @@ local module_folder = lfs.writedir()..[[Scripts\syr-miz\]]
 package.path = module_folder .. "?.lua;" .. package.path
 local io = require("io")
 local lfs = require("lfs")
-local jsonlib = lfs.writedir() .. "Scripts\\syr-miz\\json.lua"
-json = loadfile(jsonlib)()
-
 local utils = dofile(lfs.writedir() .. "Scripts\\syr-miz\\utils.lua")
--- utils = loadfile(utilsLib)()
-
 
 local BASE_FILE = lfs.writedir() .. "Scripts\\syr-miz\\state.json"
 local _BASES = {}
@@ -18,7 +13,6 @@ local ContestedBases = { "Aleppo", "Taftanaz", "Abu al-Duhur",
                          "Bassel Al-Assad", "Beirut-Rafic Hariri",
                          "Damascus" }
 local _NumAirbaseDefenders = 1
-
 
 if utils.file_exists(BASE_FILE) then
   _BASES = utils.readState(BASE_FILE)
@@ -34,20 +28,14 @@ local function prune_enemies(Site, name)
   local countTotal=Site:Count()
   local sitesKeep = UTILS.Round(countTotal/100*50, 0)
   local sitesDestroy = countTotal - sitesKeep
+  env.info("Pruning from site " .. name..": "..tostring(sitesDestroy))
     for i = 1, sitesDestroy do
       local grpObj = Site:GetRandom()
-      env.info("Pruning from site " .. name)
       grpObj:Destroy(true)
     end
+  env.info("Total after prune: "..name.." - "..tostring(Site:Count()))
 end
 
-local function tablefind(tab,el)
-  for index, value in pairs(tab) do
-    if value == el then
-      return index
-    end
-  end
-end
 
 
 local function destroyIfExists(grp_name, is_static)
@@ -64,15 +52,6 @@ local function destroyIfExists(grp_name, is_static)
   end
 end
 
-
-
-local function removeValueFromTableIfExists(tableRef, value)
-  local key = tablefind(tableRef, value)
-  if key ~= nil then
-      env.info("Removing key for logisticUnit...")
-      table.remove(tableRef, key)
-  end
-end
 
 
 local function setBaseRed(baseName)
@@ -102,26 +81,12 @@ local function setBaseBlue(baseName, startup)
   end
   logisticUnit:SpawnFromCoordinate(logisticCoord, 10, logUnitName)
   table.insert(ctld.logisticUnits, logUnitName)
-  table.insert(ctld.dropOffZones, {logZone, "blue", 2})
-  env.info(ctld.pickupZones)
-  table.insert(ctld.pickupZones, { logZone, "blue", -1, "yes", 2 })
-  env.info(ctld.pickupZones)
-  -- table.insert(ctld.extractZones, logZone)
+  -- table.insert(ctld.dropOffZones, {logZone, "blue", 2})
+  -- table.insert(ctld.pickupZones, { logZone, "blue", -1, "yes", 2 })
+  ctld.activatePickupZone(logZone)
   MESSAGE:NewType( baseName.." was captured by Blue!",
                     MESSAGE.Type.Information ):ToAll()
 end
-
-
-function saveBases(data)
-  env.info("Writing State to " .. BASE_FILE)
-  local fp = io.open(BASE_FILE, 'w')
-  fp:write(json:encode(data))
-  fp:close()
-  env.info("Done writing state.")
-end
-
-
-
 
 
 local SAMS = {}
@@ -133,7 +98,7 @@ SAMS["EWR"] = SET_GROUP:New():FilterPrefixes("EWR"):FilterActive(true):FilterSta
 
 if INIT then
   for k, sam in pairs(SAMS) do
-    prune_enemies(sam, k)
+    pcall(function(_args) prune_enemies(sam, k) end)
   end
 end
 
@@ -169,9 +134,9 @@ for _, base in pairs(ContestedBases) do
     else
       setBaseBlue(EventData.PlaceName)
     end
-    saveBases(_BASES)
+    utils.saveTable(_BASES, BASE_FILE)
   end
-  saveBases(_BASES)
+  utils.saveTable(_BASES, BASE_FILE)
 end
 
 
