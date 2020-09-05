@@ -169,7 +169,9 @@ ctld.pickupZones = {
     { "pickupzone15", "blue", -1, "yes", 2 },
     { "pickupzone16", "blue", -1, "yes", 2 },
     { "pickupzone17", "blue", -1, "yes", 2 },
-    { "pickupzone18", "blue", -1, "yes", 2 },
+    { "logizone-Hatay", "blue", -1, "yes", 2 },
+    { "logizone-Aleppo", "blue", -1, "yes", 2 },
+    { "logizone-Ramat David", "blue", -1, "yes", 2 },
     { "pickupzone19", "blue", -1, "yes", 2 },
     { "pickupzone20", "blue", -1, "yes", 2, 1000 }, -- optional extra flag number to store the current number of groups available in
 
@@ -226,6 +228,13 @@ ctld.wpZones = {
 
 -- Use any of the predefined names or set your own ones
 ctld.transportPilotNames = {
+    "transportplane1",
+    "transportplane2",
+    "transportplane3",
+    "transportplane4",
+    "transportplane5",
+    "transportplane6",
+    "transportplane7",
     "helicargo1",
     "helicargo2",
     "helicargo3",
@@ -413,6 +422,8 @@ ctld.logisticUnits = {
 ctld.vehicleTransportEnabled = {
     "76MD", -- the il-76 mod doesnt use a normal - sign so il-76md wont match... !!!! GRR
     "C-130",
+    "C-101CC",
+    "TF-51D",
 }
 
 

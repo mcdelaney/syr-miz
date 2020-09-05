@@ -155,7 +155,7 @@ local function setBaseBlue(baseName, startup)
   local logisticCoordZone = ZONE:FindByName(logZone, false)
   if logisticCoordZone == nil then
     env.info("Zone does not exist for "..logZone..". Creating one...")
-    logisticCoordZone = ZONE_RADIUS:New(logZone, AIRBASE:FindByName(baseName):GetVec2(),100)
+    logisticCoordZone = ZONE_RADIUS:New(logZone, AIRBASE:FindByName(baseName):GetVec2(),1000)
     -- logisticCoordZone = ZONE:FindByName(logZone)
   end
   local logisticCoord = logisticCoordZone:GetPointVec2()
@@ -166,9 +166,9 @@ local function setBaseBlue(baseName, startup)
   logisticUnit:SpawnFromCoordinate(logisticCoord, 10, logUnitName)
   table.insert(ctld.logisticUnits, logUnitName)
   table.insert(ctld.dropOffZones, {logZone, "blue", 2})
-  table.insert(ctld.pickupZones, { logZone, "blue", -1, "yes", 2 })
+  -- table.insert(ctld.pickupZones, { logZone, "blue", -1, "yes", 2 })
   table.insert(ctld.extractZones, logZone)
-
+  -- ctld.activatePickupZone(logZone)
   MESSAGE:NewType( baseName.." was captured by Blue!",
                     MESSAGE.Type.Information ):ToAll()
 end
