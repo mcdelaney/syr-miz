@@ -19,9 +19,6 @@ local readState = function (state_file)
     local state = statefile:read("*all")
     statefile:close()
     local saved_game_state = json:decode(state)
-    for k, v in pairs(saved_game_state) do
-      env.info(k .."-"..v)
-    end
     return saved_game_state
   end
 

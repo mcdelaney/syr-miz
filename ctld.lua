@@ -89,10 +89,10 @@ ctld.allowRandomAiTeamPickups = false -- Allows the AI to randomize the loading 
 
 -- Simulated Sling load configuration
 
-ctld.minimumHoverHeight = 5.5 -- Lowest allowable height for crate hover
+ctld.minimumHoverHeight = 3.5 -- Lowest allowable height for crate hover
 ctld.maximumHoverHeight = 20.0 -- Highest allowable height for crate hover
 ctld.maxDistanceFromCrate = 15.5 -- Maximum distance from from crate for hover
-ctld.hoverTime = 5 -- Time to hold hover above a crate for loading in seconds
+ctld.hoverTime = 1 -- Time to hold hover above a crate for loading in seconds
 
 -- end of Simulated Sling load configuration
 
@@ -2943,12 +2943,12 @@ function ctld.unpackCrates(_arguments)
             local _crate = ctld.getClosestCrate(_heli, _crates)
 
 
-            if ctld.inLogisticsZone(_heli) == true  or  ctld.farEnoughFromLogisticZone(_heli) == false then
+            -- if ctld.inLogisticsZone(_heli) == true  or  ctld.farEnoughFromLogisticZone(_heli) == false then
 
-                ctld.displayMessageToGroup(_heli, "You can't unpack that here! Take it to where it's needed!", 20)
+            --     ctld.displayMessageToGroup(_heli, "You can't unpack that here! Take it to where it's needed!", 20)
 
-                return
-            end
+            --     return
+            -- end
 
 
 
