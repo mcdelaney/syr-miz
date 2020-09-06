@@ -318,9 +318,9 @@ redIADS = SkynetIADS:create('SYRIA')
 redIADS:setUpdateInterval(15)
 redIADS:addEarlyWarningRadarsByPrefix('EWR')
 redIADS:addSAMSitesByPrefix('SAM')
-redIADS:getSAMSitesByNatoName('SA-2'):setGoLiveRangeInPercent(70)
-redIADS:getSAMSitesByNatoName('SA-3'):setGoLiveRangeInPercent(70)
-redIADS:getSAMSitesByNatoName('SA-10'):setGoLiveRangeInPercent(70)
+redIADS:getSAMSitesByNatoName('SA-2'):setGoLiveRangeInPercent(80)
+redIADS:getSAMSitesByNatoName('SA-3'):setGoLiveRangeInPercent(80)
+redIADS:getSAMSitesByNatoName('SA-10'):setGoLiveRangeInPercent(80)
 redIADS:activate()
 
 -- Define a SET_GROUP object that builds a collection of groups that define the EWR network.
