@@ -18,7 +18,8 @@ local INIT = true
 
 local ContestedBases = {
   "Aleppo",
-  "Taftanaz", "Abu al-Duhur",
+  "Taftanaz",
+  "Abu al-Duhur",
   "Hatay",
   "Haifa",
   "Ramat David",
@@ -28,6 +29,7 @@ local ContestedBases = {
   "Damascus",
   "Hama"
 }
+
 local _NumAirbaseDefenders = 1
 
 if utils.file_exists(BASE_FILE) then
@@ -143,7 +145,6 @@ INIT_CTLD_UNITS = function(args, coords2D, _country, ctld_unitIndex, key)
 
       --Debug
       --trigger.action.outTextForCoalition(2,"CTLD Unit: "..CTLD_Group.name, 30)
-
       --Increment Index and spawn unit
       ctld_unitIndex[key] = unitNumber + 1
       local _spawnedGroup = mist.dynAdd(CTLD_Group)
@@ -290,6 +291,7 @@ SAMS["SA10sam"] = SET_GROUP:New():FilterPrefixes("SAM-SA10"):FilterActive(true):
 SAMS["EWR"] = SET_GROUP:New():FilterPrefixes("EWR"):FilterActive(true):FilterStart()
 
 if INIT then
+
   for k, sam in pairs(SAMS) do
     pcall(function(_args) prune_enemies(sam, k) end)
   end
@@ -298,6 +300,33 @@ else
     removeUnit(unit)
   end
 end
+
+
+
+redIADS = SkynetIADS:create('SYRIA')
+redIADS:setUpdateInterval(15)
+-- redIADS:addEarlyWarningRadarsByPrefix('EWR')
+redIADS:addSAMSitesByPrefix('SAM')
+redIADS:getSAMSitesByNatoName('SA-2'):setGoLiveRangeInPercent(80)
+redIADS:getSAMSitesByNatoName('SA-3'):setGoLiveRangeInPercent(80)
+redIADS:getSAMSitesByNatoName('SA-10'):setGoLiveRangeInPercent(80)
+redIADS:getSAMSitesByNatoName('SA-6'):setGoLiveRangeInPercent(80)
+redIADS:activate()
+
+-- Define a SET_GROUP object that builds a collection of groups that define the EWR network.
+DetectionSetGroup = SET_GROUP:New()
+DetectionSetGroup:FilterPrefixes("EWR")
+DetectionSetGroup:FilterStart()
+Detection = DETECTION_AREAS:New( DetectionSetGroup, 60000 )
+redIADS:addMooseSetGroup(DetectionSetGroup)
+
+A2ADispatcher = AI_A2A_DISPATCHER:New( Detection )
+A2ADispatcher:SetEngageRadius(50000)
+A2ADispatcher:SetGciRadius(100000)
+-- A2ADispatcher:SetIntercept( 450 )
+
+BorderZone = ZONE_POLYGON:New( "RED-BORDER", GROUP:FindByName( "SyAF-GCI" ) )
+A2ADispatcher:SetBorderZone( BorderZone )
 
 -- For reach numbered group, for each airbase,
 -- Attempt to find the group, destroying it if the airbase is blue, and activating it
@@ -315,9 +344,21 @@ for _, base in pairs(ContestedBases) do
     setBaseBlue(base)
   else
     setBaseRed(base)
+
+    local sqd_name = base.."-cap"
+    if GROUP:FindByName(sqd_name) ~= nil then
+      A2ADispatcher:SetSquadron( sqd_name, base, { sqd_name } )
+      A2ADispatcher:SetDefaultTakeoffFromRunway(sqd_name)
+      A2ADispatcher:SetSquadronLandingAtRunway(sqd_name)
+      A2ADispatcher:SetSquadronOverhead( sqd_name, .5 )
+      A2ADispatcher:SetSquadronGrouping( sqd_name, 1 )
+      A2ADispatcher:SetSquadronGci( sqd_name, 900, 1200 )
+      A2ADispatcher:SetSquadronCapInterval( sqd_name, 1, 2, 5, 1 )
+    end
+
     for i=1,_NumAirbaseDefenders do
       local grp_name = base.."-"..tostring(i)
-      utils.log("Initializing group " .. grp_name)
+      env.info(base)
       local zone_base = ZONE_AIRBASE:New(base, 150):GetRandomPointVec2()
       local baseDef = SPAWN:NewWithAlias( "defenseBase", grp_name )
       baseDef:SpawnFromPointVec2(zone_base)
@@ -326,55 +367,8 @@ for _, base in pairs(ContestedBases) do
   utils.saveTable(_STATE, BASE_FILE)
 end
 
-
-redIADS = SkynetIADS:create('SYRIA')
-redIADS:setUpdateInterval(15)
-redIADS:addEarlyWarningRadarsByPrefix('EWR')
-redIADS:addSAMSitesByPrefix('SAM')
-redIADS:getSAMSitesByNatoName('SA-2'):setGoLiveRangeInPercent(80)
-redIADS:getSAMSitesByNatoName('SA-3'):setGoLiveRangeInPercent(80)
-redIADS:getSAMSitesByNatoName('SA-10'):setGoLiveRangeInPercent(80)
-redIADS:getSAMSitesByNatoName('SA-6'):setGoLiveRangeInPercent(80)
-redIADS:activate()
-
--- Define a SET_GROUP object that builds a collection of groups that define the EWR network.
-DetectionSetGroup = SET_GROUP:New()
-DetectionSetGroup:FilterPrefixes("EWR")
-DetectionSetGroup:FilterStart()
-Detection = DETECTION_AREAS:New( DetectionSetGroup, 30000 )
-redIADS:addMooseSetGroup(DetectionSetGroup)
-
-A2ADispatcher = AI_A2A_DISPATCHER:New( Detection )
-A2ADispatcher:SetEngageRadius(75000)
-A2ADispatcher:SetGciRadius(200000)
-A2ADispatcher:SetDefaultTakeoffFromParkingHot()
-A2ADispatcher:SetDefaultLandingAtRunway()
-BorderZone = ZONE_POLYGON:New( "RED-BORDER", GROUP:FindByName( "SyAF-GCI" ) )
-A2ADispatcher:SetBorderZone( BorderZone )
---SQNs
-A2ADispatcher:SetSquadron( "54 Squadron", "Marj Ruhayyil", { "54 Squadron" }, 5 )
-A2ADispatcher:SetSquadronGrouping( "54 Squadron", 2 )
-A2ADispatcher:SetSquadronGci( "54 Squadron", 900, 1200 )
-
-A2ADispatcher:SetSquadron( "698 Squadron", "Al-Dumayr", { "698 Squadron" }, 5 )
-A2ADispatcher:SetSquadronGrouping( "698 Squadron", 2 )
-A2ADispatcher:SetSquadronGci( "698 Squadron", 900, 1200 )
-
-A2ADispatcher:SetSquadron( "Hama-air", "Hama", { "Hama-air" }, 1 )
-A2ADispatcher:SetSquadronGrouping( "Hama-air", 1 )
-A2ADispatcher:SetSquadronGci( "Hama-air", 900, 1200 )
-
-A2ADispatcher:SetSquadron( "695 Squadron", "An Nasiriyah", { "695 Squadron" }, 5 )
-A2ADispatcher:SetSquadronGrouping( "695 Squadron", 2 )
-A2ADispatcher:SetSquadronGci( "695 Squadron", 900, 1200 )
-
-A2ADispatcher:SetSquadron( "Beirut-air", "Beirut-Rafic Hariri", { "Beirut-air" }, 5 )
-A2ADispatcher:SetSquadronGrouping( "Beirut-air", 2 )
-A2ADispatcher:SetSquadronGci( "Beirut-air", 900, 1200 )
-
-A2ADispatcher:SetSquadron( "Russia GCI", "Bassel Al-Assad", { "Russia GCI" }, 5 )
-A2ADispatcher:SetSquadronGrouping( "Russia GCI", 5 )
-A2ADispatcher:SetSquadronGci( "Russia GCI", 900, 1200 )
+A2ADispatcher:SetTacticalDisplay(true)
+A2ADispatcher:Start()
 
 
 EH1 = EVENTHANDLER:New()
@@ -418,5 +412,4 @@ function EH1:OnEventDead(EventData)
   utils.saveTable(_STATE, BASE_FILE)
 end
 
---A2ADispatcher:SetTacticalDisplay(true)
-A2ADispatcher:Start()
+
