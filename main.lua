@@ -1,21 +1,33 @@
 local io = require("io")
 local lfs = require("lfs")
-local module_folder = lfs.writedir()..[[Scripts\syr-miz\]]
-package.path = module_folder .. "?.lua;" .. package.path
-local utils = dofile(lfs.writedir() .. "Scripts\\syr-miz\\utils.lua")
-local ctld_config = dofile(lfs.writedir() .. "Scripts\\syr-miz\\ctld_config.lua")
+MODULE_FOLDER = lfs.writedir()..[[Scripts\syr-miz\]]
+package.path = MODULE_FOLDER .. "?.lua;" .. package.path
+-- local ctld = require("ctld.lua")
+local ctld_config = require("ctld_config")
+local utils = require("utils")
+
+
 local BASE_FILE = lfs.writedir() .. "Scripts\\syr-miz\\state.json"
 local _STATE = {}
 _STATE["bases"] = {}
 _STATE["ctld_units"] = {}
 _STATE["hawks"] = {}
-
-
+_STATE["dead"] = {}
 local INIT = true
-local ContestedBases = { "Aleppo", "Taftanaz", "Abu al-Duhur",
-                         "Hatay", "Haifa", "Ramat David",
-                         "Bassel Al-Assad", "Beirut-Rafic Hariri",
-                         "Damascus" }
+
+
+local ContestedBases = {
+  "Aleppo",
+  "Taftanaz", "Abu al-Duhur",
+  "Hatay",
+  "Haifa",
+  "Ramat David",
+  "Rayak",
+  "Bassel Al-Assad",
+  "Beirut-Rafic Hariri",
+  "Damascus",
+  "Hama"
+}
 local _NumAirbaseDefenders = 1
 
 if utils.file_exists(BASE_FILE) then
@@ -25,12 +37,12 @@ if utils.file_exists(BASE_FILE) then
     INIT = false
   end
 else
-  env.info("No state file exists..")
+  utils.log("No state file exists..")
 end
 
-function enumerateCTLD()
+local function enumerateCTLD()
   local CTLDstate = {}
-  env.info("Enumerating CTLD")
+  utils.log("Enumerating CTLD")
   for _groupname, _groupdetails in pairs(ctld.completeAASystems) do
       local CTLDsite = {}
       for k,v in pairs(_groupdetails) do
@@ -39,7 +51,7 @@ function enumerateCTLD()
       CTLDstate[_groupname] = CTLDsite
   end
   _STATE["hawks"] = CTLDstate
-  env.info("Done Enumerating CTLD")
+  utils.log("Done Enumerating CTLD")
 end
 
 ctld.addCallback(function(_args)
@@ -78,7 +90,7 @@ ctld.addCallback(function(_args)
               pos={x=coord.x, y=coord.y, z=coord.z}
           })
 
-      -- enumerateCTLD()
+      enumerateCTLD()
       utils.saveTable(_STATE, BASE_FILE)
   end
 end)
@@ -139,7 +151,7 @@ INIT_CTLD_UNITS = function(args, coords2D, _country, ctld_unitIndex, key)
       return Group.getByName(_spawnedGroup.name)              --Group object
   end
 
-  log("START: Spawning CTLD units from state")
+  utils.log("START: Spawning CTLD units from state")
   local ctld_unitIndex = ctld_config.unit_index
   for idx, data in ipairs(_STATE["ctld_units"]) do
 
@@ -204,6 +216,11 @@ INIT_CTLD_UNITS = function(args, coords2D, _country, ctld_unitIndex, key)
           local key = "Roland_Index"
           INIT_CTLD_UNITS(ctld_config.unit_config["Roland ADS"], coords2D, country, ctld_unitIndex, key)
       end
+
+      if data.name == 'ipv' then
+        local key = "IPV_Index"
+        INIT_CTLD_UNITS(ctld_config.unit_config["IPV LAV-25"], coords2D, country, ctld_unitIndex, key)
+    end
   end
 
   local CTLDstate = _STATE["hawks"]
@@ -219,41 +236,33 @@ local function prune_enemies(Site, name)
   local countTotal=Site:Count()
   local sitesKeep = UTILS.Round(countTotal/100*50, 0)
   local sitesDestroy = countTotal - sitesKeep
-  env.info("Pruning from site " .. name..": "..tostring(sitesDestroy))
+  utils.log("Pruning from site " .. name..": "..tostring(sitesDestroy))
     for i = 1, sitesDestroy do
       local grpObj = Site:GetRandom()
       grpObj:Destroy(true)
     end
-  env.info("Total after prune: "..name.." - "..tostring(Site:Count()))
+  utils.log("Total after prune: "..name.." - "..tostring(Site:Count()))
 end
 
-
-
-local function destroyIfExists(grp_name, is_static)
-  if is_static then
-    local grp = STATIC:FindByName(grp_name, false)
-  else
-    local grp = GROUP:FindByName(grp_name, false)
-  end
-
+local function removeUnit (unitName)
+  utils.log("Removing previously destroyed unit: "..unitName)
+  local grp = GROUP:FindByName(unitName)
   if grp ~= nil then
-    env.info('Destroying Object ' .. grp_name)
     grp:Destroy()
   end
 end
 
-
 local function setBaseRed(baseName)
-  env.info("Setting "..baseName.." as red...")
+  utils.log("Setting "..baseName.." as red...")
   local logUnitName = "logistic-"..baseName
   local logZone = 'logizone-'..baseName
-  destroyIfExists(logUnitName, true)
+  utils.destroyIfExists(logUnitName, true)
   MESSAGE:New( baseName.." was captured by Red!", 5):ToAll()
 end
 
 
 local function setBaseBlue(baseName, startup)
-  env.info("Setting "..baseName.." as blue...")
+  utils.log("Setting "..baseName.." as blue...")
   local logUnitName = "logistic-"..baseName
   local logZone = 'logizone-'..baseName
   local logisticCoordZone = ZONE:FindByName(logZone, false)
@@ -264,7 +273,7 @@ local function setBaseBlue(baseName, startup)
   local logisticCoord = logisticCoordZone:GetPointVec2()
   local logisticUnit = SPAWNSTATIC:NewFromStatic("logisticBase", country.id.USA)
   if logisticUnit == nil then
-    env.info("Could not find base logistic unit")
+    utils.log("Could not find base logistic unit")
   end
   logisticUnit:SpawnFromCoordinate(logisticCoord, 10, logUnitName)
   table.insert(ctld.logisticUnits, logUnitName)
@@ -283,6 +292,10 @@ SAMS["EWR"] = SET_GROUP:New():FilterPrefixes("EWR"):FilterActive(true):FilterSta
 if INIT then
   for k, sam in pairs(SAMS) do
     pcall(function(_args) prune_enemies(sam, k) end)
+  end
+else
+  for _, unit in pairs(_STATE["dead"]) do
+    removeUnit(unit)
   end
 end
 
@@ -304,7 +317,7 @@ for _, base in pairs(ContestedBases) do
     setBaseRed(base)
     for i=1,_NumAirbaseDefenders do
       local grp_name = base.."-"..tostring(i)
-      env.info("Initializing group " .. grp_name)
+      utils.log("Initializing group " .. grp_name)
       local zone_base = ZONE_AIRBASE:New(base, 150):GetRandomPointVec2()
       local baseDef = SPAWN:NewWithAlias( "defenseBase", grp_name )
       baseDef:SpawnFromPointVec2(zone_base)
@@ -321,80 +334,47 @@ redIADS:addSAMSitesByPrefix('SAM')
 redIADS:getSAMSitesByNatoName('SA-2'):setGoLiveRangeInPercent(80)
 redIADS:getSAMSitesByNatoName('SA-3'):setGoLiveRangeInPercent(80)
 redIADS:getSAMSitesByNatoName('SA-10'):setGoLiveRangeInPercent(80)
+redIADS:getSAMSitesByNatoName('SA-6'):setGoLiveRangeInPercent(80)
 redIADS:activate()
 
 -- Define a SET_GROUP object that builds a collection of groups that define the EWR network.
 DetectionSetGroup = SET_GROUP:New()
 DetectionSetGroup:FilterPrefixes("EWR")
 DetectionSetGroup:FilterStart()
--- Setup the detection and group targets to a 30km range!
-Detection = DETECTION_AREAS:New( DetectionSetGroup, 10000 )
+Detection = DETECTION_AREAS:New( DetectionSetGroup, 30000 )
+redIADS:addMooseSetGroup(DetectionSetGroup)
+
 A2ADispatcher = AI_A2A_DISPATCHER:New( Detection )
-A2ADispatcher:SetEngageRadius(180000) -- 100000 is the default value.
-A2ADispatcher:SetGciRadius(100000) -- 200000 is the default value.
-A2ADispatcher:SetDefaultTakeoffFromParkingCold()
-A2ADispatcher:SetDefaultLandingAtEngineShutdown()
+A2ADispatcher:SetEngageRadius(75000)
+A2ADispatcher:SetGciRadius(200000)
+A2ADispatcher:SetDefaultTakeoffFromParkingHot()
+A2ADispatcher:SetDefaultLandingAtRunway()
 BorderZone = ZONE_POLYGON:New( "RED-BORDER", GROUP:FindByName( "SyAF-GCI" ) )
 A2ADispatcher:SetBorderZone( BorderZone )
 --SQNs
-A2ADispatcher:SetSquadron( "54 Squadron", "Marj Ruhayyil", { "54 Squadron" }, 2 ) --mig23
+A2ADispatcher:SetSquadron( "54 Squadron", "Marj Ruhayyil", { "54 Squadron" }, 5 )
 A2ADispatcher:SetSquadronGrouping( "54 Squadron", 2 )
 A2ADispatcher:SetSquadronGci( "54 Squadron", 900, 1200 )
 
-A2ADispatcher:SetSquadron( "698 Squadron", "Al-Dumayr", { "698 Squadron" }, 2 ) --mig29a
+A2ADispatcher:SetSquadron( "698 Squadron", "Al-Dumayr", { "698 Squadron" }, 5 )
 A2ADispatcher:SetSquadronGrouping( "698 Squadron", 2 )
 A2ADispatcher:SetSquadronGci( "698 Squadron", 900, 1200 )
 
-A2ADispatcher:SetSquadron( "695 Squadron", "An Nasiriyah", { "695 Squadron" }, 2 ) --mig23
+A2ADispatcher:SetSquadron( "Hama-air", "Hama", { "Hama-air" }, 1 )
+A2ADispatcher:SetSquadronGrouping( "Hama-air", 1 )
+A2ADispatcher:SetSquadronGci( "Hama-air", 900, 1200 )
+
+A2ADispatcher:SetSquadron( "695 Squadron", "An Nasiriyah", { "695 Squadron" }, 5 )
 A2ADispatcher:SetSquadronGrouping( "695 Squadron", 2 )
 A2ADispatcher:SetSquadronGci( "695 Squadron", 900, 1200 )
 
--- A2ADispatcher:SetSquadron( "Beirut-Squadron", "Beirut-Rafic Hariri", { "Beirut-Squadron" }, 2 ) --Su-30
--- A2ADispatcher:SetSquadronGrouping( "Beirut-Squadron", 2 )
--- A2ADispatcher:SetSquadronGci( "Beirut-Squadron", 900, 1200 )
+A2ADispatcher:SetSquadron( "Beirut-air", "Beirut-Rafic Hariri", { "Beirut-air" }, 5 )
+A2ADispatcher:SetSquadronGrouping( "Beirut-air", 2 )
+A2ADispatcher:SetSquadronGci( "Beirut-air", 900, 1200 )
 
-A2ADispatcher:SetSquadron( "Russia GCI", "Bassel Al-Assad", { "Russia GCI" }, 2 ) --su30
-A2ADispatcher:SetSquadronGrouping( "Russia GCI", 2 )
+A2ADispatcher:SetSquadron( "Russia GCI", "Bassel Al-Assad", { "Russia GCI" }, 5 )
+A2ADispatcher:SetSquadronGrouping( "Russia GCI", 5 )
 A2ADispatcher:SetSquadronGci( "Russia GCI", 900, 1200 )
-
---A2ADispatcher:SetTacticalDisplay(true)
-A2ADispatcher:Start()
-
--- add the MOOSE SET_GROUP to the IADS
---redIADS:addMooseSetGroup(DetectionSetGroup)
-
-local Zone={}
-Zone.Alpha   = ZONE:New("Aleppo")
-Zone.Bravo   = ZONE:New("Golan")
-local AllZones=SET_ZONE:New():FilterOnce()
-
-SCHEDULER:New( nil, function()
-  local mission=AUFTRAG:NewCAS(Zone.Alpha)
-  local fg=FLIGHTGROUP:New("2 Squadron-4")
-  fg:AddMission(mission)
-
-  local mission=AUFTRAG:NewCAS(Zone.Alpha)
-  local fg=FLIGHTGROUP:New("turkishCAS")
-  fg:AddMission(mission)
-
-  local mission=AUFTRAG:NewCAS(Zone.Bravo)
-  local fg=FLIGHTGROUP:New("976 Squadron AI")
-  fg:AddMission(mission)
-end, {},4, 900, .8)
-
-SCHEDULER:New( nil, function()
-  local mission=AUFTRAG:NewCAS(Zone.Alpha)
-  local fg=FLIGHTGROUP:New("825 Squadron-7")
-  fg:AddMission(mission)
-
-  local mission=AUFTRAG:NewCAS(Zone.Alpha)
-  local fg=FLIGHTGROUP:New("Warthog-6")
-  fg:AddMission(mission)
-
-  local mission=AUFTRAG:NewCAS(Zone.Bravo)
-  local fg=FLIGHTGROUP:New("767 Squadron")
-  fg:AddMission(mission)
-end, {},300, 900, .8)
 
 
 EH1 = EVENTHANDLER:New()
@@ -412,7 +392,7 @@ end
 EH1:HandleEvent(EVENTS.BaseCaptured)
 function EH1:OnEventBaseCaptured(EventData)
   if _STATE.bases[EventData.PlaceName] == EventData.IniCoalition then
-    MESSAGE:New(EventData.PlaceName.." is already capped but dcs is trash so we get this message twice", 5):ToAll()
+    return
   end
   _STATE.bases[EventData.PlaceName] = EventData.IniCoalition
   if EventData.IniCoalition == coalition.side.RED then
@@ -422,3 +402,21 @@ function EH1:OnEventBaseCaptured(EventData)
   end
   utils.saveTable(_STATE, BASE_FILE)
 end
+
+
+EH1:HandleEvent(EVENTS.Dead)
+function EH1:OnEventDead(EventData)
+  if EventData.IniCoalition == coalition.side.RED then
+    log("Marking object dead: "..EventData.IniGroupName)
+    if _STATE["dead"] == nil then
+      _STATE["dead"] = { EventData.IniGroupName }
+    else
+      table.insert(_STATE["dead"], EventData.IniGroupName)
+    end
+  end
+
+  utils.saveTable(_STATE, BASE_FILE)
+end
+
+--A2ADispatcher:SetTacticalDisplay(true)
+A2ADispatcher:Start()

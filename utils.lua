@@ -1,9 +1,19 @@
-local lfs = require("lfs")
-local module_folder = lfs.writedir()..[[Scripts\syr-miz\]]
-package.path = module_folder .. "?.lua;" .. package.path
+lfs = require("lfs")
+io = require("io")
+package.path = MODULE_FOLDER .. "?.lua;" .. package.path
 local jsonlib = lfs.writedir() .. "Scripts\\syr-miz\\json.lua"
 local json = loadfile(jsonlib)()
+logFile = io.open(lfs.writedir()..[[Logs\syr-miz.log]], "w")
 
+
+
+local function log(str)
+  if str == nil then str = 'nil' end
+  if logFile then
+      logFile:write(os.date("!%Y-%m-%dT%TZ") .. " | " .. str .."\r\n")
+      logFile:flush()
+  end
+end
 
 local file_exists = function(name)
     if lfs.attributes(name) then
@@ -14,7 +24,7 @@ local file_exists = function(name)
 end
 
 local readState = function (state_file)
-    env.info("Reading state...")
+    log("Reading state...")
     local statefile = io.open(state_file, "r")
     local state = statefile:read("*all")
     statefile:close()
@@ -34,19 +44,33 @@ end
 local removeValueFromTableIfExists = function(tableRef, value)
   local key = tablefind(tableRef, value)
   if key ~= nil then
-      env.info("Removing key for logisticUnit...")
+      log("Removing key for logisticUnit...")
       table.remove(tableRef, key)
   end
 end
 
 
 local saveTable = function(data, file_path)
-  env.info("Writing State to " .. file_path)
   local fp = io.open(file_path, 'w')
   fp:write(json:encode(data))
   fp:close()
-  env.info("Done writing state.")
 end
+
+
+local function destroyIfExists(grp_name, is_static)
+  local grp
+  if is_static then
+    grp = STATIC:FindByName(grp_name, false)
+  else
+    grp = GROUP:FindByName(grp_name, false)
+  end
+
+  if grp ~= nil then
+    log('Destroying Object ' .. grp_name)
+    grp:Destroy()
+  end
+end
+
 
 
 return {
@@ -54,5 +78,7 @@ return {
   readState = readState,
   tablefind = tablefind,
   saveTable = saveTable,
-  removeValueFromTableIfExists = removeValueFromTableIfExists
+  removeValueFromTableIfExists = removeValueFromTableIfExists,
+  destroyIfExists = destroyIfExists,
+  log = log,
 }
