@@ -4569,6 +4569,45 @@ function ctld.dropSmoke(_args)
     end
 end
 
+function ctld.dropSmokeRGB(_args)
+   
+    local _heli = ctld.getTransportUnit(_args[1])
+    
+    if _heli ~= nil then
+    
+        local _point = _heli:getPoint()
+    
+        local _pos2 = { x = _point.x, y = _point.z }
+        local _alt = land.getHeight(_pos2)
+        local _pos3 = { x = _point.x, y = _alt, z = _point.z }
+           
+        --[[trigger.smokeColor
+                Green   0
+                Red     1
+                White   2
+                Orange  3
+                Blue    4
+        ]]
+    
+        local _colour = ""
+    
+        _colour = "RED"
+    
+        trigger.action.smoke(_pos3, trigger.smokeColor.Red)
+            
+        _colour = "BLUE"
+    
+        trigger.action.smoke(_pos3, trigger.smokeColor.Blue)
+        
+        _colour = "GREEN"
+            
+        trigger.action.smoke(_pos3, trigger.smokeColor.Green)
+    
+        end 
+    
+            trigger.action.outTextForCoalition(_heli:getCoalition(), ctld.getPlayerNameOrType(_heli) .. " dropped RGB smoke!) ", 10)
+end   
+
 function ctld.unitCanCarryVehicles(_unit)
 
     local _type = string.lower(_unit:getTypeName())
@@ -4833,6 +4872,7 @@ function ctld.addF10MenuOptions()
                             missionCommands.addCommandForGroup(_groupId, "Drop Blue Smoke", _smokeMenu, ctld.dropSmoke, { _unitName, trigger.smokeColor.Blue })
                             missionCommands.addCommandForGroup(_groupId, "Drop Orange Smoke", _smokeMenu, ctld.dropSmoke, { _unitName, trigger.smokeColor.Orange })
                             missionCommands.addCommandForGroup(_groupId, "Drop Green Smoke", _smokeMenu, ctld.dropSmoke, { _unitName, trigger.smokeColor.Green })
+                            missionCommands.addCommandForGroup(_groupId, "Drop RGB Smoke", _smokeMenu, ctld.dropSmokeRGB, { _unitName, trigger.smokeColor.White })
                         end
 
                         if ctld.enabledRadioBeaconDrop then
