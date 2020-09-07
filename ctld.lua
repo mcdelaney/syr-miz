@@ -41,13 +41,13 @@ ctld.slingLoad = false -- if false, crates can be used WITHOUT slingloading, by 
 ctld.enableSmokeDrop = true -- if false, helis and c-130 will not be able to drop smoke
 
 ctld.maxExtractDistance = 125 -- max distance from vehicle to troops to allow a group extraction
-ctld.maximumDistanceLogistic = 200 -- max distance from vehicle to logistics to allow a loading or spawning operation
+ctld.maximumDistanceLogistic = 2000 -- max distance from vehicle to logistics to allow a loading or spawning operation
 ctld.maximumSearchDistance = 4000 -- max distance for troops to search for enemy
 ctld.maximumMoveDistance = 2000 -- max distance for troops to move from drop point if no enemy is nearby
 
-ctld.minimumDeployDistance = 1000 -- minimum distance from a friendly pickup zone where you can deploy a crate
+ctld.minimumDeployDistance = 0 -- minimum distance from a friendly pickup zone where you can deploy a crate
 
-ctld.numberOfTroops = 10 -- default number of troops to load on a transport heli or C-130 
+ctld.numberOfTroops = 10 -- default number of troops to load on a transport heli or C-130
 							-- also works as maximum size of group that'll fit into a helicopter unless overridden
 ctld.enableFastRopeInsertion = true -- allows you to drop troops by fast rope
 ctld.fastRopeMaximumHeight = 18.28 -- in meters which is 60 ft max fast rope (not rappell) safe height
@@ -76,7 +76,7 @@ ctld.buildTimeFOB = 30 --time in seconds for the FOB to be built
 
 ctld.crateWaitTime = 30 -- time in seconds to wait before you can spawn another crate
 
-ctld.forceCrateToBeMoved = true -- a crate must be picked up at least once and moved before it can be unpacked. Helps to reduce crate spam
+ctld.forceCrateToBeMoved = false -- a crate must be picked up at least once and moved before it can be unpacked. Helps to reduce crate spam
 
 ctld.radioSound = "beacon.ogg" -- the name of the sound file to use for the FOB radio beacons. If this isnt added to the mission BEACONS WONT WORK!
 ctld.radioSoundFC3 = "beaconsilent.ogg" -- name of the second silent radio file, used so FC3 aircraft dont hear ALL the beacon noises... :)
@@ -89,10 +89,10 @@ ctld.allowRandomAiTeamPickups = false -- Allows the AI to randomize the loading 
 
 -- Simulated Sling load configuration
 
-ctld.minimumHoverHeight = 5.5 -- Lowest allowable height for crate hover
+ctld.minimumHoverHeight = 3.5 -- Lowest allowable height for crate hover
 ctld.maximumHoverHeight = 20.0 -- Highest allowable height for crate hover
 ctld.maxDistanceFromCrate = 15.5 -- Maximum distance from from crate for hover
-ctld.hoverTime = 5 -- Time to hold hover above a crate for loading in seconds
+ctld.hoverTime = 1 -- Time to hold hover above a crate for loading in seconds
 
 -- end of Simulated Sling load configuration
 
@@ -151,60 +151,79 @@ ctld.JTAC_lock = "all" -- "vehicle" OR "troop" OR "all" forces JTAC to only lock
 
 --pickupZones = { "Zone name or Ship Unit Name", "smoke color", "limit (-1 unlimited)", "ACTIVE (yes/no)", "side (0 = Both sides / 1 = Red / 2 = Blue )", flag number (optional) }
 ctld.pickupZones = {
-    { "pickzone1", "blue", -1, "yes", 2 },
-    { "pickzone2", "blue", -1, "yes", 2 },
-    { "pickzone3", "blue", -1, "yes", 2 },
-    { "pickzone4", "blue", -1, "yes", 2 },
-    { "pickzone5", "blue", -1, "yes", 2 },
-    { "pickzone6", "blue", -1, "yes", 2 },
-    { "pickzone7", "blue", -1, "yes", 2 },
-    { "pickzone8", "blue", -1, "yes", 2 },
-    { "pickzone9", "blue", -1, "yes", 2 }, -- limits pickup zone 9 to 5 groups of soldiers or vehicles, only red can pick up
-    { "pickzone10", "blue", -1, "yes", 2 },  -- limits pickup zone 10 to 10 groups of soldiers or vehicles, only blue can pick up
+    { "pickupzone1", "blue", -1, "yes", 2 },
+    { "pickupzone2", "blue", -1, "yes", 2 },
+    { "pickupzone3", "blue", -1, "yes", 2 },
+    { "pickupzone4", "blue", -1, "yes", 2 },
+    { "pickupzone5", "blue", -1, "yes", 2 },
+    { "pickupzone6", "blue", -1, "yes", 2 },
+    { "pickupzone7", "blue", -1, "yes", 2 },
+    { "pickupzone8", "blue", -1, "yes", 2 },
+    { "pickupzone9", "blue", -1, "yes", 2 }, -- limits pickup zone 9 to 5 groups of soldiers or vehicles, only red can pick up
+    { "pickupzone10", "blue", -1, "yes", 2 },  -- limits pickup zone 10 to 10 groups of soldiers or vehicles, only blue can pick up
 
-    { "pickzone11", "blue", -1, "yes", 2 },  -- limits pickup zone 11 to 20 groups of soldiers or vehicles, only blue can pick up. Zone starts inactive!
-    { "pickzone12", "blue", -1, "yes", 2 },  -- limits pickup zone 11 to 20 groups of soldiers or vehicles, only blue can pick up. Zone starts inactive!
-    { "pickzone13", "blue", -1, "yes", 2 },
-    { "pickzone14", "blue", -1, "yes", 2 },
-    { "pickzone15", "blue", -1, "yes", 2 },
-    { "pickzone16", "blue", -1, "yes", 2 },
-    { "pickzone17", "blue", -1, "yes", 2 },
-    { "pickzone18", "blue", -1, "yes", 2 },
-    { "pickzone19", "blue", -1, "yes", 2 },
-    { "pickzone20", "blue", -1, "yes", 2, 1000 }, -- optional extra flag number to store the current number of groups available in
+    { "pickupzone11", "blue", -1, "yes", 2 },  -- limits pickup zone 11 to 20 groups of soldiers or vehicles, only blue can pick up. Zone starts inactive!
+    { "pickupzone12", "blue", -1, "yes", 2 },  -- limits pickup zone 11 to 20 groups of soldiers or vehicles, only blue can pick up. Zone starts inactive!
+    { "pickupzone13", "blue", -1, "yes", 2 },
+    { "pickupzone14", "blue", -1, "yes", 2 },
+    { "pickupzone15", "blue", -1, "yes", 2 },
+    { "pickupzone16", "blue", -1, "yes", 2 },
+    { "pickupzone17", "blue", -1, "yes", 2 },
+    { "logizone-Hatay", "blue", -1, "no", 2 },
+    { "logizone-Aleppo", "blue", -1, "no", 2 },
+    { "logizone-Ramat David", "blue", -1, "no", 2 },
+    { "logizone-Taftanaz", "blue", -1, "no", 2 },
+    { "logizone-Abu al-Duhur", "blue", -1, "no", 2 },
+    { "logizone-Bassel Al-Assad", "blue", -1, "no", 2 },
+    { "logizone-Beirut-Rafic Hariri", "blue", -1, "no", 2 },
+    { "logizone-Rene Mouawad", "blue", -1, "no", 2 },
+    { "logizone-Rayak", "blue", -1, "no", 2 },
+    { "logizone-Hama", "blue", -1, "no", 2 },
+    { "logizone-Haifa", "blue", -1, "no", 2 },
+    { "logizone-Damascus", "blue", -1, "no", 2 },
+    { "logizone-Khalkhalah", "blue", -1, "no", 2 },
+    { "logizone-Kiryat Shmona", "blue", -1, "no", 2 },
+    { "pickupzone19", "blue", -1, "yes", 2 },
+    { "pickupzone20", "blue", -1, "yes", 2, 1000 }, -- optional extra flag number to store the current number of groups available in
 
     { "USA Carrier", "blue", 10, "yes", 2, 1001 }, -- instead of a Zone Name you can also use the UNIT NAME of a ship
 }
 
 
 -- dropOffZones = {"name","smoke colour",0,side 1 = Red or 2 = Blue or 0 = Both sides}
-ctld.dropOffZones = {
-    { "dropzone1", "blue", 2 },
-    { "dropzone2", "blue", 2 },
-    { "dropzone3", "blue", 2 },
-    { "dropzone4", "blue", 2 },
-    { "dropzone5", "blue", 2 },
-    { "dropzone6", "blue", 2 },
-    { "dropzone7", "blue", 2 },
-    { "dropzone8", "blue", 2 },
-    { "dropzone9", "blue", 2 },
-    { "dropzone10", "blue", 2 },
-    { "dropzone11", "blue", 2 },
-    { "dropzone12", "blue", 2 },
+ctld.dropOffZones = {}
+for _, elem in pairs(ctld.pickupZones) do
+    table.insert(ctld.dropOffZones, { elem[1], "blue", 2} )
+end
+-- ctld.dropOffZones = {
+--     { "dropzone1", "blue", 2 },
+--     { "dropzone2", "blue", 2 },
+--     { "dropzone3", "blue", 2 },
+--     { "dropzone4", "blue", 2 },
+--     { "dropzone5", "blue", 2 },
+--     { "dropzone6", "blue", 2 },
+--     { "dropzone7", "blue", 2 },
+--     { "dropzone8", "blue", 2 },
+--     { "dropzone9", "blue", 2 },
+--     { "dropzone10", "blue", 2 },
+--     { "dropzone11", "blue", 2 },
+--     { "dropzone12", "blue", 2 },
 
-    { "dropoffzone1", "blue", 2 },
-    { "dropoffzone2", "blue", 2 },
-    { "dropoffzone3", "blue", 2 },
-    { "dropoffzone4", "blue", 2 },
-    { "dropoffzone5", "blue", 2 },
-    { "dropoffzone6", "blue", 2 },
-    { "dropoffzone7", "blue", 2 },
-    { "dropoffzone8", "blue", 2 },
-    { "dropoffzone9", "blue", 2 },
-    { "dropoffzone10", "blue", 2 },
-    { "dropoffzone11", "blue", 2 },
-    { "dropoffzone12", "blue", 2 },
-}
+--     { "dropoffzone1", "blue", 2 },
+--     { "dropoffzone2", "blue", 2 },
+--     { "dropoffzone3", "blue", 2 },
+--     { "dropoffzone4", "blue", 2 },
+--     { "dropoffzone5", "blue", 2 },
+--     { "dropoffzone6", "blue", 2 },
+--     { "dropoffzone7", "blue", 2 },
+--     { "dropoffzone8", "blue", 2 },
+--     { "dropoffzone9", "blue", 2 },
+--     { "dropoffzone10", "blue", 2 },
+--     { "dropoffzone11", "blue", 2 },
+--     { "dropoffzone12", "blue", 2 },
+
+--     {"logizone-Hatay", "blue", 2},
+-- }
 
 
 --wpZones = { "Zone name", "smoke color",  "ACTIVE (yes/no)", "side (0 = Both sides / 1 = Red / 2 = Blue )", }
@@ -226,6 +245,19 @@ ctld.wpZones = {
 
 -- Use any of the predefined names or set your own ones
 ctld.transportPilotNames = {
+    "transportplane1",
+    "transportplane2",
+    "transportplane3",
+    "transportplane4",
+    "transportplane5",
+    "transportplane6",
+    "transportplane7",
+    "transportplane8",
+    "transportplane9",
+    "transportplane10",
+    "transportplane11",
+    "transportplane12",
+    "transportplane13",
     "helicargo1",
     "helicargo2",
     "helicargo3",
@@ -364,6 +396,8 @@ ctld.extractableGroups = {
     "extract9",
     "extract10",
 
+    "pickupzone9",
+
     "extract11",
     "extract12",
     "extract13",
@@ -411,6 +445,11 @@ ctld.logisticUnits = {
 ctld.vehicleTransportEnabled = {
     "76MD", -- the il-76 mod doesnt use a normal - sign so il-76md wont match... !!!! GRR
     "C-130",
+    "C-101CC",
+    "TF-51D",
+    "P-51D",
+    "C-101",
+    "L-39C",
 }
 
 
@@ -1413,51 +1452,51 @@ function ctld.spawnCrateStatic(_country, _unitId, _point, _name, _weight,_side)
                 --            ["cargoDisplayName"] = "cargo123",
                 --            ["CargoDisplayName"] = "cargo123",
             }
-        
+
 --[[ Placeholder for different type of cargo containers. Let's say pipes and trunks, fuel for FOB building
                         ["shape_name"] = "ab-212_cargo",
 			["type"] = "uh1h_cargo" --new type for the container previously used
-			
+
 			["shape_name"] = "ammo_box_cargo",
                         ["type"] = "ammo_cargo",
-			
+
 			["shape_name"] = "barrels_cargo",
                         ["type"] = "barrels_cargo",
 
                         ["shape_name"] = "bw_container_cargo",
                         ["type"] = "container_cargo",
-			
+
                         ["shape_name"] = "f_bar_cargo",
                         ["type"] = "f_bar_cargo",
-			
+
 			["shape_name"] = "fueltank_cargo",
                         ["type"] = "fueltank_cargo",
-			
+
 			["shape_name"] = "iso_container_cargo",
 			["type"] = "iso_container",
-			
+
 			["shape_name"] = "iso_container_small_cargo",
 			["type"] = "iso_container_small",
-			
+
 			["shape_name"] = "oiltank_cargo",
                         ["type"] = "oiltank_cargo",
-                        
+
 			["shape_name"] = "pipes_big_cargo",
-                        ["type"] = "pipes_big_cargo",			
-			
+                        ["type"] = "pipes_big_cargo",
+
 			["shape_name"] = "pipes_small_cargo",
 			["type"] = "pipes_small_cargo",
-			
+
 			["shape_name"] = "tetrapod_cargo",
 			["type"] = "tetrapod_cargo",
-			
+
 			["shape_name"] = "trunks_long_cargo",
 			["type"] = "trunks_long_cargo",
-			
+
 			["shape_name"] = "trunks_small_cargo",
 			["type"] = "trunks_small_cargo",
 ]]--
-	else	
+	else
             _crate = {
                 ["shape_name"] = "GeneratorF",
                 ["type"] = "GeneratorF",
@@ -2904,12 +2943,12 @@ function ctld.unpackCrates(_arguments)
             local _crate = ctld.getClosestCrate(_heli, _crates)
 
 
-            if ctld.inLogisticsZone(_heli) == true  or  ctld.farEnoughFromLogisticZone(_heli) == false then
+            -- if ctld.inLogisticsZone(_heli) == true  or  ctld.farEnoughFromLogisticZone(_heli) == false then
 
-                ctld.displayMessageToGroup(_heli, "You can't unpack that here! Take it to where it's needed!", 20)
+            --     ctld.displayMessageToGroup(_heli, "You can't unpack that here! Take it to where it's needed!", 20)
 
-                return
-            end
+            --     return
+            -- end
 
 
 
@@ -4010,7 +4049,7 @@ function ctld.spawnDroppedGroup(_point, _details, _spawnBehind, _maxSearch)
             local _xOffset = math.cos(_angle) * 30
             local _yOffset = math.sin(_angle) * 30
 
-            _group.units[_i] = ctld.createUnit(_pos.x + _xOffset, _pos.z + _yOffset, _angle, _detail)
+            _group.units[_i] = ctld.createUnit(_pos.x + _xOffset + 10, _pos.z + _yOffset +10, _angle, _detail)
         end
 
     else
@@ -4024,7 +4063,7 @@ function ctld.spawnDroppedGroup(_point, _details, _spawnBehind, _maxSearch)
 
 
         for _i, _detail in ipairs(_details.units) do
-            _group.units[_i] = ctld.createUnit(_pos.x + (_xOffset + 10 * _i), _pos.z + (_yOffset + 10 * _i), _angle, _detail)
+            _group.units[_i] = ctld.createUnit(_pos.x + (_xOffset + 5 * _i), _pos.z + (_yOffset + 5 * _i), _angle, _detail)
         end
     end
 
@@ -4332,25 +4371,26 @@ function ctld.inDropoffZone(_heli)
         return false
     end
 
-    local _heliPoint = _heli:getPoint()
+    return true
+    -- local _heliPoint = _heli:getPoint()
 
-    for _, _zoneDetails in pairs(ctld.dropOffZones) do
+    -- for _, _zoneDetails in pairs(ctld.dropOffZones) do
 
-        local _triggerZone = trigger.misc.getZone(_zoneDetails[1])
+    --     local _triggerZone = trigger.misc.getZone(_zoneDetails[1])
 
-        if _triggerZone ~= nil and (_zoneDetails[3] == _heli:getCoalition() or _zoneDetails[3]== 0) then
+    --     if _triggerZone ~= nil and (_zoneDetails[3] == _heli:getCoalition() or _zoneDetails[3]== 0) then
 
-            --get distance to center
+    --         --get distance to center
 
-            local _dist = ctld.getDistance(_heliPoint, _triggerZone.point)
+    --         local _dist = ctld.getDistance(_heliPoint, _triggerZone.point)
 
-            if _dist <= _triggerZone.radius then
-                return true
-            end
-        end
-    end
+    --         if _dist <= _triggerZone.radius then
+    --             return true
+    --         end
+    --     end
+    -- end
 
-    return false
+    -- return false
 end
 
 -- are we in a waypoint zone
@@ -4528,111 +4568,6 @@ function ctld.dropSmoke(_args)
         trigger.action.outTextForCoalition(_heli:getCoalition(), ctld.getPlayerNameOrType(_heli) .. " dropped " .. _colour .. " smoke ", 10)
     end
 end
---i abandoned this not sure it works or how it works
---[[function ctld.dropSmoke3color(_args)
-
-    local _heli = ctld.getTransportUnit(_args[1])
-
-    if _heli ~= nil then
-
-        local _colour = ""
-
-        if _args[2] == trigger.smokeColor.Red then
-
-            _colour = "RED"
-        elseif _args[2] == trigger.smokeColor.Blue then
-
-            _colour = "BLUE"
-        elseif _args[2] == trigger.smokeColor.Green then
-
-            _colour = "GREEN"
-        elseif _args[2] == trigger.smokeColor.Orange then
-
-            _colour = "ORANGE"
-        end
-       
-        if _args[3] == trigger.smokeColor.Red then
-    
-             _colour = "RED"
-        elseif _args[3] == trigger.smokeColor.Blue then
-    
-            _colour = "BLUE"
-        elseif _args[3] == trigger.smokeColor.Green then
-    
-            _colour = "GREEN"
-        elseif _args[3] == trigger.smokeColor.Orange then
-    
-            _colour = "ORANGE"
-        end
-
-        if _args[4] == trigger.smokeColor.Red then
-        
-            _colour = "RED"
-        elseif _args[4] == trigger.smokeColor.Blue then
-        
-                _colour = "BLUE"
-        elseif _args[4] == trigger.smokeColor.Green then
-        
-                _colour = "GREEN"
-        elseif _args[4] == trigger.smokeColor.Orange then
-        
-                _colour = "ORANGE"
-        end
-
-        local _point = _heli:getPoint()
-
-        local _pos2 = { x = _point.x, y = _point.z }
-        local _alt = land.getHeight(_pos2)
-        local _pos3 = { x = _point.x, y = _alt, z = _point.z }
-
-        trigger.action.smoke(_pos3, _args[2])
-        trigger.action.smoke(_pos3, _args[3])
-        trigger.action.smoke(_pos3, _args[4])
-
-        trigger.action.outTextForCoalition(_heli:getCoalition(), ctld.getPlayerNameOrType(_heli) .. " dropped " .. _colour .. " smoke ", 10)
-    end
-end
-]]
---im trying this right now NASA
-function ctld.dropSmokeRGB(_args)
-   
-    local _heli = ctld.getTransportUnit(_args[1])
-    
-    if _heli ~= nil then
-    
-        local _point = _heli:getPoint()
-    
-        local _pos2 = { x = _point.x, y = _point.z }
-        local _alt = land.getHeight(_pos2)
-        local _pos3 = { x = _point.x, y = _alt, z = _point.z }
-           
-        --[[trigger.smokeColor
-                Green   0
-                Red     1
-                White   2
-                Orange  3
-                Blue    4
-        ]]
-    
-        local _colour = ""
-    
-        _colour = "RED"
-    
-        trigger.action.smoke(_pos3, trigger.smokeColor.Red)
-            
-        _colour = "BLUE"
-    
-        trigger.action.smoke(_pos3, trigger.smokeColor.Blue)
-        
-        _colour = "GREEN"
-            
-        trigger.action.smoke(_pos3, trigger.smokeColor.Green)
-    
-        end 
-    
-            trigger.action.outTextForCoalition(_heli:getCoalition(), ctld.getPlayerNameOrType(_heli) .. " dropped RGB smoke!) ", 10)
-end   
-
 
 function ctld.unitCanCarryVehicles(_unit)
 
@@ -4898,7 +4833,6 @@ function ctld.addF10MenuOptions()
                             missionCommands.addCommandForGroup(_groupId, "Drop Blue Smoke", _smokeMenu, ctld.dropSmoke, { _unitName, trigger.smokeColor.Blue })
                             missionCommands.addCommandForGroup(_groupId, "Drop Orange Smoke", _smokeMenu, ctld.dropSmoke, { _unitName, trigger.smokeColor.Orange })
                             missionCommands.addCommandForGroup(_groupId, "Drop Green Smoke", _smokeMenu, ctld.dropSmoke, { _unitName, trigger.smokeColor.Green })
-                            missionCommands.addCommandForGroup(_groupId, "Drop RGB Smoke", _smokeMenu, ctld.dropSmokeRGB, { _unitName, trigger.smokeColor.White })
                         end
 
                         if ctld.enabledRadioBeaconDrop then
