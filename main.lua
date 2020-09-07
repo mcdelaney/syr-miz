@@ -367,7 +367,7 @@ for _, base in pairs(ContestedBases) do
   utils.saveTable(_STATE, BASE_FILE)
 end
 
-A2ADispatcher:SetTacticalDisplay(true)
+-- A2ADispatcher:SetTacticalDisplay(true)
 A2ADispatcher:Start()
 
 
