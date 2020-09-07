@@ -53,7 +53,7 @@ ctld.enableFastRopeInsertion = true -- allows you to drop troops by fast rope
 ctld.fastRopeMaximumHeight = 18.28 -- in meters which is 60 ft max fast rope (not rappell) safe height
 
 ctld.vehiclesForTransportRED = { "BRDM-2", "BTR_D" } -- vehicles to load onto Il-76 - Alternatives {"Strela-1 9P31","BMP-1"}
-ctld.vehiclesForTransportBLUE = { "M1045 HMMWV TOW", "M1043 HMMWV Armament" } -- vehicles to load onto c130 - Alternatives {"M1128 Stryker MGS","M1097 Avenger"}
+ctld.vehiclesForTransportBLUE = { "IFV LAV-25", "M1045 HMMWV TOW", "M1043 HMMWV Armament" } -- vehicles to load onto c130 - Alternatives {"M1128 Stryker MGS","M1097 Avenger"}
 
 ctld.aaLaunchers = 3 -- controls how many launchers to add to the kub/buk when its spawned.
 ctld.hawkLaunchers = 5 -- controls how many launchers to add to the hawk when its spawned.
@@ -529,6 +529,7 @@ ctld.spawnableCrates = {
         -- dont use that option with the HAWK Crates
         { weight = 500, desc = "HMMWV - TOW", unit = "M1045 HMMWV TOW", side = 2 },
         { weight = 505, desc = "HMMWV - MG", unit = "M1043 HMMWV Armament", side = 2 },
+        { weight = 505, desc = "IFV LAV-25", unit = "IFV LAV-25", side = 2 },
 
         { weight = 510, desc = "BTR-D", unit = "BTR_D", side = 1 },
         { weight = 515, desc = "BRDM-2", unit = "BRDM-2", side = 1 },

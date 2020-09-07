@@ -84,6 +84,12 @@ ctld_config.unit_config = {
 		["name"] = "CTLD_Stinger #",
 		["playerCanDrive"] = false,
 		["skill"] = "Excellent",
+	},
+	["IFV LAV-25"] = {
+		["type"] = "IFV LAV-25",
+		["name"] = "CTLD_IFV #",
+		["playerCanDrive"] = false,
+		["skill"] = "Excellent",
 	}
 }
 
@@ -98,7 +104,8 @@ ctld_config.unit_index = {
 	Avenger_Index = 1,
 	Chaparral_Index = 1,
     Roland_Index = 1,
-    Stinger_Index = 1,
+	Stinger_Index = 1,
+	IFV_Index = 1,
 }
 
 return ctld_config
