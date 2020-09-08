@@ -305,7 +305,7 @@ end
 
 redIADS = SkynetIADS:create('SYRIA')
 redIADS:setUpdateInterval(15)
--- redIADS:addEarlyWarningRadarsByPrefix('EWR')
+redIADS:addEarlyWarningRadarsByPrefix('EWR')
 redIADS:addSAMSitesByPrefix('SAM')
 redIADS:getSAMSitesByNatoName('SA-2'):setGoLiveRangeInPercent(80)
 redIADS:getSAMSitesByNatoName('SA-3'):setGoLiveRangeInPercent(80)
