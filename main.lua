@@ -5,7 +5,7 @@ package.path = MODULE_FOLDER .. "?.lua;" .. package.path
 -- local ctld = require("ctld.lua")
 local ctld_config = require("ctld_config")
 local utils = require("utils")
-local DEBUG = true
+local DEBUG = false
 
 local BASE_FILE = lfs.writedir() .. "Scripts\\syr-miz\\state.json"
 local _STATE = {}
@@ -38,19 +38,22 @@ local ContestedBases = {
 
 -- clientSlots:ForEachClient(
 --   function(client)
---     env.info(client:Name())
---     -- local cli = SPAWN:New(client:Name())
---     -- local coord = cli:GetCoordinate()
---     local unit = DCSUnit:getByName(client:Name())
---     if coord ~= nil then
---       local dist = coord:GetClosestAirbase()
---       local base = dist.Airbase
---       env.info(base:GetName().." - "..client:Name())
---       if _STATE.slots[base] ~= nil then
+--     local unit = Unit.getByName(client:Name())
+--     if unit then
+--       local coord = unit.getPosition()
+--       env.info("Not null!!!")
+
+--       if coord ~= nil then
+--         env.info(coord.x)
+--         local dist = coord:GetClosestAirbase()
+--         local base = dist.Airbase
+--         env.info(base:GetName().." - "..client:Name())
+--         if _STATE.slots[base] ~= nil then
+--           table.insert(_STATE.slots, base:GetName(), { client:Name() })
+--         end
 --         table.insert(_STATE.slots, base:GetName(), { client:Name() })
+--         env.info(client:Name())
 --       end
---       table.insert(_STATE.slots, base:GetName(), { client:Name() })
---       env.info(client:Name())
 --     end
 --   end
 -- )
