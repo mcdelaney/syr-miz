@@ -31,35 +31,6 @@ local ContestedBases = {
   "Hama"
 }
 
--- local clientSlots = SET_CLIENT:New():FilterCoalitions("blue"):FilterStart()
-
--- BASE:TraceOnOff(true)
--- BASE:TraceAll(true)
-
--- clientSlots:ForEachClient(
---   function(client)
---     local unit = Unit.getByName(client:Name())
---     if unit then
---       local coord = unit.getPosition()
---       env.info("Not null!!!")
-
---       if coord ~= nil then
---         env.info(coord.x)
---         local dist = coord:GetClosestAirbase()
---         local base = dist.Airbase
---         env.info(base:GetName().." - "..client:Name())
---         if _STATE.slots[base] ~= nil then
---           table.insert(_STATE.slots, base:GetName(), { client:Name() })
---         end
---         table.insert(_STATE.slots, base:GetName(), { client:Name() })
---         env.info(client:Name())
---       end
---     end
---   end
--- )
--- BASE:TraceOnOff(false)
--- BASE:TraceAll(false)
-
 local _NumAirbaseDefenders = 1
 
 if utils.file_exists(BASE_FILE) then
@@ -417,9 +388,6 @@ if DEBUG then
 end
 
 A2ADispatcher:Start()
--- A2ADispatcher:TraceOnOff( true )
--- A2ADispatcher:TraceAll(true)
-
 
 EH1 = EVENTHANDLER:New()
 EH1:HandleEvent(EVENTS.MarkRemoved)
@@ -461,11 +429,3 @@ function EH1:OnEventDead(EventData)
 
   utils.saveTable(_STATE, BASE_FILE)
 end
-
-
--- SetClient = SET_CLIENT:New():FilterCoalitions("blue"):FilterCategories("plane"):FilterStart()
--- log(SetClient:Flush())
--- -- setClient:ForEachClient()
--- for k, v in pairs(SetClient) do
---   log(k.." - "..v)
--- end
