@@ -5,11 +5,12 @@ package.path = MODULE_FOLDER .. "?.lua;" .. package.path
 -- local ctld = require("ctld.lua")
 local ctld_config = require("ctld_config")
 local utils = require("utils")
-
+local DEBUG = true
 
 local BASE_FILE = lfs.writedir() .. "Scripts\\syr-miz\\state.json"
 local _STATE = {}
 _STATE["bases"] = {}
+_STATE["slots"] = {}
 _STATE["ctld_units"] = {}
 _STATE["hawks"] = {}
 _STATE["dead"] = {}
@@ -29,6 +30,32 @@ local ContestedBases = {
   "Damascus",
   "Hama"
 }
+
+-- local clientSlots = SET_CLIENT:New():FilterCoalitions("blue"):FilterStart()
+
+-- BASE:TraceOnOff(true)
+-- BASE:TraceAll(true)
+
+-- clientSlots:ForEachClient(
+--   function(client)
+--     env.info(client:Name())
+--     -- local cli = SPAWN:New(client:Name())
+--     -- local coord = cli:GetCoordinate()
+--     local unit = DCSUnit:getByName(client:Name())
+--     if coord ~= nil then
+--       local dist = coord:GetClosestAirbase()
+--       local base = dist.Airbase
+--       env.info(base:GetName().." - "..client:Name())
+--       if _STATE.slots[base] ~= nil then
+--         table.insert(_STATE.slots, base:GetName(), { client:Name() })
+--       end
+--       table.insert(_STATE.slots, base:GetName(), { client:Name() })
+--       env.info(client:Name())
+--     end
+--   end
+-- )
+-- BASE:TraceOnOff(false)
+-- BASE:TraceAll(false)
 
 local _NumAirbaseDefenders = 1
 
@@ -60,30 +87,11 @@ ctld.addCallback(function(_args)
   if _args.action and _args.action == "unpack" then
       local name
       local groupname = _args.spawnedGroup:getName()
-      if string.match(groupname, "Hawk") then
-          name = "hawk"
-      elseif string.match(groupname, "Avenger") then
-          name = "avenger"
-      elseif string.match(groupname, "M 818") then
-          name = 'ammo'
-      elseif string.match(groupname, "Gepard") then
-          name = 'gepard'
-      elseif string.match(groupname, "MLRS") then
-          name = 'mlrs'
-      elseif string.match(groupname, "Hummer") then
-          name = 'jtac'
-      elseif string.match(groupname, "Abrams") then
-          name = 'abrams'
-      elseif string.match(groupname, "Chaparral") then
-          name = 'chaparral'
-      elseif string.match(groupname, "Vulcan") then
-          name = 'vulcan'
-      elseif string.match(groupname, "M-109") then
-          name = 'M-109'
-      elseif string.match(groupname, "Soldier stinger") then
-          name = "stinger"
-      elseif string.match(groupname, "Roland") then
-          name = 'roland'
+
+    if string.match(groupname, "Soldier stinger") then
+        name = "stinger"
+      else
+        name = groupname:lower()
       end
 
       local coord = GROUP:FindByName(groupname):GetCoordinate()
@@ -302,8 +310,33 @@ else
 end
 
 
-
 redIADS = SkynetIADS:create('SYRIA')
+if DEBUG then
+  local iadsDebug = redIADS:getDebugSettings()
+  iadsDebug.IADSStatus = true
+  iadsDebug.samWentDark = false
+  iadsDebug.contacts = true
+  iadsDebug.radarWentLive = true
+  iadsDebug.noWorkingCommmandCenter = true
+  iadsDebug.ewRadarNoConnection = true
+  iadsDebug.samNoConnection = true
+  iadsDebug.jammerProbability = false
+  iadsDebug.addedEWRadar = true
+  iadsDebug.hasNoPower = false
+  iadsDebug.harmDefence = false
+  iadsDebug.samSiteStatusEnvOutput = false
+  iadsDebug.earlyWarningRadarStatusEnvOutput = false
+  redIADS:addRadioMenu()
+end
+
+local redCommand = COMMANDCENTER:New( GROUP:FindByName( "REDHQ" ), "RedHQ" )
+DetectionSetGroup = SET_GROUP:New()
+DetectionSetGroup:FilterPrefixes( {"EWR", "SAM"} )
+DetectionSetGroup:FilterStart()
+Detection = DETECTION_AREAS:New( DetectionSetGroup, 30000 )
+
+commandCenter = StaticObject.getByName('red-command-center')
+redIADS:addCommandCenter(commandCenter)
 redIADS:setUpdateInterval(15)
 redIADS:addEarlyWarningRadarsByPrefix('EWR')
 redIADS:addSAMSitesByPrefix('SAM')
@@ -311,20 +344,17 @@ redIADS:getSAMSitesByNatoName('SA-2'):setGoLiveRangeInPercent(80)
 redIADS:getSAMSitesByNatoName('SA-3'):setGoLiveRangeInPercent(80)
 redIADS:getSAMSitesByNatoName('SA-10'):setGoLiveRangeInPercent(80)
 redIADS:getSAMSitesByNatoName('SA-6'):setGoLiveRangeInPercent(80)
-redIADS:activate()
-
--- Define a SET_GROUP object that builds a collection of groups that define the EWR network.
-DetectionSetGroup = SET_GROUP:New()
-DetectionSetGroup:FilterPrefixes("EWR")
-DetectionSetGroup:FilterStart()
-Detection = DETECTION_AREAS:New( DetectionSetGroup, 60000 )
 redIADS:addMooseSetGroup(DetectionSetGroup)
+redIADS:setupSAMSitesAndThenActivate()
+
 
 A2ADispatcher = AI_A2A_DISPATCHER:New( Detection )
-A2ADispatcher:SetEngageRadius(50000)
-A2ADispatcher:SetGciRadius(100000)
--- A2ADispatcher:SetIntercept( 450 )
+A2ADispatcher:SetCommandCenter(redCommand)
+A2ADispatcher:SetEngageRadius(100000)
+-- A2ADispatcher:SetGciRadius(100000)
+A2ADispatcher:SetIntercept( 450 )
 
+-- BorderZone = ZONE:FindByName("monster-zone")
 BorderZone = ZONE_POLYGON:New( "RED-BORDER", GROUP:FindByName( "SyAF-GCI" ) )
 A2ADispatcher:SetBorderZone( BorderZone )
 
@@ -344,31 +374,48 @@ for _, base in pairs(ContestedBases) do
     setBaseBlue(base)
   else
     setBaseRed(base)
-
+    local zone_name = base.."-cap-zone"
+    local zone = ZONE:FindByName(base)
+    if zone == nil then
+      zone = ZONE_AIRBASE:New(base, 350000)
+    end
     local sqd_name = base.."-cap"
     if GROUP:FindByName(sqd_name) ~= nil then
-      A2ADispatcher:SetSquadron( sqd_name, base, { sqd_name } )
+      A2ADispatcher:SetSquadron( sqd_name, base, { sqd_name } , 10)
       A2ADispatcher:SetDefaultTakeoffFromRunway(sqd_name)
       A2ADispatcher:SetSquadronLandingAtRunway(sqd_name)
-      A2ADispatcher:SetSquadronOverhead( sqd_name, .5 )
-      A2ADispatcher:SetSquadronGrouping( sqd_name, 1 )
+      A2ADispatcher:SetSquadronOverhead( sqd_name, 5 )
+      A2ADispatcher:SetSquadronGrouping( sqd_name, 2 )
       A2ADispatcher:SetSquadronGci( sqd_name, 900, 1200 )
+      A2ADispatcher:SetSquadronCap( sqd_name, zone, 5000, 30000, 400, 700, 900, 1200, "BARO")
       A2ADispatcher:SetSquadronCapInterval( sqd_name, 1, 2, 5, 1 )
     end
 
     for i=1,_NumAirbaseDefenders do
       local grp_name = base.."-"..tostring(i)
-      env.info(base)
       local zone_base = ZONE_AIRBASE:New(base, 150):GetRandomPointVec2()
       local baseDef = SPAWN:NewWithAlias( "defenseBase", grp_name )
-      baseDef:SpawnFromPointVec2(zone_base)
+      local is_valid = false
+      local tries = 0
+      while is_valid == false and tries < 5 do
+        local units = baseDef:SpawnFromPointVec2(zone_base)
+        if base_obj:CheckOnRunWay(units, 10, true) == false then
+          is_valid = true
+        end
+        tries = tries + 1
+      end
     end
   end
   utils.saveTable(_STATE, BASE_FILE)
 end
 
--- A2ADispatcher:SetTacticalDisplay(true)
+if DEBUG then
+  A2ADispatcher:SetTacticalDisplay(true)
+end
+
 A2ADispatcher:Start()
+-- A2ADispatcher:TraceOnOff( true )
+-- A2ADispatcher:TraceAll(true)
 
 
 EH1 = EVENTHANDLER:New()
@@ -413,3 +460,9 @@ function EH1:OnEventDead(EventData)
 end
 
 
+-- SetClient = SET_CLIENT:New():FilterCoalitions("blue"):FilterCategories("plane"):FilterStart()
+-- log(SetClient:Flush())
+-- -- setClient:ForEachClient()
+-- for k, v in pairs(SetClient) do
+--   log(k.." - "..v)
+-- end
