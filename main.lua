@@ -235,7 +235,7 @@ INIT_CTLD_UNITS = function(args, coords2D, _country, ctld_unitIndex, key)
 
 local function prune_enemies(Site, name)
   local countTotal=Site:Count()
-  local sitesKeep = UTILS.Round(countTotal/100*50, 0)
+  local sitesKeep = UTILS.Round(countTotal/100*70, 0)
   local sitesDestroy = countTotal - sitesKeep
   utils.log("Pruning from site " .. name..": "..tostring(sitesDestroy))
     for i = 1, sitesDestroy do
