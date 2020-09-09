@@ -432,7 +432,9 @@ end
 EH1:HandleEvent(EVENTS.Dead)
 function EH1:OnEventDead(EventData)
   if EventData.IniCoalition == coalition.side.RED then
-    log("Marking object dead: "..EventData.IniGroupName)
+    if EventData.IniGroupName ~= nil then
+      log("Marking object dead: "..EventData.IniGroupName)
+    end
     if _STATE["dead"] == nil then
       _STATE["dead"] = { EventData.IniGroupName }
     else
@@ -441,7 +443,7 @@ function EH1:OnEventDead(EventData)
   end
 
   for id, name in pairs(sceneryTargets) do
-    if EventData.IniUnitName == id then
+    if EventData.IniUnitName ~= nil and EventData.IniUnitName == id then
       MESSAGE:New(name.." Destoyed!").ToAll()
       table.remove(sceneryTargets, id)
     end
