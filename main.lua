@@ -351,11 +351,9 @@ for _, base in pairs(ContestedBases) do
     end
 
     local sqd = base.."-cap"
-    local template = "su-30-base-cap"
-    -- SPAWN:NewWithAlias(template, sqd)
-    if true or GROUP:FindByName(sqd) ~= nil then
+    if GROUP:FindByName(sqd) ~= nil then
       utils.log("Creating a2a group: "..sqd)
-      A2ADispatcher:SetSquadron( sqd, base, { "su-30-base-cap", "su-30-base-gci" }  ) --, 10)
+      A2ADispatcher:SetSquadron( sqd, base, { sqd }  ) --, 10)
       A2ADispatcher:SetDefaultTakeoffFromRunway(sqd)
       A2ADispatcher:SetSquadronLandingNearAirbase(sqd)
       A2ADispatcher:SetSquadronOverhead( sqd, 1 )
