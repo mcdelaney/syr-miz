@@ -19,7 +19,7 @@ local INIT = true
 
 local ContestedBases = {
   "Aleppo",
-  "Taftanaz",
+  -- "Taftanaz",
   "Abu al-Duhur",
   "Hatay",
   "Haifa",
@@ -297,24 +297,15 @@ if DEBUG then
   iadsDebug.radarWentLive = true
   iadsDebug.noWorkingCommmandCenter = true
   iadsDebug.ewRadarNoConnection = true
-  iadsDebug.samNoConnection = true
-  iadsDebug.jammerProbability = false
   iadsDebug.addedEWRadar = true
-  iadsDebug.hasNoPower = false
-  iadsDebug.harmDefence = false
-  iadsDebug.samSiteStatusEnvOutput = false
-  iadsDebug.earlyWarningRadarStatusEnvOutput = false
   redIADS:addRadioMenu()
 end
 
-local redCommand = COMMANDCENTER:New( GROUP:FindByName( "REDHQ" ), "RedHQ" )
-DetectionSetGroup = SET_GROUP:New()
-DetectionSetGroup:FilterPrefixes( {"EWR", "SAM"} )
-DetectionSetGroup:FilterStart()
-Detection = DETECTION_AREAS:New( DetectionSetGroup, 30000 )
 
-commandCenter = StaticObject.getByName('red-command-center')
-redIADS:addCommandCenter(commandCenter)
+commandCenter1 = StaticObject.getByName('red-command-center')
+redIADS:addCommandCenter(commandCenter1)
+commandCenter2 = StaticObject.getByName('REDHQ')
+redIADS:addCommandCenter(commandCenter2)
 redIADS:setUpdateInterval(15)
 redIADS:addEarlyWarningRadarsByPrefix('EWR')
 redIADS:addSAMSitesByPrefix('SAM')
@@ -322,17 +313,21 @@ redIADS:getSAMSitesByNatoName('SA-2'):setGoLiveRangeInPercent(80)
 redIADS:getSAMSitesByNatoName('SA-3'):setGoLiveRangeInPercent(80)
 redIADS:getSAMSitesByNatoName('SA-10'):setGoLiveRangeInPercent(80)
 redIADS:getSAMSitesByNatoName('SA-6'):setGoLiveRangeInPercent(80)
-redIADS:addMooseSetGroup(DetectionSetGroup)
 redIADS:setupSAMSitesAndThenActivate()
 
+DetectionSetGroup = SET_GROUP:New()
+redIADS:addMooseSetGroup(DetectionSetGroup)
 
+Detection = DETECTION_AREAS:New( DetectionSetGroup, 130000 )
 A2ADispatcher = AI_A2A_DISPATCHER:New( Detection )
-A2ADispatcher:SetCommandCenter(redCommand)
-A2ADispatcher:SetEngageRadius(100000)
-A2ADispatcher:SetIntercept( 450 )
-
+redCommand = COMMANDCENTER:New( GROUP:FindByName( "REDHQ" ), "RedHQ" )
 BorderZone = ZONE_POLYGON:New( "RED-BORDER", GROUP:FindByName( "SyAF-GCI" ) )
 A2ADispatcher:SetBorderZone( BorderZone )
+A2ADispatcher:SetCommandCenter(redCommand)
+A2ADispatcher:SetEngageRadius(100000)
+A2ADispatcher:SetDisengageRadius(190000)
+A2ADispatcher:SetIntercept( 10 )
+A2ADispatcher:SetGciRadius()
 
 -- For reach numbered group, for each airbase,
 -- Attempt to find the group, destroying it if the airbase is blue, and activating it
@@ -351,20 +346,28 @@ for _, base in pairs(ContestedBases) do
   else
     setBaseRed(base)
     local zone_name = base.."-cap-zone"
-    local zone = ZONE:FindByName(base)
+    local zone = ZONE:FindByName(zone_name)
     if zone == nil then
       zone = ZONE_AIRBASE:New(base, 350000)
+      zone:SetName(zone_name)
     end
-    local sqd_name = base.."-cap"
-    if GROUP:FindByName(sqd_name) ~= nil then
-      A2ADispatcher:SetSquadron( sqd_name, base, { sqd_name } , 10)
-      A2ADispatcher:SetDefaultTakeoffFromRunway(sqd_name)
-      A2ADispatcher:SetSquadronLandingAtRunway(sqd_name)
-      A2ADispatcher:SetSquadronOverhead( sqd_name, 5 )
-      A2ADispatcher:SetSquadronGrouping( sqd_name, 2 )
-      A2ADispatcher:SetSquadronGci( sqd_name, 900, 1200 )
-      A2ADispatcher:SetSquadronCap( sqd_name, zone, 5000, 30000, 400, 700, 900, 1200, "BARO")
-      A2ADispatcher:SetSquadronCapInterval( sqd_name, 1, 2, 5, 1 )
+
+    local sqd = base.."-cap"
+    local template = "su-30-base-cap"
+    -- SPAWN:NewWithAlias(template, sqd)
+    if true or GROUP:FindByName(sqd) ~= nil then
+      utils.log("Creating a2a group: "..sqd)
+      A2ADispatcher:SetSquadron( sqd, base, { "su-30-base-cap", "su-30-base-gci" }  ) --, 10)
+      A2ADispatcher:SetDefaultTakeoffFromRunway(sqd)
+      A2ADispatcher:SetSquadronLandingNearAirbase(sqd)
+      A2ADispatcher:SetSquadronOverhead( sqd, 1 )
+      A2ADispatcher:SetSquadronGrouping( sqd, math.random(4) )
+      A2ADispatcher:SetSquadronGci( sqd, 900, 1200 )
+      A2ADispatcher:SetSquadronCap( sqd, zone, 5000, 30000, 400, 700, 900, 1200, "BARO")
+      A2ADispatcher:SetSquadronCapInterval( sqd, 1, 2, 120, 1 )
+      A2ADispatcher:SetSquadronCapRacetrack(sqd, 5000, 10000, 90, 180, 10*60, 20*60)
+    else
+      env.info("Could not spawn red a2a group: "..sqd.."!")
     end
 
     for i=1,_NumAirbaseDefenders do
@@ -388,7 +391,6 @@ end
 if DEBUG then
   A2ADispatcher:SetTacticalDisplay(true)
 end
-
 
 A2ADispatcher:Start()
 
