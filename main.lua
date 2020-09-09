@@ -31,9 +31,7 @@ local ContestedBases = {
   "Hama"
 }
 
-local sceneryTargets = {}
-sceneryTargets[1] = "damascus-target"
-
+local sceneryTargets = {"damascus-target-1", "damascus-target-2", "damascus-target-3"}
 
 local _NumAirbaseDefenders = 1
 
