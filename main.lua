@@ -31,6 +31,10 @@ local ContestedBases = {
   "Hama"
 }
 
+local sceneryTargets = {}
+sceneryTargets[139429070] = "Marj as Sultan"
+
+
 local _NumAirbaseDefenders = 1
 
 if utils.file_exists(BASE_FILE) then
@@ -325,10 +329,8 @@ redIADS:setupSAMSitesAndThenActivate()
 A2ADispatcher = AI_A2A_DISPATCHER:New( Detection )
 A2ADispatcher:SetCommandCenter(redCommand)
 A2ADispatcher:SetEngageRadius(100000)
--- A2ADispatcher:SetGciRadius(100000)
 A2ADispatcher:SetIntercept( 450 )
 
--- BorderZone = ZONE:FindByName("monster-zone")
 BorderZone = ZONE_POLYGON:New( "RED-BORDER", GROUP:FindByName( "SyAF-GCI" ) )
 A2ADispatcher:SetBorderZone( BorderZone )
 
@@ -387,7 +389,18 @@ if DEBUG then
   A2ADispatcher:SetTacticalDisplay(true)
 end
 
+
 A2ADispatcher:Start()
+
+local function ShowStatus(  )
+  for i, name in pairs(sceneryTargets) do
+    MESSAGE:New( name ):ToBlue()
+  end
+end
+
+local MenuCoalitionBlue = MENU_COALITION:New( coalition.side.BLUE, "Objectives" )
+local MenuAdd = MENU_COALITION_COMMAND:New( coalition.side.BLUE, "List", MenuCoalitionBlue, ShowStatus )
+
 
 EH1 = EVENTHANDLER:New()
 EH1:HandleEvent(EVENTS.MarkRemoved)
@@ -424,6 +437,13 @@ function EH1:OnEventDead(EventData)
       _STATE["dead"] = { EventData.IniGroupName }
     else
       table.insert(_STATE["dead"], EventData.IniGroupName)
+    end
+  end
+
+  for id, name in pairs(sceneryTargets) do
+    if EventData.IniUnitName == id then
+      MESSAGE:New(name.." Destoyed!").ToAll()
+      table.remove(sceneryTargets, id)
     end
   end
 
