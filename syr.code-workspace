@@ -7,5 +7,36 @@
 			// "path": "..\\..\\..\\..\\moose-dev"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"Lua.diagnostics.globals": [
+			"MESSAGE",
+			"MENU_COALITION_COMMAND",
+			"SPAWN",
+			"EVENTS",
+			"ctld",
+			"GROUP",
+			"Group",
+			"mist",
+			"SPAWNSTATIC",
+			"ZONE",
+			"ZONE_RADIUS",
+			"AIRBASE",
+			"country",
+			"SET_GROUP",
+			"COMMANDCENTER",
+			"DETECTION_AREAS",
+			"StaticObject",
+			"AI_A2A_DISPATCHER",
+			"ZONE_POLYGON",
+			"coalition",
+			"ZONE_AIRBASE",
+			"Object",
+			"MENU_COALITION",
+			"EVENTHANDLER",
+			"UTILS"
+		],
+		"Lua.diagnostics.disable": [
+			"lowercase-global"
+		]
+	}
 }

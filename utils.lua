@@ -71,6 +71,30 @@ local function destroyIfExists(grp_name, is_static)
   end
 end
 
+local function respawnHAWKFromState(_points)
+  log("Spawning hawk from state")
+  -- spawn HAWK crates around center point
+  ctld.spawnCrateAtPoint("blue",551, _points["Hawk pcp"])
+  ctld.spawnCrateAtPoint("blue",540, _points["Hawk ln"])
+  ctld.spawnCrateAtPoint("blue",545, _points["Hawk sr"])
+  ctld.spawnCrateAtPoint("blue",550, _points["Hawk tr"])
+
+  -- spawn a helper unit that will "build" the site
+  local _SpawnObject = Spawner( "HawkHelo" )
+  local _SpawnGroup = _SpawnObject:SpawnAtPoint({x=_points["Hawk pcp"]["x"], y=_points["Hawk pcp"]["z"]})
+  local _unit=_SpawnGroup:getUnit(1)
+
+  -- enumerate nearby crates
+  local _crates = ctld.getCratesAndDistance(_unit)
+  local _crate = ctld.getClosestCrate(_unit, _crates)
+  local terlaaTemplate = ctld.getAATemplate(_crate.details.unit)
+
+  ctld.unpackAASystem(_unit, _crate, _crates, terlaaTemplate)
+  _SpawnGroup:destroy()
+  log("Done Spawning hawk from state")
+end
+
+
 
 
 return {
@@ -80,5 +104,6 @@ return {
   saveTable = saveTable,
   removeValueFromTableIfExists = removeValueFromTableIfExists,
   destroyIfExists = destroyIfExists,
+  respawnHAWKFromState = respawnHAWKFromState,
   log = log,
 }

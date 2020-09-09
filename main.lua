@@ -213,7 +213,7 @@ INIT_CTLD_UNITS = function(args, coords2D, _country, ctld_unitIndex, key)
   local CTLDstate = _STATE["hawks"]
   if CTLDstate ~= nil then
       for k,v in pairs(CTLDstate) do
-          respawnHAWKFromState(v)
+          utils.respawnHAWKFromState(v)
       end
   end
 
@@ -392,20 +392,15 @@ end
 
 A2ADispatcher:Start()
 
-
-
-
-
-
-
 local function ShowStatus(  )
   for i, name in pairs(sceneryTargets) do
     local Zone = ZONE:New( name )
     Zone:Scan( Object.Category.SCENERY )
     for SceneryTypeName, SceneryData in pairs( Zone:GetScannedScenery() ) do
       for SceneryName, SceneryObject in pairs( SceneryData ) do
-        local SceneryObject = SceneryObject -- Wrapper.Scenery#SCENERY
-        MESSAGE:NewType( "Targets: " .. SceneryObject:GetTypeName() .. ", Coord LL DMS: " .. SceneryObject:GetCoordinate():ToStringLLDMS(), MESSAGE.Type.Information ):ToAll()
+        local SceneryObject = SceneryObject
+        MESSAGE:NewType( "Targets: " .. SceneryObject:GetTypeName() .. ", Coord LL DMS: " .. SceneryObject:GetCoordinate():ToStringLLDMS(),
+         MESSAGE.Type.Information ):ToAll()
       end
     end
   end
@@ -446,7 +441,7 @@ EH1:HandleEvent(EVENTS.Dead)
 function EH1:OnEventDead(EventData)
   if EventData.IniCoalition == coalition.side.RED then
     if EventData.IniGroupName ~= nil then
-      log("Marking object dead: "..EventData.IniGroupName)
+      utils.log("Marking object dead: "..EventData.IniGroupName)
     end
     if _STATE["dead"] == nil then
       _STATE["dead"] = { EventData.IniGroupName }
