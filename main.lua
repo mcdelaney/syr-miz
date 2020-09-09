@@ -7,7 +7,7 @@ local ctld_config = require("ctld_config")
 local utils = require("utils")
 local DEBUG = false
 
-local BASE_FILE = lfs.writedir() .. "Scripts\\syr-miz\\state.json"
+local BASE_FILE = lfs.writedir() .. "Scripts\\syr-miz\\syr_state.json"
 local _STATE = {}
 _STATE["bases"] = {}
 _STATE["slots"] = {}
@@ -32,7 +32,7 @@ local ContestedBases = {
 }
 
 local sceneryTargets = {}
-sceneryTargets[139429070] = "Marj as Sultan"
+sceneryTargets[1] = "damascus-target"
 
 
 local _NumAirbaseDefenders = 1
@@ -392,9 +392,22 @@ end
 
 A2ADispatcher:Start()
 
+
+
+
+
+
+
 local function ShowStatus(  )
   for i, name in pairs(sceneryTargets) do
-    MESSAGE:New( name ):ToBlue()
+    local Zone = ZONE:New( name )
+    Zone:Scan( Object.Category.SCENERY )
+    for SceneryTypeName, SceneryData in pairs( Zone:GetScannedScenery() ) do
+      for SceneryName, SceneryObject in pairs( SceneryData ) do
+        local SceneryObject = SceneryObject -- Wrapper.Scenery#SCENERY
+        MESSAGE:NewType( "Targets: " .. SceneryObject:GetTypeName() .. ", Coord LL DMS: " .. SceneryObject:GetCoordinate():ToStringLLDMS(), MESSAGE.Type.Information ):ToAll()
+      end
+    end
   end
 end
 
@@ -442,12 +455,13 @@ function EH1:OnEventDead(EventData)
     end
   end
 
-  for id, name in pairs(sceneryTargets) do
-    if EventData.IniUnitName ~= nil and EventData.IniUnitName == id then
-      MESSAGE:New(name.." Destoyed!").ToAll()
-      table.remove(sceneryTargets, id)
+  if EventData.IniUnit and EventData.IniObjectCategory==Object.Category.SCENERY then
+    for id, name in pairs(sceneryTargets) do
+      if EventData.IniUnitName ~= nil and EventData.IniUnitName == id then
+        MESSAGE:New(name.." Destoyed!").ToAll()
+        table.remove(sceneryTargets, id)
+      end
     end
   end
-
   utils.saveTable(_STATE, BASE_FILE)
 end
