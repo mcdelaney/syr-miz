@@ -33,7 +33,21 @@
 			"Object",
 			"MENU_COALITION",
 			"EVENTHANDLER",
-			"UTILS"
+			"UTILS",
+			"mist",
+			"Group",
+			"env",
+			"Unit",
+			"world",
+			"missionCommands",
+			"AI",
+			"timer",
+			"Controller",
+			"trigger",
+			"land",
+			"Weapon",
+			"STATIC",
+			"Spawner"
 		],
 		"Lua.diagnostics.disable": [
 			"lowercase-global"
