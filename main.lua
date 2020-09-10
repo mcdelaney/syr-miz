@@ -388,7 +388,7 @@ end
 if DEBUG then
   A2ADispatcher:SetTacticalDisplay(true)
 end
-A2ADispatcher:SetTacticalDisplay(true)
+
 A2ADispatcher:Start()
 
 local function ShowStatus(  )
