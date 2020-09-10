@@ -354,11 +354,12 @@ for _, base in pairs(ContestedBases) do
     if GROUP:FindByName(sqd) ~= nil then
       utils.log("Creating a2a group: "..sqd)
       A2ADispatcher:SetSquadron( sqd, base, { sqd }  ) --, 10)
-      A2ADispatcher:SetDefaultTakeoffFromRunway(sqd)
+      A2ADispatcher:SetDefaultTakeoffInAir(sqd)
+      -- A2ADispatcher:SetDefaultTakeoffFromRunway(sqd)
       A2ADispatcher:SetSquadronLandingNearAirbase(sqd)
       A2ADispatcher:SetSquadronOverhead( sqd, 1 )
       A2ADispatcher:SetSquadronGrouping( sqd, math.random(4) )
-      A2ADispatcher:SetSquadronGci( sqd, 900, 1200 )
+      -- A2ADispatcher:SetSquadronGci( sqd, 900, 1200 )
       A2ADispatcher:SetSquadronCap( sqd, zone, 5000, 30000, 400, 700, 900, 1200, "BARO")
       A2ADispatcher:SetSquadronCapInterval( sqd, 1, 2, 120, 1 )
       A2ADispatcher:SetSquadronCapRacetrack(sqd, 5000, 10000, 90, 180, 10*60, 20*60)
@@ -387,7 +388,7 @@ end
 if DEBUG then
   A2ADispatcher:SetTacticalDisplay(true)
 end
-
+A2ADispatcher:SetTacticalDisplay(true)
 A2ADispatcher:Start()
 
 local function ShowStatus(  )
