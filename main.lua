@@ -241,6 +241,7 @@ local function setBaseRed(baseName)
   utils.log("Setting "..baseName.." as red...")
   local logUnitName = "logistic-"..baseName
   local logZone = 'logizone-'..baseName
+  ctld.deactivatePickupZone(logZone)
   utils.destroyIfExists(logUnitName, true)
   MESSAGE:New( baseName.." was captured by Red!", 5):ToAll()
 end
@@ -311,6 +312,7 @@ redIADS:getSAMSitesByNatoName('SA-2'):setGoLiveRangeInPercent(80)
 redIADS:getSAMSitesByNatoName('SA-3'):setGoLiveRangeInPercent(80)
 redIADS:getSAMSitesByNatoName('SA-10'):setGoLiveRangeInPercent(80)
 redIADS:getSAMSitesByNatoName('SA-6'):setGoLiveRangeInPercent(80)
+redIADS:getSAMSitesByNatoName('SA-19'):setGoLiveRangeInPercent(80)
 redIADS:setupSAMSitesAndThenActivate()
 
 DetectionSetGroup = SET_GROUP:New()
@@ -351,14 +353,15 @@ for _, base in pairs(ContestedBases) do
     end
 
     local sqd = base.."-cap"
+    local sqdName = {"su-30-base-gci", "su-30-base-cap"}
+
     if GROUP:FindByName(sqd) ~= nil then
-      utils.log("Creating a2a group: "..sqd)
-      A2ADispatcher:SetSquadron( sqd, base, { sqd }  ) --, 10)
+      utils.log("Creating a2a group: "..base)
+      A2ADispatcher:SetSquadron( sqd, base, sqdName ) --, 10)
       A2ADispatcher:SetDefaultTakeoffInAir(sqd)
-      -- A2ADispatcher:SetDefaultTakeoffFromRunway(sqd)
       A2ADispatcher:SetSquadronLandingNearAirbase(sqd)
       A2ADispatcher:SetSquadronOverhead( sqd, 1 )
-      A2ADispatcher:SetSquadronGrouping( sqd, math.random(4) )
+      A2ADispatcher:SetSquadronGrouping( sqd, math.random(3) )
       A2ADispatcher:SetSquadronGci( sqd, 900, 1200 )
       A2ADispatcher:SetSquadronCap( sqd, zone, 5000, 30000, 400, 700, 900, 1200, "BARO")
       A2ADispatcher:SetSquadronCapInterval( sqd, 1, 2, 120, 1 )
@@ -373,9 +376,13 @@ for _, base in pairs(ContestedBases) do
       local baseDef = SPAWN:NewWithAlias( "defenseBase", grp_name )
       local is_valid = false
       local tries = 0
+      local despawn = true
       while is_valid == false and tries < 5 do
         local units = baseDef:SpawnFromPointVec2(zone_base)
-        if base_obj:CheckOnRunWay(units, 10, true) == false then
+        if tries == 4 then
+          despawn = false
+        end
+        if base_obj:CheckOnRunWay(units, 10, despawn) == false then
           is_valid = true
         end
         tries = tries + 1
@@ -441,8 +448,7 @@ function EH1:OnEventDead(EventData)
   if EventData.IniCoalition == coalition.side.RED then
     if EventData.IniGroupName ~= nil then
       utils.log("Marking object dead: "..EventData.IniGroupName)
-    end
-    if _STATE["dead"] == nil then
+    elseif _STATE["dead"] == nil then
       _STATE["dead"] = { EventData.IniGroupName }
     else
       table.insert(_STATE["dead"], EventData.IniGroupName)
@@ -459,3 +465,6 @@ function EH1:OnEventDead(EventData)
   end
   utils.saveTable(_STATE, BASE_FILE)
 end
+
+local is_server = DCS.isServer()
+env.info('syr-miz init complete: '..tostring(is_server))
