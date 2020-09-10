@@ -359,7 +359,7 @@ for _, base in pairs(ContestedBases) do
       A2ADispatcher:SetSquadronLandingNearAirbase(sqd)
       A2ADispatcher:SetSquadronOverhead( sqd, 1 )
       A2ADispatcher:SetSquadronGrouping( sqd, math.random(4) )
-      -- A2ADispatcher:SetSquadronGci( sqd, 900, 1200 )
+      A2ADispatcher:SetSquadronGci( sqd, 900, 1200 )
       A2ADispatcher:SetSquadronCap( sqd, zone, 5000, 30000, 400, 700, 900, 1200, "BARO")
       A2ADispatcher:SetSquadronCapInterval( sqd, 1, 2, 120, 1 )
       A2ADispatcher:SetSquadronCapRacetrack(sqd, 5000, 10000, 90, 180, 10*60, 20*60)
