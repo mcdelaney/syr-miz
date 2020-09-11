@@ -92,7 +92,7 @@ ctld.allowRandomAiTeamPickups = false -- Allows the AI to randomize the loading 
 ctld.minimumHoverHeight = 3.5 -- Lowest allowable height for crate hover
 ctld.maximumHoverHeight = 20.0 -- Highest allowable height for crate hover
 ctld.maxDistanceFromCrate = 15.5 -- Maximum distance from from crate for hover
-ctld.hoverTime = 1 -- Time to hold hover above a crate for loading in seconds
+ctld.hoverTime = 4 -- Time to hold hover above a crate for loading in seconds
 
 -- end of Simulated Sling load configuration
 
@@ -531,25 +531,18 @@ ctld.spawnableCrates = {
         { weight = 505, desc = "HMMWV - MG", unit = "M1043 HMMWV Armament", side = 2 },
         { weight = 505, desc = "IFV LAV-25", unit = "IFV LAV-25", side = 2 },
 
-        { weight = 510, desc = "BTR-D", unit = "BTR_D", side = 1 },
-        { weight = 515, desc = "BRDM-2", unit = "BRDM-2", side = 1 },
-
         { weight = 520, desc = "HMMWV - JTAC", unit = "Hummer", side = 2, }, -- used as jtac and unarmed, not on the crate list if JTAC is disabled
-        { weight = 525, desc = "SKP-11 - JTAC", unit = "SKP-11", side = 1, }, -- used as jtac and unarmed, not on the crate list if JTAC is disabled
 
         { weight = 100, desc = "2B11 Mortar", unit = "2B11 mortar" },
 
-        { weight = 250, desc = "SPH 2S19 Msta", unit = "SAU Msta", side = 1, cratesRequired = 3 },
-        { weight = 255, desc = "M-109", unit = "M-109", side = 2, cratesRequired = 3 },
+        { weight = 255, desc = "M-109", unit = "M-109", side = 2, cratesRequired = 2 },
 
-        { weight = 252, desc = "Ural-375 Ammo Truck", unit = "Ural-375", side = 1, cratesRequired = 2 },
         { weight = 253, desc = "M-818 Ammo Truck", unit = "M 818", side = 2, cratesRequired = 2 },
 
         { weight = 800, desc = "FOB Crate - Small", unit = "FOB-SMALL" }, -- Builds a FOB! - requires 3 * ctld.cratesRequiredForFOB
     },
     ["AA Crates"] = {
         { weight = 50, desc = "Stinger", unit = "Soldier stinger", side = 2 },
-        { weight = 55, desc = "Igla", unit = "SA-18 Igla manpad", side = 1 },
 
         -- HAWK System
         { weight = 540, desc = "HAWK Launcher", unit = "Hawk ln", side = 2},
@@ -558,25 +551,7 @@ ctld.spawnableCrates = {
         { weight = 551, desc = "HAWK PCP", unit = "Hawk pcp" , side = 2 }, -- Remove this if on 1.2
         { weight = 552, desc = "HAWK Repair", unit = "HAWK Repair" , side = 2 },
         -- End of HAWK
-
-        -- KUB SYSTEM
-        { weight = 560, desc = "KUB Launcher", unit = "Kub 2P25 ln", side = 1},
-        { weight = 565, desc = "KUB Radar", unit = "Kub 1S91 str", side = 1 },
-        { weight = 570, desc = "KUB Repair", unit = "KUB Repair", side = 1},
-        -- End of KUB
-
-        -- BUK System
-        --        { weight = 575, desc = "BUK Launcher", unit = "SA-11 Buk LN 9A310M1"},
-        --        { weight = 580, desc = "BUK Search Radar", unit = "SA-11 Buk SR 9S18M1"},
-        --        { weight = 585, desc = "BUK CC Radar", unit = "SA-11 Buk CC 9S470M1"},
-        --        { weight = 590, desc = "BUK Repair", unit = "BUK Repair"},
-        -- END of BUK
-
-        { weight = 595, desc = "Early Warning Radar", unit = "1L13 EWR", side = 1 }, -- cant be used by BLUE coalition
-
-        { weight = 405, desc = "Strela-1 9P31", unit = "Strela-1 9P31", side = 1, cratesRequired = 3 },
-        { weight = 400, desc = "M1097 Avenger", unit = "M1097 Avenger", side = 2, cratesRequired = 3 },
-
+        { weight = 400, desc = "M1097 Avenger", unit = "M1097 Avenger", side = 2, cratesRequired = 2 },
     },
 }
 
@@ -4571,17 +4546,17 @@ function ctld.dropSmoke(_args)
 end
 
 function ctld.dropSmokeRGB(_args)
-   
+
     local _heli = ctld.getTransportUnit(_args[1])
-    
+
     if _heli ~= nil then
-    
+
         local _point = _heli:getPoint()
-    
+
         local _pos2 = { x = _point.x, y = _point.z }
         local _alt = land.getHeight(_pos2)
         local _pos3 = { x = _point.x, y = _alt, z = _point.z }
-           
+
         --[[trigger.smokeColor
                 Green   0
                 Red     1
@@ -4589,25 +4564,25 @@ function ctld.dropSmokeRGB(_args)
                 Orange  3
                 Blue    4
         ]]
-    
+
         local _colour = ""
-    
+
         _colour = "RED"
-    
+
         trigger.action.smoke(_pos3, trigger.smokeColor.Red)
-            
+
         _colour = "BLUE"
-    
+
         trigger.action.smoke(_pos3, trigger.smokeColor.Blue)
-        
+
         _colour = "GREEN"
-            
+
         trigger.action.smoke(_pos3, trigger.smokeColor.Green)
-    
-        end 
-    
+
+        end
+
             trigger.action.outTextForCoalition(_heli:getCoalition(), ctld.getPlayerNameOrType(_heli) .. " dropped RGB smoke!) ", 10)
-end   
+end
 
 function ctld.unitCanCarryVehicles(_unit)
 
