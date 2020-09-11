@@ -19,7 +19,6 @@ local INIT = true
 
 local ContestedBases = {
   "Aleppo",
-  -- "Taftanaz",
   "Abu al-Duhur",
   "Hatay",
   "Haifa",
@@ -29,6 +28,11 @@ local ContestedBases = {
   "Beirut-Rafic Hariri",
   "Damascus",
   "Hama"
+}
+
+local AG_BASES = {
+  "Damascus",
+  "Bassel Al-Assad",
 }
 
 local sceneryTargets = {"damascus-target-1", "damascus-target-2", "damascus-target-3"}
@@ -307,6 +311,7 @@ commandCenter2 = StaticObject.getByName('REDHQ')
 redIADS:addCommandCenter(commandCenter2)
 redIADS:setUpdateInterval(15)
 redIADS:addEarlyWarningRadarsByPrefix('EWR')
+redIADS:addEarlyWarningRadar('redAWACS')
 redIADS:addSAMSitesByPrefix('SAM')
 redIADS:getSAMSitesByNatoName('SA-2'):setGoLiveRangeInPercent(80)
 redIADS:getSAMSitesByNatoName('SA-3'):setGoLiveRangeInPercent(80)
@@ -319,15 +324,25 @@ DetectionSetGroup = SET_GROUP:New()
 redIADS:addMooseSetGroup(DetectionSetGroup)
 
 Detection = DETECTION_AREAS:New( DetectionSetGroup, 130000 )
-A2ADispatcher = AI_A2A_DISPATCHER:New( Detection )
 redCommand = COMMANDCENTER:New( GROUP:FindByName( "REDHQ" ), "RedHQ" )
 BorderZone = ZONE_POLYGON:New( "RED-BORDER", GROUP:FindByName( "SyAF-GCI" ) )
+
+A2ADispatcher = AI_A2A_DISPATCHER:New( Detection )
 A2ADispatcher:SetBorderZone( BorderZone )
 A2ADispatcher:SetCommandCenter(redCommand)
 A2ADispatcher:SetEngageRadius(100000)
 A2ADispatcher:SetDisengageRadius(190000)
 A2ADispatcher:SetIntercept( 10 )
 A2ADispatcher:SetGciRadius()
+
+
+
+A2GDispatcher = AI_A2G_DISPATCHER:New( Detection )
+A2GDispatcher:AddDefenseCoordinate( "RedHQ", GROUP:FindByName( "REDHQ" ):GetCoordinate() )
+A2GDispatcher:SetDefenseReactivityMedium()
+
+A2GDispatcher:SetBorderZone( BorderZone )
+A2GDispatcher:SetCommandCenter(redCommand)
 
 -- For reach numbered group, for each airbase,
 -- Attempt to find the group, destroying it if the airbase is blue, and activating it
@@ -358,16 +373,29 @@ for _, base in pairs(ContestedBases) do
     if GROUP:FindByName(sqd) ~= nil then
       utils.log("Creating a2a group: "..base)
       A2ADispatcher:SetSquadron( sqd, base, sqdName ) --, 10)
-      A2ADispatcher:SetDefaultTakeoffInAir(sqd)
-      A2ADispatcher:SetSquadronLandingNearAirbase(sqd)
+      A2ADispatcher:SetDefaultTakeoffInAir( sqd )
+      A2ADispatcher:SetSquadronLandingNearAirbase( sqd )
       A2ADispatcher:SetSquadronOverhead( sqd, 1 )
       A2ADispatcher:SetSquadronGrouping( sqd, math.random(3) )
       A2ADispatcher:SetSquadronGci( sqd, 900, 1200 )
       A2ADispatcher:SetSquadronCap( sqd, zone, 5000, 30000, 400, 700, 900, 1200, "BARO")
-      A2ADispatcher:SetSquadronCapInterval( sqd, 1, 2, 120, 1 )
-      A2ADispatcher:SetSquadronCapRacetrack(sqd, 5000, 10000, 90, 180, 10*60, 20*60)
+      A2ADispatcher:SetSquadronCapInterval( sqd, 1, 2, 240, 1 )
+      A2ADispatcher:SetSquadronCapRacetrack(sqd, 10000, 20000, 90, 180, 10*60, 20*60)
     else
       env.info("Could not spawn red a2a group: "..sqd.."!")
+    end
+
+    for _, agBase in pairs(AG_BASES) do
+      if agBase == base then
+        local sqd_gnd = base.."-gnd"
+        local sqdName_gnd = { "jf-17-strike" }
+        A2GDispatcher:SetSquadron(sqd_gnd, base, sqdName_gnd )
+        A2GDispatcher:SetSquadronOverhead( sqd_gnd, 0.5 )
+        A2GDispatcher:SetSquadronGrouping( sqd_gnd, 1 )
+        A2GDispatcher:SetSquadronBai(sqd_gnd, 250, 500, 10000, 25000 )
+        A2GDispatcher:SetDefaultTakeoffInAir( sqd_gnd )
+        A2GDispatcher:SetSquadronLandingNearAirbase( sqd_gnd )
+      end
     end
 
     for i=1,_NumAirbaseDefenders do
@@ -393,10 +421,14 @@ for _, base in pairs(ContestedBases) do
 end
 
 if DEBUG then
-  A2ADispatcher:SetTacticalDisplay(true)
+  A2ADispatcher:SetTacticalDisplay(false)
+  A2GDispatcher:SetTacticalDisplay(true)
 end
 
+
 A2ADispatcher:Start()
+A2GDispatcher:Start()
+
 
 local function ShowStatus(  )
   for i, name in pairs(sceneryTargets) do
@@ -465,6 +497,3 @@ function EH1:OnEventDead(EventData)
   end
   utils.saveTable(_STATE, BASE_FILE)
 end
-
-local is_server = DCS.isServer()
-env.info('syr-miz init complete: '..tostring(is_server))
