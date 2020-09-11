@@ -94,7 +94,73 @@ local function respawnHAWKFromState(_points)
   log("Done Spawning hawk from state")
 end
 
+Spawner = function(grpName)
+  local CallBack = {}
+  local handleSpawnedGroup = function(spawnedGroup)
+      if spawnedGroup and spawnedGroup:getCoalition() == coalition.side.RED then
+          --I really want this only to affect red air fighters.
+          --I don't think we need to filter by fighters because
+          --the larger planes can probably survive in the air
+          --for the duration of the mission (~4 hr).
+          DisableRTB(spawnedGroup)
+      end
+  end
+  local executeCallBack = function(addedGroup)
+      if CallBack.func then
+          if not CallBack.args then CallBack.args = {} end
+          mist.scheduleFunction(CallBack.func, {addedGroup, unpack(CallBack.args)}, timer.getTime() + 1)
+      end
+      --Also run any additional handlers when we spawn groups
+      handleSpawnedGroup(addedGroup)
+  end
+  return {
+      _spawnAttempts = 0,
+      MEName = grpName,
+      Spawn = function(self)
+          local added_grp = Group.getByName(mist.cloneGroup(grpName, true).name)
+          executeCallBack(added_grp)
+          return added_grp
+      end,
+      SpawnAtPoint = function(self, point, noDisperse)
+          local vars = {
+              groupName = grpName,
+              point = point,
+              action = "clone",
+              disperse = true,
+              maxDisp = 1000,
+              route = mist.getGroupRoute(grpName, 'task')
+          }
 
+          if noDisperse then
+              vars.disperse = false
+          end
+
+          local new_group = mist.teleportToPoint(vars)
+          if new_group then
+              local spawned_grp = Group.getByName(new_group.name)
+              executeCallBack(spawned_grp)
+              return spawned_grp
+          else
+              if self._spawnAttempts >= 10 then
+                  log("Error spawning " .. grpName .. " after " .. self._spawnAttempts .." attempts." )
+              else
+                  self._spawnAttempts = self._spawnAttempts + 1
+                  self:SpawnAtPoint(point, noDisperse)
+              end
+          end
+      end,
+      SpawnInZone = function(self, zoneName)
+          log("Creating spawn in zone:" .. zoneName)
+          local zone = trigger.misc.getZone(zoneName)
+          local point = mist.getRandPointInCircle(zone.point, zone.radius)
+          return self:SpawnAtPoint(point)
+      end,
+      OnSpawnGroup = function(self, f, args)
+          CallBack.func = f
+          CallBack.args = args
+      end
+  }
+end
 
 
 return {
