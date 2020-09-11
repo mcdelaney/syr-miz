@@ -47,7 +47,8 @@
 			"land",
 			"Weapon",
 			"STATIC",
-			"Spawner"
+			"Spawner",
+			"A2GAispatcher"
 		],
 		"Lua.diagnostics.disable": [
 			"lowercase-global"
