@@ -5,17 +5,20 @@ package.path = MODULE_FOLDER .. "?.lua;" .. package.path
 -- local ctld = require("ctld.lua")
 local ctld_config = require("ctld_config")
 local utils = require("utils")
-local DEBUG = false
+
 
 local BASE_FILE = lfs.writedir() .. "Scripts\\syr-miz\\syr_state.json"
 local _STATE = {}
 _STATE["bases"] = {}
 _STATE["slots"] = {}
+_STATE["scenery"] = {}
 _STATE["ctld_units"] = {}
 _STATE["hawks"] = {}
 _STATE["dead"] = {}
 local INIT = true
-
+local DEBUG_DISPATCH = false
+local DEBUG_IADS = false
+local A2G_ACTIVE = true
 
 local ContestedBases = {
   "Aleppo",
@@ -35,6 +38,8 @@ local AG_BASES = {
   "Bassel Al-Assad",
 }
 
+-- obj:TraceAll(true)
+-- obj:TraceOnOff(true)
 local sceneryTargets = {"damascus-target-1", "damascus-target-2", "damascus-target-3"}
 
 local _NumAirbaseDefenders = 1
@@ -288,11 +293,20 @@ else
   for _, unit in pairs(_STATE["dead"]) do
     removeUnit(unit)
   end
+
+  -- for _, coord in pairs(_STATE["scenery"]) do
+
+  --   local Zone = ZONE:New( name )
+  --   Zone:Scan( Object.Category.SCENERY )
+
+  --   removeUnit(coord)
+  -- end
+
 end
 
 
 redIADS = SkynetIADS:create('SYRIA')
-if DEBUG then
+if DEBUG_IADS then
   local iadsDebug = redIADS:getDebugSettings()
   iadsDebug.IADSStatus = true
   iadsDebug.samWentDark = false
@@ -313,36 +327,34 @@ redIADS:setUpdateInterval(15)
 redIADS:addEarlyWarningRadarsByPrefix('EWR')
 redIADS:addEarlyWarningRadar('redAWACS')
 redIADS:addSAMSitesByPrefix('SAM')
-redIADS:getSAMSitesByNatoName('SA-2'):setGoLiveRangeInPercent(80)
-redIADS:getSAMSitesByNatoName('SA-3'):setGoLiveRangeInPercent(80)
-redIADS:getSAMSitesByNatoName('SA-10'):setGoLiveRangeInPercent(80)
-redIADS:getSAMSitesByNatoName('SA-6'):setGoLiveRangeInPercent(80)
-redIADS:getSAMSitesByNatoName('SA-19'):setGoLiveRangeInPercent(80)
-redIADS:setupSAMSitesAndThenActivate()
+redIADS:getSAMSites():setEngagementZone(SkynetIADSAbstractRadarElement.GO_LIVE_WHEN_IN_SEARCH_RANGE):setGoLiveRangeInPercent(70)
+redIADS:getSAMSitesByPrefix("SA-10"):setActAsEW(true)
+-- redIADS:setupSAMSitesAndThenActivate(30)
+redIADS:activate()
 
-DetectionSetGroup = SET_GROUP:New()
-redIADS:addMooseSetGroup(DetectionSetGroup)
+DetectionSetGroup = SET_GROUP:New():FilterPrefixes({"EWR", "redAWACS"}):FilterActive(true):FilterStart()
+-- redIADS:addMooseSetGroup(DetectionSetGroup)
+Detection = DETECTION_AREAS:New( DetectionSetGroup, 30000 )
 
-Detection = DETECTION_AREAS:New( DetectionSetGroup, 130000 )
-redCommand = COMMANDCENTER:New( GROUP:FindByName( "REDHQ" ), "RedHQ" )
-BorderZone = ZONE_POLYGON:New( "RED-BORDER", GROUP:FindByName( "SyAF-GCI" ) )
+redCommand = COMMANDCENTER:New( GROUP:FindByName( "REDHQ" ), "REDHQ" )
 
 A2ADispatcher = AI_A2A_DISPATCHER:New( Detection )
+
+BorderZone = ZONE_POLYGON:New( "RED-BORDER", GROUP:FindByName( "red-border" ) )
+
 A2ADispatcher:SetBorderZone( BorderZone )
 A2ADispatcher:SetCommandCenter(redCommand)
-A2ADispatcher:SetEngageRadius(100000)
-A2ADispatcher:SetDisengageRadius(190000)
-A2ADispatcher:SetIntercept( 10 )
+A2ADispatcher:SetEngageRadius()
 A2ADispatcher:SetGciRadius()
+-- A2ADispatcher:SetIntercept( 10 )
 
-
-
-A2GDispatcher = AI_A2G_DISPATCHER:New( Detection )
-A2GDispatcher:AddDefenseCoordinate( "RedHQ", GROUP:FindByName( "REDHQ" ):GetCoordinate() )
-A2GDispatcher:SetDefenseReactivityMedium()
-
-A2GDispatcher:SetBorderZone( BorderZone )
-A2GDispatcher:SetCommandCenter(redCommand)
+if A2G_ACTIVE then
+  A2GDispatcher = AI_A2G_DISPATCHER:New( Detection )
+  A2GDispatcher:AddDefenseCoordinate( "RedHQ", GROUP:FindByName( "REDHQ" ):GetCoordinate() )
+  A2GDispatcher:SetDefenseReactivityHigh()
+  A2GDispatcher:SetBorderZone( BorderZone )
+  A2GDispatcher:SetCommandCenter(redCommand)
+end
 
 -- For reach numbered group, for each airbase,
 -- Attempt to find the group, destroying it if the airbase is blue, and activating it
@@ -360,41 +372,49 @@ for _, base in pairs(ContestedBases) do
     setBaseBlue(base)
   else
     setBaseRed(base)
-    local zone_name = base.."-cap-zone"
+    local zone_name = base.."-capzone"
     local zone = ZONE:FindByName(zone_name)
     if zone == nil then
-      zone = ZONE_AIRBASE:New(base, 350000)
+      zone = ZONE_AIRBASE:New(base, 150000)
       zone:SetName(zone_name)
     end
 
     local sqd = base.."-cap"
-    local sqdName = {"su-30-base-gci", "su-30-base-cap"}
+    local sqd_gci = base.."-gci"
+    local sqdName = { sqd }
+
 
     if GROUP:FindByName(sqd) ~= nil then
       utils.log("Creating a2a group: "..base)
+
       A2ADispatcher:SetSquadron( sqd, base, sqdName ) --, 10)
+      A2ADispatcher:SetSquadronGrouping( sqd, 2 )
       A2ADispatcher:SetDefaultTakeoffInAir( sqd )
       A2ADispatcher:SetSquadronLandingNearAirbase( sqd )
-      A2ADispatcher:SetSquadronOverhead( sqd, 1 )
-      A2ADispatcher:SetSquadronGrouping( sqd, math.random(3) )
-      A2ADispatcher:SetSquadronGci( sqd, 900, 1200 )
-      A2ADispatcher:SetSquadronCap( sqd, zone, 5000, 30000, 400, 700, 900, 1200, "BARO")
-      A2ADispatcher:SetSquadronCapInterval( sqd, 1, 2, 240, 1 )
-      A2ADispatcher:SetSquadronCapRacetrack(sqd, 10000, 20000, 90, 180, 10*60, 20*60)
+      A2ADispatcher:SetSquadronCap( sqd, zone, 5000, 30000, 600, 800, 800, 1200, "BARO")
+      A2ADispatcher:SetSquadronCapInterval( sqd, 1, 2, 30, 1)
+      A2ADispatcher:SetSquadronCapRacetrack(sqd, 5000, 10000, 90, 180, 10*60, 20*60)
+
+      A2ADispatcher:SetSquadron( sqd_gci, base, {"su-30-base-gci"} )
+      A2ADispatcher:SetSquadronGrouping( sqd_gci, 1 )
+      A2ADispatcher:SetSquadronGci( sqd_gci, 900, 1200 )
+
     else
       env.info("Could not spawn red a2a group: "..sqd.."!")
     end
 
-    for _, agBase in pairs(AG_BASES) do
-      if agBase == base then
-        local sqd_gnd = base.."-gnd"
-        local sqdName_gnd = { "jf-17-strike" }
-        A2GDispatcher:SetSquadron(sqd_gnd, base, sqdName_gnd )
-        A2GDispatcher:SetSquadronOverhead( sqd_gnd, 0.5 )
-        A2GDispatcher:SetSquadronGrouping( sqd_gnd, 1 )
-        A2GDispatcher:SetSquadronBai(sqd_gnd, 250, 500, 10000, 25000 )
-        A2GDispatcher:SetDefaultTakeoffInAir( sqd_gnd )
-        A2GDispatcher:SetSquadronLandingNearAirbase( sqd_gnd )
+    if A2G_ACTIVE then
+      for _, agBase in pairs(AG_BASES) do
+        if agBase == base then
+          local sqd_gnd = base.."-gnd"
+          local sqdName_gnd = { "jf-17-strike" }
+          A2GDispatcher:SetSquadron(sqd_gnd, base, sqdName_gnd )
+          A2GDispatcher:SetSquadronOverhead( sqd_gnd, 0.5 )
+          A2GDispatcher:SetSquadronGrouping( sqd_gnd, 1 )
+          A2GDispatcher:SetSquadronBai(sqd_gnd, 250, 500, 10000, 25000 )
+          A2GDispatcher:SetDefaultTakeoffInAir( sqd_gnd )
+          A2GDispatcher:SetSquadronLandingNearAirbase( sqd_gnd )
+        end
       end
     end
 
@@ -420,15 +440,15 @@ for _, base in pairs(ContestedBases) do
   utils.saveTable(_STATE, BASE_FILE)
 end
 
-if DEBUG then
-  A2ADispatcher:SetTacticalDisplay(false)
-  A2GDispatcher:SetTacticalDisplay(true)
+if DEBUG_DISPATCH then
+  A2ADispatcher:SetTacticalDisplay(true)
+  -- A2GDispatcher:SetTacticalDisplay(true)
 end
 
-
 A2ADispatcher:Start()
-A2GDispatcher:Start()
-
+if A2G_ACTIVE then
+  A2GDispatcher:Start()
+end
 
 local function ShowStatus(  )
   for i, name in pairs(sceneryTargets) do
@@ -488,6 +508,9 @@ function EH1:OnEventDead(EventData)
   end
 
   if EventData.IniUnit and EventData.IniObjectCategory==Object.Category.SCENERY then
+    if EventData.IniUnitName ~= nil then
+      table.insert(_STATE["scenery"], EventData.MarkCoordinate)
+    end
     for id, name in pairs(sceneryTargets) do
       if EventData.IniUnitName ~= nil and EventData.IniUnitName == id then
         MESSAGE:New(name.." Destoyed!").ToAll()
