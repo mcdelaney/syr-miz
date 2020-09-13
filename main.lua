@@ -424,8 +424,9 @@ end
 
 local MenuCoalitionBlue = MENU_COALITION:New( coalition.side.BLUE, "Mission Data" )
 MENU_COALITION_COMMAND:New( coalition.side.BLUE, "Show Objectives", MenuCoalitionBlue, ShowStatus )
-MENU_COALITION_COMMAND:New( coalition.side.BLUE, "Toggle Debug", MenuCoalitionBlue, ToggleDebug )
 
+local MenuCoalitionRed = MENU_COALITION:New( coalition.side.RED, "Mission Data" )
+MENU_COALITION_COMMAND:New( coalition.side.RED, "Toggle Debug", MenuCoalitionRed, ToggleDebug )
 
 EH1 = EVENTHANDLER:New()
 EH1:HandleEvent(EVENTS.MarkRemoved)
