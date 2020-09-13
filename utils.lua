@@ -163,6 +163,63 @@ Spawner = function(grpName)
 end
 
 
+
+local init_ctld_units = function(args, coords2D, _country, ctld_unitIndex, key)
+  --Spawns the CTLD unit at a given point using the ctld_config templates,
+  --returning the unit object so that it can be tracked later.
+  --
+  --Inputs
+  --  args : table
+  --    The ctld_config unit template to spawn.
+  --    Ex. ctld_config.unit_config["M818 Transport"]
+  --  coord2D : table {x,y}
+  --    The location to spawn the unit at.
+  --  _country : int or str
+  --    The country ID that the spawned unit will belong to. Ex. 2='USA'
+  --  cltd_unitIndex : table
+  --    The table of unit indices to help keep track of unit IDs. This table
+  --    will be accessed by keys so that the indices are passed by reference
+  --    rather than by value.
+  --  key : str
+  --    The table entry of cltd_unitIndex that will be incremented after a
+  --    unit and group name are assigned.
+  --    Ex. key = "Gepard_Index"
+  --
+  --Outputs
+  --  Group_Object : obj
+  --    A reference to the spawned group object so that it can be tracked.
+
+      local unitNumber = ctld_unitIndex[key]
+      local CTLD_Group = {
+          ["visible"] = false,
+          ["hidden"] = false,
+          ["units"] = {
+            [1] = {
+              ["type"] = args.type,                           --unit type
+              ["name"] = args.name .. unitNumber,             --unit name
+              ["heading"] = 0,
+              ["playerCanDrive"] = args.playerCanDrive,
+              ["skill"] = args.skill,
+              ["x"] = coords2D.x,
+              ["y"] = coords2D.y,
+            },
+          },
+          ["name"] = args.name .. unitNumber,                 --group name
+          ["task"] = {},
+          ["category"] = Group.Category.GROUND,
+          ["country"] = _country                              --group country
+      }
+
+      --Debug
+      --trigger.action.outTextForCoalition(2,"CTLD Unit: "..CTLD_Group.name, 30)
+      --Increment Index and spawn unit
+      ctld_unitIndex[key] = unitNumber + 1
+      local _spawnedGroup = mist.dynAdd(CTLD_Group)
+
+      return Group.getByName(_spawnedGroup.name)              --Group object
+  end
+
+
 return {
   file_exists = file_exists,
   readState = readState,
@@ -172,4 +229,5 @@ return {
   destroyIfExists = destroyIfExists,
   respawnHAWKFromState = respawnHAWKFromState,
   log = log,
+  init_ctld_units = init_ctld_units,
 }

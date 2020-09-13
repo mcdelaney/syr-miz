@@ -30,6 +30,7 @@ local ContestedBases = {
   "Bassel Al-Assad",
   "Beirut-Rafic Hariri",
   "Damascus",
+  "Al Qusayr",
   "Hama"
 }
 
@@ -90,141 +91,6 @@ ctld.addCallback(function(_args)
   end
 end)
 
-INIT_CTLD_UNITS = function(args, coords2D, _country, ctld_unitIndex, key)
-  --Spawns the CTLD unit at a given point using the ctld_config templates,
-  --returning the unit object so that it can be tracked later.
-  --
-  --Inputs
-  --  args : table
-  --    The ctld_config unit template to spawn.
-  --    Ex. ctld_config.unit_config["M818 Transport"]
-  --  coord2D : table {x,y}
-  --    The location to spawn the unit at.
-  --  _country : int or str
-  --    The country ID that the spawned unit will belong to. Ex. 2='USA'
-  --  cltd_unitIndex : table
-  --    The table of unit indices to help keep track of unit IDs. This table
-  --    will be accessed by keys so that the indices are passed by reference
-  --    rather than by value.
-  --  key : str
-  --    The table entry of cltd_unitIndex that will be incremented after a
-  --    unit and group name are assigned.
-  --    Ex. key = "Gepard_Index"
-  --
-  --Outputs
-  --  Group_Object : obj
-  --    A reference to the spawned group object so that it can be tracked.
-
-      local unitNumber = ctld_unitIndex[key]
-      local CTLD_Group = {
-          ["visible"] = false,
-          ["hidden"] = false,
-          ["units"] = {
-            [1] = {
-              ["type"] = args.type,                           --unit type
-              ["name"] = args.name .. unitNumber,             --unit name
-              ["heading"] = 0,
-              ["playerCanDrive"] = args.playerCanDrive,
-              ["skill"] = args.skill,
-              ["x"] = coords2D.x,
-              ["y"] = coords2D.y,
-            },
-          },
-          ["name"] = args.name .. unitNumber,                 --group name
-          ["task"] = {},
-          ["category"] = Group.Category.GROUND,
-          ["country"] = _country                              --group country
-      }
-
-      --Debug
-      --trigger.action.outTextForCoalition(2,"CTLD Unit: "..CTLD_Group.name, 30)
-      --Increment Index and spawn unit
-      ctld_unitIndex[key] = unitNumber + 1
-      local _spawnedGroup = mist.dynAdd(CTLD_Group)
-
-      return Group.getByName(_spawnedGroup.name)              --Group object
-  end
-
-  utils.log("START: Spawning CTLD units from state")
-  local ctld_unitIndex = ctld_config.unit_index
-  for idx, data in ipairs(_STATE["ctld_units"]) do
-
-      local coords2D = { x = data.pos.x, y = data.pos.z}
-      local country = 2   --USA
-
-      if data.name == 'mlrs' then
-          local key = "M270_Index"
-          INIT_CTLD_UNITS(ctld_config.unit_config["MLRS M270"], coords2D, country, ctld_unitIndex, key)
-      end
-
-      if data.name == 'M-109' then
-          local key = "M109_Index"
-          INIT_CTLD_UNITS(ctld_config.unit_config["M109 Paladin"], coords2D, country, ctld_unitIndex, key)
-      end
-
-      if data.name == 'abrams' then
-          local key = "M1A1_Index"
-          INIT_CTLD_UNITS(ctld_config.unit_config["M1A1 Abrams"], coords2D, country, ctld_unitIndex, key)
-      end
-
-      if data.name == 'jtac' then
-          local key = "JTAC_Index"
-          local _spawnedGroup = INIT_CTLD_UNITS(ctld_config.unit_config["HMMWV JTAC"], coords2D, country, ctld_unitIndex, key)
-
-          local _code = table.remove(ctld.jtacGeneratedLaserCodes, 1)
-          table.insert(ctld.jtacGeneratedLaserCodes, _code)
-          ctld.JTACAutoLase(_spawnedGroup:getName(), _code)
-      end
-
-      if data.name == 'ammo' then
-          local key = "M818_Index"
-          INIT_CTLD_UNITS(ctld_config.unit_config["M818 Transport"], coords2D, country, ctld_unitIndex, key)
-      end
-
-      if data.name == 'stinger' then
-        local key = "Stinger_Index"
-        INIT_CTLD_UNITS(ctld_config.unit_config["Stinger"], coords2D, country, ctld_unitIndex, key)
-      end
-
-      if data.name == 'gepard' then
-          local key = "Gepard_Index"
-          INIT_CTLD_UNITS(ctld_config.unit_config["Flugabwehrkanonenpanzer Gepard"], coords2D, country, ctld_unitIndex, key)
-      end
-
-      if data.name == 'vulcan' then
-          local key = "Vulcan_Index"
-          INIT_CTLD_UNITS(ctld_config.unit_config["M163 Vulcan"], coords2D, country, ctld_unitIndex, key)
-      end
-
-      if data.name == 'avenger' then
-          local key = "Avenger_Index"
-          INIT_CTLD_UNITS(ctld_config.unit_config["M1097 Avenger"], coords2D, country, ctld_unitIndex, key)
-      end
-
-      if data.name == 'chaparral' then
-          local key = "Chaparral_Index"
-          INIT_CTLD_UNITS(ctld_config.unit_config["M48 Chaparral"], coords2D, country, ctld_unitIndex, key)
-      end
-
-      if data.name == 'roland' then
-          local key = "Roland_Index"
-          INIT_CTLD_UNITS(ctld_config.unit_config["Roland ADS"], coords2D, country, ctld_unitIndex, key)
-      end
-
-      if data.name == 'ipv' then
-        local key = "IPV_Index"
-        INIT_CTLD_UNITS(ctld_config.unit_config["IPV LAV-25"], coords2D, country, ctld_unitIndex, key)
-    end
-  end
-
-  local CTLDstate = _STATE["hawks"]
-  if CTLDstate ~= nil then
-      for k,v in pairs(CTLDstate) do
-          utils.respawnHAWKFromState(v)
-      end
-  end
-
-  -- game_state["CTLD_ASSETS"] = saved_game_state["CTLD_ASSETS"]
 
 local function prune_enemies(Site, name)
   local countTotal=Site:Count()
@@ -305,6 +171,84 @@ else
 end
 
 
+utils.log("START: Spawning CTLD units from state")
+local ctld_unitIndex = ctld_config.unit_index
+for idx, data in ipairs(_STATE["ctld_units"]) do
+
+    local coords2D = { x = data.pos.x, y = data.pos.z}
+    local country = 2   --USA
+
+    if data.name == 'mlrs' then
+        local key = "M270_Index"
+        utils.init_ctld_units(ctld_config.unit_config["MLRS M270"], coords2D, country, ctld_unitIndex, key)
+    end
+
+    if data.name == 'M-109' then
+        local key = "M109_Index"
+        utils.init_ctld_units(ctld_config.unit_config["M109 Paladin"], coords2D, country, ctld_unitIndex, key)
+    end
+
+    if data.name == 'abrams' then
+        local key = "M1A1_Index"
+        utils.init_ctld_units(ctld_config.unit_config["M1A1 Abrams"], coords2D, country, ctld_unitIndex, key)
+    end
+
+    if data.name == 'jtac' then
+        local key = "JTAC_Index"
+        local _spawnedGroup = utils.init_ctld_units(ctld_config.unit_config["HMMWV JTAC"], coords2D, country, ctld_unitIndex, key)
+
+        local _code = table.remove(ctld.jtacGeneratedLaserCodes, 1)
+        table.insert(ctld.jtacGeneratedLaserCodes, _code)
+        ctld.JTACAutoLase(_spawnedGroup:getName(), _code)
+    end
+
+    if data.name == 'ammo' then
+        local key = "M818_Index"
+        utils.init_ctld_units(ctld_config.unit_config["M818 Transport"], coords2D, country, ctld_unitIndex, key)
+    end
+
+    if data.name == 'stinger' then
+      local key = "Stinger_Index"
+      utils.init_ctld_units(ctld_config.unit_config["Stinger"], coords2D, country, ctld_unitIndex, key)
+    end
+
+    if data.name == 'gepard' then
+        local key = "Gepard_Index"
+        utils.init_ctld_units(ctld_config.unit_config["Flugabwehrkanonenpanzer Gepard"], coords2D, country, ctld_unitIndex, key)
+    end
+
+    if data.name == 'vulcan' then
+        local key = "Vulcan_Index"
+        utils.init_ctld_units(ctld_config.unit_config["M163 Vulcan"], coords2D, country, ctld_unitIndex, key)
+    end
+
+    if data.name == 'avenger' then
+        local key = "Avenger_Index"
+        utils.init_ctld_units(ctld_config.unit_config["M1097 Avenger"], coords2D, country, ctld_unitIndex, key)
+    end
+
+    if data.name == 'chaparral' then
+        local key = "Chaparral_Index"
+        utils.init_ctld_units(ctld_config.unit_config["M48 Chaparral"], coords2D, country, ctld_unitIndex, key)
+    end
+
+    if data.name == 'roland' then
+        local key = "Roland_Index"
+        utils.init_ctld_units(ctld_config.unit_config["Roland ADS"], coords2D, country, ctld_unitIndex, key)
+    end
+
+    if data.name == 'ipv' then
+      local key = "IPV_Index"
+      utils.init_ctld_units(ctld_config.unit_config["IPV LAV-25"], coords2D, country, ctld_unitIndex, key)
+  end
+end
+
+if  _STATE["hawks"] ~= nil then
+    for k,v in pairs( _STATE["hawks"]) do
+        utils.respawnHAWKFromState(v)
+    end
+end
+
 redIADS = SkynetIADS:create('SYRIA')
 if DEBUG_IADS then
   local iadsDebug = redIADS:getDebugSettings()
@@ -319,37 +263,34 @@ if DEBUG_IADS then
 end
 
 
-commandCenter1 = StaticObject.getByName('red-command-center')
+commandCenter1 = StaticObject.getByName('RED-HQ-2')
 redIADS:addCommandCenter(commandCenter1)
-commandCenter2 = StaticObject.getByName('REDHQ')
-redIADS:addCommandCenter(commandCenter2)
 redIADS:setUpdateInterval(15)
 redIADS:addEarlyWarningRadarsByPrefix('EWR')
 redIADS:addEarlyWarningRadar('redAWACS')
 redIADS:addSAMSitesByPrefix('SAM')
-redIADS:getSAMSites():setEngagementZone(SkynetIADSAbstractRadarElement.GO_LIVE_WHEN_IN_SEARCH_RANGE):setGoLiveRangeInPercent(70)
+redIADS:getSAMSites():setEngagementZone(SkynetIADSAbstractRadarElement.GO_LIVE_WHEN_IN_SEARCH_RANGE):setGoLiveRangeInPercent(80)
 redIADS:getSAMSitesByPrefix("SA-10"):setActAsEW(true)
--- redIADS:setupSAMSitesAndThenActivate(30)
-redIADS:activate()
+redIADS:setupSAMSitesAndThenActivate()
+-- redIADS:activate()
 
 DetectionSetGroup = SET_GROUP:New():FilterPrefixes({"EWR", "redAWACS"}):FilterActive(true):FilterStart()
--- redIADS:addMooseSetGroup(DetectionSetGroup)
 Detection = DETECTION_AREAS:New( DetectionSetGroup, 30000 )
+BorderZone = ZONE_POLYGON:New( "RED-BORDER", GROUP:FindByName( "red-border" ) )
 
 redCommand = COMMANDCENTER:New( GROUP:FindByName( "REDHQ" ), "REDHQ" )
 
 A2ADispatcher = AI_A2A_DISPATCHER:New( Detection )
-
-BorderZone = ZONE_POLYGON:New( "RED-BORDER", GROUP:FindByName( "red-border" ) )
-
 A2ADispatcher:SetBorderZone( BorderZone )
 A2ADispatcher:SetCommandCenter(redCommand)
 A2ADispatcher:SetEngageRadius()
 A2ADispatcher:SetGciRadius()
--- A2ADispatcher:SetIntercept( 10 )
+A2ADispatcher:SetIntercept( 10 )
 
 if A2G_ACTIVE then
-  A2GDispatcher = AI_A2G_DISPATCHER:New( Detection )
+  DetectionSetGroup_G = SET_GROUP:New():FilterPrefixes({"EWR", "redAWACS"}):FilterActive(true):FilterStart()
+  Detection_G = DETECTION_AREAS:New( DetectionSetGroup, 1000 )
+  A2GDispatcher = AI_A2G_DISPATCHER:New( Detection_G )
   A2GDispatcher:AddDefenseCoordinate( "RedHQ", GROUP:FindByName( "REDHQ" ):GetCoordinate() )
   A2GDispatcher:SetDefenseReactivityHigh()
   A2GDispatcher:SetBorderZone( BorderZone )
@@ -390,10 +331,12 @@ for _, base in pairs(ContestedBases) do
       A2ADispatcher:SetSquadron( sqd, base, sqdName ) --, 10)
       A2ADispatcher:SetSquadronGrouping( sqd, 2 )
       A2ADispatcher:SetDefaultTakeoffInAir( sqd )
+      A2ADispatcher:SetDefaultTakeoffInAirAltitude(10000)
+      -- A2ADispatcher.SetSquadronFuelThreshold(sqd, 0.01)
       A2ADispatcher:SetSquadronLandingNearAirbase( sqd )
-      A2ADispatcher:SetSquadronCap( sqd, zone, 5000, 30000, 600, 800, 800, 1200, "BARO")
+      A2ADispatcher:SetSquadronCap( sqd, zone, 10000, 25000, 500, 800, 600, 1200, "BARO")
       A2ADispatcher:SetSquadronCapInterval( sqd, 1, 2, 30, 1)
-      A2ADispatcher:SetSquadronCapRacetrack(sqd, 5000, 10000, 90, 180, 10*60, 20*60)
+      A2ADispatcher:SetSquadronCapRacetrack(sqd, 10000, 20000, 90, 180, 5*60, 10*60)
 
       A2ADispatcher:SetSquadron( sqd_gci, base, {"su-30-base-gci"} )
       A2ADispatcher:SetSquadronGrouping( sqd_gci, 1 )
@@ -445,7 +388,9 @@ if DEBUG_DISPATCH then
   -- A2GDispatcher:SetTacticalDisplay(true)
 end
 
+
 A2ADispatcher:Start()
+
 if A2G_ACTIVE then
   A2GDispatcher:Start()
 end
@@ -464,8 +409,19 @@ local function ShowStatus(  )
   end
 end
 
-local MenuCoalitionBlue = MENU_COALITION:New( coalition.side.BLUE, "Objectives" )
-local MenuAdd = MENU_COALITION_COMMAND:New( coalition.side.BLUE, "List", MenuCoalitionBlue, ShowStatus )
+
+local function ToggleDebug(  )
+  if DEBUG_DISPATCH then
+    DEBUG_DISPATCH = false
+  else
+    DEBUG_DISPATCH = true
+  end
+  A2ADispatcher:SetTacticalDisplay(DEBUG_DISPATCH)
+end
+
+local MenuCoalitionBlue = MENU_COALITION:New( coalition.side.BLUE, "Mission Data" )
+MENU_COALITION_COMMAND:New( coalition.side.BLUE, "Show Objectives", MenuCoalitionBlue, ShowStatus )
+MENU_COALITION_COMMAND:New( coalition.side.BLUE, "Toggle Debug", MenuCoalitionBlue, ToggleDebug )
 
 
 EH1 = EVENTHANDLER:New()
@@ -499,11 +455,12 @@ EH1:HandleEvent(EVENTS.Dead)
 function EH1:OnEventDead(EventData)
   if EventData.IniCoalition == coalition.side.RED then
     if EventData.IniGroupName ~= nil then
-      utils.log("Marking object dead: "..EventData.IniGroupName)
-    elseif _STATE["dead"] == nil then
-      _STATE["dead"] = { EventData.IniGroupName }
+      utils.log("Marking object dead: "..EventData.IniGroupName.." - "..EventData.IniUnitName)
+    end
+    if _STATE["dead"] == nil then
+      _STATE["dead"] = { EventData.IniUnitName }
     else
-      table.insert(_STATE["dead"], EventData.IniGroupName)
+      table.insert(_STATE["dead"], EventData.IniUnitName)
     end
   end
 

@@ -6,7 +6,7 @@
 -- labels =  0  -- NONE
 -- labels =  1  -- FULL
 -- labels =  2  -- ABBREVIATED
--- labels =  3  -- DOT ONLY
+labels =  3  -- DOT ONLY
 
 -- Off: No labels are used
 -- Full: As we have now
