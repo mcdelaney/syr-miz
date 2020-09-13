@@ -5,8 +5,6 @@ package.path = MODULE_FOLDER .. "?.lua;" .. package.path
 -- local ctld = require("ctld.lua")
 local ctld_config = require("ctld_config")
 local utils = require("utils")
-
-
 local BASE_FILE = lfs.writedir() .. "Scripts\\syr-miz\\syr_state.json"
 local _STATE = {}
 _STATE["bases"] = {}
@@ -37,10 +35,10 @@ local ContestedBases = {
 local AG_BASES = {
   "Damascus",
   "Bassel Al-Assad",
+  "Al Qusayr",
 }
 
--- obj:TraceAll(true)
--- obj:TraceOnOff(true)
+
 local sceneryTargets = {"damascus-target-1", "damascus-target-2", "damascus-target-3"}
 
 local _NumAirbaseDefenders = 1
@@ -109,6 +107,11 @@ local function removeUnit (unitName)
   local grp = GROUP:FindByName(unitName)
   if grp ~= nil then
     grp:Destroy()
+  else
+    local unit = UNIT:FindByName(unitName)
+    if unit then
+      unit:Destroy()
+    end
   end
 end
 
@@ -306,7 +309,7 @@ for _, base in pairs(ContestedBases) do
     MESSAGE:New("Invalid airbase name in main.lua: " .. base, 5):ToCoalition( coalition.side.BLUE )
   end
 
-  if INIT then
+  if INIT or _STATE.bases[base] == nil then
     _STATE.bases[base] = base_obj:GetCoalition()
   end
   if _STATE.bases[base] == coalition.side.BLUE then
@@ -403,7 +406,7 @@ local function ShowStatus(  )
       for SceneryName, SceneryObject in pairs( SceneryData ) do
         local SceneryObject = SceneryObject
         MESSAGE:NewType( "Targets: " .. SceneryObject:GetTypeName() .. ", Coord LL DMS: " .. SceneryObject:GetCoordinate():ToStringLLDMS(),
-         MESSAGE.Type.Information ):ToAll()
+          MESSAGE.Type.Information ):ToAll()
       end
     end
   end
