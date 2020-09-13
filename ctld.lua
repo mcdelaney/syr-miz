@@ -193,7 +193,7 @@ ctld.pickupZones = {
 -- dropOffZones = {"name","smoke colour",0,side 1 = Red or 2 = Blue or 0 = Both sides}
 ctld.dropOffZones = {}
 for _, elem in pairs(ctld.pickupZones) do
-    table.insert(ctld.dropOffZones, { elem[1], "blue", 2} )
+    table.insert(ctld.dropOffZones, { elem[1], -1, 2} )
 end
 -- ctld.dropOffZones = {
 --     { "dropzone1", "blue", 2 },
