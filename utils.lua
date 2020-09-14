@@ -5,6 +5,14 @@ local jsonlib = lfs.writedir() .. "Scripts\\syr-miz\\json.lua"
 local json = loadfile(jsonlib)()
 logFile = io.open(lfs.writedir()..[[Logs\syr-miz.log]], "w")
 
+local function split(string, sep)
+  local fields = {}
+  local pattern = string.format("([^%s]+)", sep)
+  string:gsub(pattern, function(c)
+      fields[#fields + 1] = c
+  end)
+  return fields
+end
 
 
 local function log(str)
@@ -22,6 +30,7 @@ local file_exists = function(name)
         return false
     end
 end
+
 
 local readState = function (state_file)
     log("Reading state...")
@@ -220,6 +229,53 @@ local init_ctld_units = function(args, coords2D, _country, ctld_unitIndex, key)
   end
 
 
+local function startswith(string, prefix)
+    if string:sub(1, #prefix) == prefix then
+        return true
+    end
+    return false
+end
+
+local function matchesBaseName(baseName, prefix)
+  if prefix == nil then
+      return false
+  end
+  if startswith(baseName, prefix) then
+      return true
+  end
+
+  -- special case for typos!
+  if prefix == "Sukumi" and baseName == "Sukhumi-Babushara" then
+      return true
+  end
+
+  local baseNameParts = split(baseName, "-")
+  local prefixParts = split(prefix, "-")
+
+  if #baseNameParts < #prefixParts then
+      return false
+  end
+  for i = 1, #prefixParts do
+      local baseNamePart = baseNameParts[i]
+      local groupPrefixPart = prefixParts[i]
+      if startswith(baseNamePart, groupPrefixPart) == false then
+          return false
+      end
+  end
+  return true
+end
+
+local function getBaseAndSideNamesFromGroupName(groupName)
+  local blueIndex = string.find(groupName:lower(), " blue ")
+  local redIndex = string.find(groupName:lower(), " red ")
+  if blueIndex ~= nil then
+      return groupName:sub(1, blueIndex - 1), "blue"
+  end
+  if redIndex ~= nil then
+      return groupName:sub(1, redIndex - 1), "red"
+  end
+end
+
 return {
   file_exists = file_exists,
   readState = readState,
@@ -229,5 +285,8 @@ return {
   destroyIfExists = destroyIfExists,
   respawnHAWKFromState = respawnHAWKFromState,
   log = log,
+  startswith = startswith,
   init_ctld_units = init_ctld_units,
+  matchesBaseName = matchesBaseName,
+  getBaseAndSideNamesFromGroupName = getBaseAndSideNamesFromGroupName,
 }

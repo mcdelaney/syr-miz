@@ -151,24 +151,6 @@ ctld.JTAC_lock = "all" -- "vehicle" OR "troop" OR "all" forces JTAC to only lock
 
 --pickupZones = { "Zone name or Ship Unit Name", "smoke color", "limit (-1 unlimited)", "ACTIVE (yes/no)", "side (0 = Both sides / 1 = Red / 2 = Blue )", flag number (optional) }
 ctld.pickupZones = {
-    { "pickupzone1", "blue", -1, "yes", 2 },
-    { "pickupzone2", "blue", -1, "yes", 2 },
-    { "pickupzone3", "blue", -1, "yes", 2 },
-    { "pickupzone4", "blue", -1, "yes", 2 },
-    { "pickupzone5", "blue", -1, "yes", 2 },
-    { "pickupzone6", "blue", -1, "yes", 2 },
-    { "pickupzone7", "blue", -1, "yes", 2 },
-    { "pickupzone8", "blue", -1, "yes", 2 },
-    { "pickupzone9", "blue", -1, "yes", 2 }, -- limits pickup zone 9 to 5 groups of soldiers or vehicles, only red can pick up
-    { "pickupzone10", "blue", -1, "yes", 2 },  -- limits pickup zone 10 to 10 groups of soldiers or vehicles, only blue can pick up
-
-    { "pickupzone11", "blue", -1, "yes", 2 },  -- limits pickup zone 11 to 20 groups of soldiers or vehicles, only blue can pick up. Zone starts inactive!
-    { "pickupzone12", "blue", -1, "yes", 2 },  -- limits pickup zone 11 to 20 groups of soldiers or vehicles, only blue can pick up. Zone starts inactive!
-    { "pickupzone13", "blue", -1, "yes", 2 },
-    { "pickupzone14", "blue", -1, "yes", 2 },
-    { "pickupzone15", "blue", -1, "yes", 2 },
-    { "pickupzone16", "blue", -1, "yes", 2 },
-    { "pickupzone17", "blue", -1, "yes", 2 },
     { "logizone-Hatay", "blue", -1, "no", 2 },
     { "logizone-Aleppo", "blue", -1, "no", 2 },
     { "logizone-Ramat David", "blue", -1, "no", 2 },
@@ -183,9 +165,6 @@ ctld.pickupZones = {
     { "logizone-Damascus", "blue", -1, "no", 2 },
     { "logizone-Khalkhalah", "blue", -1, "no", 2 },
     { "logizone-Kiryat Shmona", "blue", -1, "no", 2 },
-    { "pickupzone19", "blue", -1, "yes", 2 },
-    { "pickupzone20", "blue", -1, "yes", 2, 1000 }, -- optional extra flag number to store the current number of groups available in
-
     { "USA Carrier", "blue", 10, "yes", 2, 1001 }, -- instead of a Zone Name you can also use the UNIT NAME of a ship
 }
 
@@ -195,36 +174,6 @@ ctld.dropOffZones = {}
 for _, elem in pairs(ctld.pickupZones) do
     table.insert(ctld.dropOffZones, { elem[1], -1, 2} )
 end
--- ctld.dropOffZones = {
---     { "dropzone1", "blue", 2 },
---     { "dropzone2", "blue", 2 },
---     { "dropzone3", "blue", 2 },
---     { "dropzone4", "blue", 2 },
---     { "dropzone5", "blue", 2 },
---     { "dropzone6", "blue", 2 },
---     { "dropzone7", "blue", 2 },
---     { "dropzone8", "blue", 2 },
---     { "dropzone9", "blue", 2 },
---     { "dropzone10", "blue", 2 },
---     { "dropzone11", "blue", 2 },
---     { "dropzone12", "blue", 2 },
-
---     { "dropoffzone1", "blue", 2 },
---     { "dropoffzone2", "blue", 2 },
---     { "dropoffzone3", "blue", 2 },
---     { "dropoffzone4", "blue", 2 },
---     { "dropoffzone5", "blue", 2 },
---     { "dropoffzone6", "blue", 2 },
---     { "dropoffzone7", "blue", 2 },
---     { "dropoffzone8", "blue", 2 },
---     { "dropoffzone9", "blue", 2 },
---     { "dropoffzone10", "blue", 2 },
---     { "dropoffzone11", "blue", 2 },
---     { "dropoffzone12", "blue", 2 },
-
---     {"logizone-Hatay", "blue", 2},
--- }
-
 
 --wpZones = { "Zone name", "smoke color",  "ACTIVE (yes/no)", "side (0 = Both sides / 1 = Red / 2 = Blue )", }
 ctld.wpZones = {
@@ -258,6 +207,7 @@ ctld.transportPilotNames = {
     "transportplane11",
     "transportplane12",
     "transportplane13",
+
     "helicargo1",
     "helicargo2",
     "helicargo3",
@@ -268,7 +218,6 @@ ctld.transportPilotNames = {
     "helicargo8",
     "helicargo9",
     "helicargo10",
-
     "helicargo11",
     "helicargo12",
     "helicargo13",
@@ -279,106 +228,11 @@ ctld.transportPilotNames = {
     "helicargo18",
     "helicargo19",
     "helicargo20",
-    "helicargo-15",
-
     "helicargo21",
     "helicargo22",
     "helicargo23",
     "helicargo24",
     "helicargo25",
-
-    "MEDEVAC #1",
-    "MEDEVAC #2",
-    "MEDEVAC #3",
-    "MEDEVAC #4",
-    "MEDEVAC #5",
-    "MEDEVAC #6",
-    "MEDEVAC #7",
-    "MEDEVAC #8",
-    "MEDEVAC #9",
-    "MEDEVAC #10",
-    "MEDEVAC #11",
-    "MEDEVAC #12",
-    "MEDEVAC #13",
-    "MEDEVAC #14",
-    "MEDEVAC #15",
-    "MEDEVAC #16",
-
-    "MEDEVAC RED #1",
-    "MEDEVAC RED #2",
-    "MEDEVAC RED #3",
-    "MEDEVAC RED #4",
-    "MEDEVAC RED #5",
-    "MEDEVAC RED #6",
-    "MEDEVAC RED #7",
-    "MEDEVAC RED #8",
-    "MEDEVAC RED #9",
-    "MEDEVAC RED #10",
-    "MEDEVAC RED #11",
-    "MEDEVAC RED #12",
-    "MEDEVAC RED #13",
-    "MEDEVAC RED #14",
-    "MEDEVAC RED #15",
-    "MEDEVAC RED #16",
-    "MEDEVAC RED #17",
-    "MEDEVAC RED #18",
-    "MEDEVAC RED #19",
-    "MEDEVAC RED #20",
-    "MEDEVAC RED #21",
-
-    "MEDEVAC BLUE #1",
-    "MEDEVAC BLUE #2",
-    "MEDEVAC BLUE #3",
-    "MEDEVAC BLUE #4",
-    "MEDEVAC BLUE #5",
-    "MEDEVAC BLUE #6",
-    "MEDEVAC BLUE #7",
-    "MEDEVAC BLUE #8",
-    "MEDEVAC BLUE #9",
-    "MEDEVAC BLUE #10",
-    "MEDEVAC BLUE #11",
-    "MEDEVAC BLUE #12",
-    "MEDEVAC BLUE #13",
-    "MEDEVAC BLUE #14",
-    "MEDEVAC BLUE #15",
-    "MEDEVAC BLUE #16",
-    "MEDEVAC BLUE #17",
-    "MEDEVAC BLUE #18",
-    "MEDEVAC BLUE #19",
-    "MEDEVAC BLUE #20",
-    "MEDEVAC BLUE #21",
-
-    -- *** AI transports names (different names only to ease identification in mission) ***
-
-    -- Use any of the predefined names or set your own ones
-
-    "transport1",
-    "transport2",
-    "transport3",
-    "transport4",
-    "transport5",
-    "transport6",
-    "transport7",
-    "transport8",
-    "transport9",
-    "transport10",
-
-    "transport11",
-    "transport12",
-    "transport13",
-    "transport14",
-    "transport15",
-    "transport16",
-    "transport17",
-    "transport18",
-    "transport19",
-    "transport20",
-
-    "transport21",
-    "transport22",
-    "transport23",
-    "transport24",
-    "transport25",
 }
 
 -- *************** Optional Extractable GROUPS *****************

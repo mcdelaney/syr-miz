@@ -14,7 +14,8 @@ _STATE["ctld_units"] = {}
 _STATE["hawks"] = {}
 _STATE["dead"] = {}
 local INIT = true
-local DEBUG_DISPATCH = false
+local DEBUG_DISPATCH_AA = false
+local DEBUG_DISPATCH_AG = false
 local DEBUG_IADS = false
 local A2G_ACTIVE = true
 
@@ -163,14 +164,27 @@ else
     removeUnit(unit)
   end
 
-  -- for _, coord in pairs(_STATE["scenery"]) do
+  for _, obj in pairs(_STATE["scenery"]) do
+    if obj then
+      local unit = Unit.getByName(tostring(obj.id))
+      if unit then
+        env.info("Destrying object: "..obj.id)
+        unit:destroy()
+      end
+    end
+    local vec3 = COORDINATE:New(obj.x, obj.y, obj.z)
+    local searchZone = ZONE_RADIUS:New(tostring(i), vec3:GetVec2(), 1)
+    searchZone:Scan( Object.Category.SCENERY )
 
-  --   local Zone = ZONE:New( name )
-  --   Zone:Scan( Object.Category.SCENERY )
-
-  --   removeUnit(coord)
-  -- end
-
+    for SceneryTypeName, SceneryData in pairs( searchZone:GetScannedScenery() ) do
+      for SceneryName, SceneryObject in pairs( SceneryData ) do
+        local SceneryObject = SceneryObject
+        env.info( "Scenery Destroyed: " .. SceneryObject:GetTypeName())
+        SceneryObject:GetDCSObject():destroy()
+        vec3:Explosion(200)
+      end
+    end
+  end
 end
 
 
@@ -270,7 +284,9 @@ commandCenter1 = StaticObject.getByName('RED-HQ-2')
 redIADS:addCommandCenter(commandCenter1)
 redIADS:setUpdateInterval(15)
 redIADS:addEarlyWarningRadarsByPrefix('EWR')
-redIADS:addEarlyWarningRadar('redAWACS')
+redIADS:addEarlyWarningRadarsByPrefix("redAWACS")
+
+-- redIADS:addEarlyWarningRadar('redAWACS')
 redIADS:addSAMSitesByPrefix('SAM')
 redIADS:getSAMSites():setEngagementZone(SkynetIADSAbstractRadarElement.GO_LIVE_WHEN_IN_SEARCH_RANGE):setGoLiveRangeInPercent(80)
 redIADS:getSAMSitesByPrefix("SA-10"):setActAsEW(true)
@@ -386,12 +402,6 @@ for _, base in pairs(ContestedBases) do
   utils.saveTable(_STATE, BASE_FILE)
 end
 
-if DEBUG_DISPATCH then
-  A2ADispatcher:SetTacticalDisplay(true)
-  -- A2GDispatcher:SetTacticalDisplay(true)
-end
-
-
 A2ADispatcher:Start()
 
 if A2G_ACTIVE then
@@ -413,20 +423,30 @@ local function ShowStatus(  )
 end
 
 
-local function ToggleDebug(  )
-  if DEBUG_DISPATCH then
-    DEBUG_DISPATCH = false
+local function ToggleDebugAA(  )
+  if DEBUG_DISPATCH_AA then
+    DEBUG_DISPATCH_AA = false
   else
-    DEBUG_DISPATCH = true
+    DEBUG_DISPATCH_AA = true
   end
-  A2ADispatcher:SetTacticalDisplay(DEBUG_DISPATCH)
+  A2ADispatcher:SetTacticalDisplay(DEBUG_DISPATCH_AA)
+end
+
+local function ToggleDebugAG(  )
+  if DEBUG_DISPATCH_AG then
+    DEBUG_DISPATCH_AG = false
+  else
+    DEBUG_DISPATCH_AG = true
+  end
+  A2GDispatcher:SetTacticalDisplay(DEBUG_DISPATCH_AG)
 end
 
 local MenuCoalitionBlue = MENU_COALITION:New( coalition.side.BLUE, "Mission Data" )
 MENU_COALITION_COMMAND:New( coalition.side.BLUE, "Show Objectives", MenuCoalitionBlue, ShowStatus )
 
 local MenuCoalitionRed = MENU_COALITION:New( coalition.side.RED, "Mission Data" )
-MENU_COALITION_COMMAND:New( coalition.side.RED, "Toggle Debug", MenuCoalitionRed, ToggleDebug )
+MENU_COALITION_COMMAND:New( coalition.side.RED, "Toggle AA Debug", MenuCoalitionRed, ToggleDebugAA )
+MENU_COALITION_COMMAND:New( coalition.side.RED, "Toggle AG Debug", MenuCoalitionRed, ToggleDebugAG )
 
 EH1 = EVENTHANDLER:New()
 EH1:HandleEvent(EVENTS.MarkRemoved)
@@ -470,7 +490,14 @@ function EH1:OnEventDead(EventData)
 
   if EventData.IniUnit and EventData.IniObjectCategory==Object.Category.SCENERY then
     if EventData.IniUnitName ~= nil then
-      table.insert(_STATE["scenery"], EventData.MarkCoordinate)
+      local Scenery_Point = EventData.initiator:getPoint()
+      local Scenery_Coordinate = COORDINATE:NewFromVec3(Scenery_Point)
+      local insdata = { x=Scenery_Coordinate.x, y=Scenery_Coordinate.y, z=Scenery_Coordinate.z, id=EventData.IniDCSUnit }
+      if _STATE["scenery"] then
+        table.insert(_STATE["scenery"], insdata)
+      else
+        _STATE["scenery"] = insdata
+      end
     end
     for id, name in pairs(sceneryTargets) do
       if EventData.IniUnitName ~= nil and EventData.IniUnitName == id then
