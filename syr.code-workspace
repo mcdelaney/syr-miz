@@ -26,7 +26,6 @@
 			"COMMANDCENTER",
 			"DETECTION_AREAS",
 			"StaticObject",
-			"AI_A2A_DISPATCHER",
 			"ZONE_POLYGON",
 			"coalition",
 			"ZONE_AIRBASE",
@@ -48,7 +47,10 @@
 			"Weapon",
 			"STATIC",
 			"Spawner",
-			"A2GAispatcher"
+			"A2GAispatcher",
+			"AI_A2G_DISPATCHER",
+			"UNIT",
+			"COORDINATE"
 		],
 		"Lua.diagnostics.disable": [
 			"lowercase-global"
