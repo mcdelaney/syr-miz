@@ -128,7 +128,7 @@ local function setBaseRed(baseName)
   ctld.deactivatePickupZone(logZone)
   utils.destroyIfExists(logUnitName, true)
 
-  -- slotblock.configureSlotsForBase(baseName, "red")
+  slotblock.configureSlotsForBase(baseName, "red")
 
   MESSAGE:New( baseName.." was captured by Red!", 5):ToAll()
 end
@@ -152,7 +152,7 @@ local function setBaseBlue(baseName, startup)
   table.insert(ctld.logisticUnits, logUnitName)
   ctld.activatePickupZone(logZone)
 
-  -- slotblock.configureSlotsForBase(baseName, "blue")
+  slotblock.configureSlotsForBase(baseName, "blue")
 
   MESSAGE:New( baseName.." was captured by Blue!", 5):ToAll()
 end
@@ -296,13 +296,10 @@ redIADS:addCommandCenter(commandCenter1)
 redIADS:setUpdateInterval(15)
 redIADS:addEarlyWarningRadarsByPrefix('EWR')
 redIADS:addEarlyWarningRadarsByPrefix("redAWACS")
-
--- redIADS:addEarlyWarningRadar('redAWACS')
 redIADS:addSAMSitesByPrefix('SAM')
 redIADS:getSAMSites():setEngagementZone(SkynetIADSAbstractRadarElement.GO_LIVE_WHEN_IN_SEARCH_RANGE):setGoLiveRangeInPercent(80)
 redIADS:getSAMSitesByPrefix("SA-10"):setActAsEW(true)
 redIADS:setupSAMSitesAndThenActivate()
--- redIADS:activate()
 
 DetectionSetGroup = SET_GROUP:New():FilterPrefixes({"EWR", "redAWACS"}):FilterActive(true):FilterStart()
 Detection = DETECTION_AREAS:New( DetectionSetGroup, 30000 )
@@ -521,7 +518,3 @@ function EH1:OnEventDead(EventData)
   utils.saveTable(_STATE, BASE_FILE)
 end
 
-for _, slot in pairs(slotblock.clientGroupNames) do
-  env.info(slot)
-  trigger.action.setUserFlag(slot, slotblock.slotDisabled)
-end
