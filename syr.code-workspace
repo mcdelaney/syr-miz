@@ -50,7 +50,8 @@
 			"A2GAispatcher",
 			"AI_A2G_DISPATCHER",
 			"UNIT",
-			"COORDINATE"
+			"COORDINATE",
+			"AI_A2A_DISPATCHER"
 		],
 		"Lua.diagnostics.disable": [
 			"lowercase-global"
