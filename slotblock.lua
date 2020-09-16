@@ -98,8 +98,6 @@ function M.configureSlotsForBase(baseName, sideName)
             else
                 disableSlot(groupName)
             end
-        else
-            log:info("Slot does not match basename for $1", groupName)
         end
     end
 end
