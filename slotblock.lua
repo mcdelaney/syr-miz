@@ -1,5 +1,4 @@
 local logging = require("logging")
--- local missionUtils = require("missionUtils")
 local utils = require("utils")
 
 local M = {}
@@ -89,20 +88,18 @@ function M.onMissionStart()
     blockAllSlots()
 end
 
+
 function M.configureSlotsForBase(baseName, sideName)
     log:info("Configuring slots for $1 as owned by $2", baseName, sideName)
     for _, groupName in pairs(M.clientGroupNames) do
-        local groupBaseName, groupSideName = utils.getBaseAndSideNamesFromGroupName(groupName)
-        if groupBaseName ~= nil and groupSideName ~= nil then
-            if utils.matchesBaseName(baseName, groupBaseName) then
-                if groupSideName == sideName then
-                    enableSlot(groupName)
-                else
-                    disableSlot(groupName)
-                end
+        if groupName:find(baseName) then
+            if sideName == "blue" then
+                enableSlot(groupName)
             else
-                log:info("Slot does not match basename for $1", groupBaseName)
+                disableSlot(groupName)
             end
+        else
+            log:info("Slot does not match basename for $1", groupName)
         end
     end
 end
