@@ -5,7 +5,7 @@ local utils = require("utils")
 local M = {}
 
 -- These values must match what's in Hooks\RSRSlotBlocker.lua
-M.slotEnabled = 1
+M.slotEnabled = 0
 M.slotDisabled = 99 -- see Hooks\RSRSlotBlocker.lua for the reason for this value
 
 local log = logging.Logger:new("SlotBlocker", "info")
@@ -92,7 +92,6 @@ end
 function M.configureSlotsForBase(baseName, sideName)
     log:info("Configuring slots for $1 as owned by $2", baseName, sideName)
     for _, groupName in pairs(M.clientGroupNames) do
-        log:info(groupName)
         local groupBaseName, groupSideName = utils.getBaseAndSideNamesFromGroupName(groupName)
         if groupBaseName ~= nil and groupSideName ~= nil then
             if utils.matchesBaseName(baseName, groupBaseName) then

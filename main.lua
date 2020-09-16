@@ -6,6 +6,8 @@ package.path = MODULE_FOLDER .. "?.lua;" .. package.path
 local ctld_config = require("ctld_config")
 local utils = require("utils")
 
+trigger.action.setUserFlag("SSB", 100)
+
 local slotblock = require("slotblock")
 
 local BASE_FILE = lfs.writedir() .. "Scripts\\syr-miz\\syr_state.json"
@@ -126,7 +128,7 @@ local function setBaseRed(baseName)
   ctld.deactivatePickupZone(logZone)
   utils.destroyIfExists(logUnitName, true)
 
-  slotblock.configureSlotsForBase(baseName, "red")
+  -- slotblock.configureSlotsForBase(baseName, "red")
 
   MESSAGE:New( baseName.." was captured by Red!", 5):ToAll()
 end
@@ -150,7 +152,7 @@ local function setBaseBlue(baseName, startup)
   table.insert(ctld.logisticUnits, logUnitName)
   ctld.activatePickupZone(logZone)
 
-  slotblock.configureSlotsForBase(baseName, "blue")
+  -- slotblock.configureSlotsForBase(baseName, "blue")
 
   MESSAGE:New( baseName.." was captured by Blue!", 5):ToAll()
 end
@@ -519,3 +521,7 @@ function EH1:OnEventDead(EventData)
   utils.saveTable(_STATE, BASE_FILE)
 end
 
+for _, slot in pairs(slotblock.clientGroupNames) do
+  env.info(slot)
+  trigger.action.setUserFlag(slot, slotblock.slotDisabled)
+end
