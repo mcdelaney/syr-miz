@@ -351,13 +351,11 @@ for _, base in pairs(ContestedBases) do
     local sqd_gci = base.."-gci"
     local sqdName = { sqd }
 
-
     if GROUP:FindByName(sqd) ~= nil then
       utils.log("Creating a2a group: "..base)
 
       A2ADispatcher:SetSquadron( sqd, base, sqdName ) --, 10)
       A2ADispatcher:SetSquadronGrouping( sqd, 2 )
-      -- A2ADispatcher:SetDefaultTakeoffFromRunway( sqd )
       A2ADispatcher:SetSquadronTakeoffInAir(sqd)
       A2ADispatcher:SetDefaultTakeoffInAirAltitude(1000)
       -- A2ADispatcher.SetSquadronFuelThreshold(sqd, 0.01)
@@ -462,7 +460,7 @@ EH1:HandleEvent(EVENTS.MarkRemoved)
 
 function EH1:OnEventMarkRemoved(EventData)
   if EventData.text == "tgt" then
-    EventData.MarkCoordinate:Explosion(5400)
+    EventData.MarkCoordinate:Explosion(1000)
   end
   if EventData.text == 'spw' then
     SPAWN:New("blue-ground"):SpawnFromCoordinate(EventData.MarkCoordinate)
