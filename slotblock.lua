@@ -2,17 +2,14 @@ local logging = require("logging")
 local utils = require("utils")
 
 local M = {}
-
--- These values must match what's in Hooks\RSRSlotBlocker.lua
 M.slotEnabled = 0
-M.slotDisabled = 99 -- see Hooks\RSRSlotBlocker.lua for the reason for this value
+M.slotDisabled = 99
 
 local log = logging.Logger:new("SlotBlocker", "info")
 
 M.clientGroupNames = {}
 
 function M.isClientGroup(group)
-    -- returns true if any unit in the group is a Client, otherwise false
     for _, unit in ipairs(group.units) do
         if unit.skill == "Client" then
             return true
@@ -66,26 +63,6 @@ end
 local function enableSlot(groupName)
     log:info("Enabling group '$1'", groupName)
     trigger.action.setUserFlag(groupName, M.slotEnabled)
-end
-
-local function blockAllSlots()
-    log:info("Blocking all slots")
-    for _, groupName in pairs(M.clientGroupNames) do
-        local _disableSlot = true
-        if utils.startswith(groupName, "Carrier") then
-            log:info("Not blocking carrier group '$1'", groupName)
-            _disableSlot = false
-        end
-
-        if _disableSlot then
-            disableSlot(groupName)
-        end
-    end
-end
-
-function M.onMissionStart()
-    trigger.action.setUserFlag("SSB", 100)
-    blockAllSlots()
 end
 
 
