@@ -5,7 +5,9 @@ package.path = MODULE_FOLDER .. "?.lua;" .. package.path
 -- local ctld = require("ctld.lua")
 local ctld_config = require("ctld_config")
 local utils = require("utils")
--- local slotblock = require("slotblock")
+
+local slotblock = require("slotblock")
+
 local BASE_FILE = lfs.writedir() .. "Scripts\\syr-miz\\syr_state.json"
 local _STATE = {}
 _STATE["bases"] = {}
@@ -123,7 +125,9 @@ local function setBaseRed(baseName)
   local logZone = 'logizone-'..baseName
   ctld.deactivatePickupZone(logZone)
   utils.destroyIfExists(logUnitName, true)
-  -- slotblock.configureSlotsForBase(baseName, "red")
+
+  slotblock.configureSlotsForBase(baseName, "red")
+
   MESSAGE:New( baseName.." was captured by Red!", 5):ToAll()
 end
 
@@ -145,7 +149,9 @@ local function setBaseBlue(baseName, startup)
   logisticUnit:SpawnFromCoordinate(logisticCoord, 10, logUnitName)
   table.insert(ctld.logisticUnits, logUnitName)
   ctld.activatePickupZone(logZone)
-  -- slotblock.configureSlotsForBase(baseName, "blue")
+
+  slotblock.configureSlotsForBase(baseName, "blue")
+
   MESSAGE:New( baseName.." was captured by Blue!", 5):ToAll()
 end
 
@@ -352,8 +358,9 @@ for _, base in pairs(ContestedBases) do
 
       A2ADispatcher:SetSquadron( sqd, base, sqdName ) --, 10)
       A2ADispatcher:SetSquadronGrouping( sqd, 2 )
-      A2ADispatcher:SetDefaultTakeoffFromRunway( sqd )
-      -- A2ADispatcher:SetDefaultTakeoffInAirAltitude(10000)
+      -- A2ADispatcher:SetDefaultTakeoffFromRunway( sqd )
+      A2ADispatcher:SetSquadronTakeoffInAir(sqd)
+      A2ADispatcher:SetDefaultTakeoffInAirAltitude(1000)
       -- A2ADispatcher.SetSquadronFuelThreshold(sqd, 0.01)
       A2ADispatcher:SetSquadronLandingNearAirbase( sqd )
       A2ADispatcher:SetSquadronCap( sqd, zone, 10000, 25000, 500, 800, 600, 1200, "BARO")
