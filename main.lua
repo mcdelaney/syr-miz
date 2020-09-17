@@ -4,8 +4,9 @@ MODULE_FOLDER = lfs.writedir()..[[Scripts\syr-miz\]]
 package.path = MODULE_FOLDER .. "?.lua;" .. package.path
 -- local ctld = require("ctld.lua")
 local ctld_config = require("ctld_config")
+local logging = require("logging")
 local utils = require("utils")
-
+local log = logging.Logger:new("main", "info")
 trigger.action.setUserFlag("SSB", 100)
 
 local slotblock = require("slotblock")
@@ -41,7 +42,7 @@ local ContestedBases = {
 local AG_BASES = {
   "Damascus",
   "Bassel Al-Assad",
-  "Al Qusayr",
+  -- "Al Qusayr",
 }
 
 
@@ -277,6 +278,45 @@ if  _STATE["hawks"] ~= nil then
     end
 end
 
+
+-- For reach numbered group, for each airbase,
+-- Attempt to find the group, destroying it if the airbase is blue, and activating it
+--  if the base is red.
+for _, base in pairs(ContestedBases) do
+  local base_obj = AIRBASE:FindByName(base)
+  if base_obj == nil then
+    MESSAGE:New("Invalid airbase name in main.lua: " .. base, 5):ToCoalition( coalition.side.BLUE )
+  end
+
+  if INIT or _STATE.bases[base] == nil then
+    _STATE.bases[base] = base_obj:GetCoalition()
+  end
+  if _STATE.bases[base] == coalition.side.BLUE then
+    setBaseBlue(base)
+  else
+    setBaseRed(base)
+    for i=1,_NumAirbaseDefenders do
+      local grp_name = "defenseBase-"..base.."-"..tostring(i)
+      local zone_base = ZONE_AIRBASE:New(base, 150):GetRandomPointVec2()
+      local baseDef = SPAWN:NewWithAlias( "defenseBase", grp_name )
+      local is_valid = false
+      local tries = 0
+      local despawn = true
+      while is_valid == false and tries < 5 do
+        local units = baseDef:SpawnFromPointVec2(zone_base)
+        if tries == 4 then
+          despawn = false
+        end
+        if base_obj:CheckOnRunWay(units, 10, despawn) == false then
+          is_valid = true
+        end
+        tries = tries + 1
+      end
+    end
+  end
+end
+
+
 redIADS = SkynetIADS:create('SYRIA')
 if DEBUG_IADS then
   local iadsDebug = redIADS:getDebugSettings()
@@ -301,7 +341,7 @@ redIADS:getSAMSites():setEngagementZone(SkynetIADSAbstractRadarElement.GO_LIVE_W
 redIADS:getSAMSitesByPrefix("SA-10"):setActAsEW(true)
 redIADS:setupSAMSitesAndThenActivate()
 
-DetectionSetGroup = SET_GROUP:New():FilterPrefixes({"EWR", "redAWACS"}):FilterActive(true):FilterStart()
+DetectionSetGroup = SET_GROUP:New():FilterPrefixes({"EWR", "redAWACS", "defenseBase-"}):FilterCoalitions("red"):FilterActive(true):FilterStart()
 Detection = DETECTION_AREAS:New( DetectionSetGroup, 30000 )
 BorderZone = ZONE_POLYGON:New( "RED-BORDER", GROUP:FindByName( "red-border" ) )
 
@@ -315,31 +355,20 @@ A2ADispatcher:SetGciRadius()
 A2ADispatcher:SetIntercept( 10 )
 
 if A2G_ACTIVE then
-  DetectionSetGroup_G = SET_GROUP:New():FilterPrefixes({"EWR", "redAWACS"}):FilterActive(true):FilterStart()
-  Detection_G = DETECTION_AREAS:New( DetectionSetGroup, 1000 )
+  DetectionSetGroup_G = SET_GROUP:New():FilterPrefixes({"redAWACS", "mark-redtank", "defenseBase-"}):FilterCoalitions("red"):FilterActive(true):FilterStart()
+  Detection_G = DETECTION_AREAS:New( DetectionSetGroup_G, 1000 )
   A2GDispatcher = AI_A2G_DISPATCHER:New( Detection_G )
-  A2GDispatcher:AddDefenseCoordinate( "RedHQ", GROUP:FindByName( "REDHQ" ):GetCoordinate() )
+  A2GDispatcher:AddDefenseCoordinate( "ag-base", AIRBASE:FindByName( "Damascus" ):GetCoordinate() )
   A2GDispatcher:SetDefenseReactivityHigh()
-  A2GDispatcher:SetBorderZone( BorderZone )
+  A2GDispatcher:SetDefenseRadius( 200000 )
   A2GDispatcher:SetCommandCenter(redCommand)
 end
 
--- For reach numbered group, for each airbase,
--- Attempt to find the group, destroying it if the airbase is blue, and activating it
---  if the base is red.
+
 for _, base in pairs(ContestedBases) do
   local base_obj = AIRBASE:FindByName(base)
-  if base_obj == nil then
-    MESSAGE:New("Invalid airbase name in main.lua: " .. base, 5):ToCoalition( coalition.side.BLUE )
-  end
 
-  if INIT or _STATE.bases[base] == nil then
-    _STATE.bases[base] = base_obj:GetCoalition()
-  end
-  if _STATE.bases[base] == coalition.side.BLUE then
-    setBaseBlue(base)
-  else
-    setBaseRed(base)
+  if _STATE.bases[base] == coalition.side.RED then
     local zone_name = base.."-capzone"
     local zone = ZONE:FindByName(zone_name)
     if zone == nil then
@@ -375,34 +404,55 @@ for _, base in pairs(ContestedBases) do
     if A2G_ACTIVE then
       for _, agBase in pairs(AG_BASES) do
         if agBase == base then
-          local sqd_gnd = base.."-gnd"
-          local sqdName_gnd = { "jf-17-strike" }
-          A2GDispatcher:SetSquadron(sqd_gnd, base, sqdName_gnd )
-          A2GDispatcher:SetSquadronOverhead( sqd_gnd, 0.5 )
-          A2GDispatcher:SetSquadronGrouping( sqd_gnd, 1 )
-          A2GDispatcher:SetSquadronBai(sqd_gnd, 250, 500, 10000, 25000 )
-          A2GDispatcher:SetDefaultTakeoffInAir( sqd_gnd )
-          A2GDispatcher:SetSquadronLandingNearAirbase( sqd_gnd )
-        end
-      end
-    end
+          local cas_zone = ZONE_AIRBASE:New(base, 10000)
 
-    for i=1,_NumAirbaseDefenders do
-      local grp_name = base.."-"..tostring(i)
-      local zone_base = ZONE_AIRBASE:New(base, 150):GetRandomPointVec2()
-      local baseDef = SPAWN:NewWithAlias( "defenseBase", grp_name )
-      local is_valid = false
-      local tries = 0
-      local despawn = true
-      while is_valid == false and tries < 5 do
-        local units = baseDef:SpawnFromPointVec2(zone_base)
-        if tries == 4 then
-          despawn = false
+          local sqd_cas = base.."-cas"
+          A2GDispatcher:SetSquadron(sqd_cas, base,  { "ka-50-cas" }, 4 )
+          A2GDispatcher:SetSquadronGrouping( sqd_cas, 1 )
+          A2GDispatcher:SetSquadronCasPatrol(sqd_cas, cas_zone) --,  300, 500, 50, 80, 250, 300 )
+          A2GDispatcher:SetSquadronCasPatrolInterval( sqd_cas, 2, 30, 60, 1 )
+          A2GDispatcher:SetSquadronOverhead(sqd_cas, 0.15)
+          -- A2GDispatcher:SetDefaultPatrolTimeInterval(180)
+          A2GDispatcher:SetDefaultTakeoffInAir( sqd_cas )
+          A2GDispatcher:SetSquadronLandingNearAirbase( sqd_cas )
+
+          local sqd_sead = base.."-sead"
+          A2GDispatcher:SetSquadron(sqd_sead, base,  { "jf-17-sead" }, 4 )
+          A2GDispatcher:SetSquadronGrouping( sqd_sead, 1 )
+          A2GDispatcher:SetSquadronSead(sqd_sead, 400, 1200, 10000, 30000)
+          -- A2GDispatcher:SetSquadronCasPatrolInterval( sqd_cas, 1, 30, 60, 1 )
+          A2GDispatcher:SetSquadronOverhead(sqd_sead, 0.15)
+          A2GDispatcher:SetDefaultTakeoffInAirAltitude(5000)
+          -- A2GDispatcher:SetDefaultPatrolTimeInterval(180)
+          A2GDispatcher:SetDefaultTakeoffInAir( sqd_sead )
+          A2GDispatcher:SetSquadronLandingAtRunway( sqd_sead )
+
+          -- local sqd_bai = base.."-bai"
+          -- A2GDispatcher:SetSquadron(sqd_bai, base,  { "ka-50-bai" }, 10 )
+          -- A2GDispatcher:SetSquadronGrouping( sqd_bai, 1 )
+          -- A2GDispatcher:SetSquadronBaiPatrol2(sqd_bai, cas_zone,  50, 80, 600, 700, "BARO", 200, 230, 30, 30, "RADIO" )
+          -- A2GDispatcher:SetSquadronBaiPatrolInterval( sqd_bai, 1, 30, 60, 1 )
+          -- A2GDispatcher:SetSquadronOverhead(sqd_bai, 0.15)
+          -- A2GDispatcher:SetDefaultTakeoffInAir( sqd_bai )
+          -- A2GDispatcher:SetSquadronLandingNearAirbase( sqd_bai )
+
+
+          -- local sqd_strike = base.."-sead"
+          -- A2GDispatcher:SetSquadron(sqd_strike, base,  { "ka-50-bai" }, 10 )
+          -- A2GDispatcher:SetSquadronGrouping( sqd_strike, 1 )
+          -- A2GDispatcher:SetSquadronCasPatrol2(sqd_strike, cas_zone,  50, 80, 600, 700, "BARO", 200, 230, 30, 30, "RADIO" )
+          -- A2GDispatcher:SetSquadronCasPatrolInterval( sqd_strike, 1, 30, 60, 1 )
+          -- A2GDispatcher:SetSquadronOverhead(sqd_strike, 0.15)
+          -- A2GDispatcher:SetDefaultTakeoffInAir( sqd_strike )
+          -- A2GDispatcher:SetSquadronLandingNearAirbase( sqd_strike )
+
+
+          -- A2GDispatcher:SetSquadron(sqd_strike, base, { "jf-17-strike" } )
+          -- A2GDispatcher:SetSquadronGrouping( sqd_strike, 1 )
+          -- A2GDispatcher:SetSquadronSead(sqd_strike, 250, 500, 10000, 25000 )
+          -- A2GDispatcher:SetDefaultTakeoffInAir( sqd_strike )
+          -- A2GDispatcher:SetSquadronLandingNearAirbase( sqd_strike )
         end
-        if base_obj:CheckOnRunWay(units, 10, despawn) == false then
-          is_valid = true
-        end
-        tries = tries + 1
       end
     end
   end
@@ -455,15 +505,39 @@ local MenuCoalitionRed = MENU_COALITION:New( coalition.side.RED, "Mission Data" 
 MENU_COALITION_COMMAND:New( coalition.side.RED, "Toggle AA Debug", MenuCoalitionRed, ToggleDebugAA )
 MENU_COALITION_COMMAND:New( coalition.side.RED, "Toggle AG Debug", MenuCoalitionRed, ToggleDebugAG )
 
+local num_tanks = 1
+local num_sams = 1
+local n_hawks = 1
+local num_redtanks = 1
+
 EH1 = EVENTHANDLER:New()
 EH1:HandleEvent(EVENTS.MarkRemoved)
-
 function EH1:OnEventMarkRemoved(EventData)
+
   if EventData.text == "tgt" then
     EventData.MarkCoordinate:Explosion(1000)
-  end
-  if EventData.text == 'spw' then
-    SPAWN:New("blue-ground"):SpawnFromCoordinate(EventData.MarkCoordinate)
+
+  elseif EventData.text == 'spw' then
+    SPAWN:NewWithAlias("blue-ground", "blue-ground-"):SpawnFromCoordinate(EventData.MarkCoordinate)
+
+  elseif EventData.text == 'tank' then
+    SPAWN:NewWithAlias("tank-base", "mark-tank-"..tostring(num_tanks)):SpawnFromCoordinate(EventData.MarkCoordinate)
+    num_tanks = num_tanks + 1
+
+  elseif EventData.text == 'redtank' then
+    SPAWN:NewWithAlias("redtank-base", "mark-redtank-"..tostring(num_redtanks)):SpawnFromCoordinate(EventData.MarkCoordinate)
+    log:info(DetectionSetGroup_G:Flush())
+    num_redtanks = num_redtanks + 1
+
+  elseif EventData.text == 'rapier' then
+    SPAWN:NewWithAlias("rapier-base", "mark-rapier-"..tostring(num_sams)):SpawnFromCoordinate(EventData.MarkCoordinate)
+    num_sams = num_sams + 1
+
+  elseif EventData.text == 'hawk' then
+    SPAWN:NewWithAlias("hawk-base", "mark-hawk-"..tostring(n_hawks)):SpawnFromCoordinate(EventData.MarkCoordinate)
+    n_hawks = n_hawks + 1
+  -- elseif EventData.text == 'farp' then
+  --   SPAWNSTATIC:NewFrom("farp-static"):SpawnFromCoordinate(EventData.MarkCoordinate)
   end
 end
 
@@ -494,6 +568,7 @@ function EH1:OnEventDead(EventData)
       table.insert(_STATE["dead"], EventData.IniUnitName)
     end
   end
+
 
   if EventData.IniUnit and EventData.IniObjectCategory==Object.Category.SCENERY then
     if EventData.IniUnitName ~= nil then
