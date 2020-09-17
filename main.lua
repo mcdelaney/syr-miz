@@ -349,7 +349,7 @@ for _, base in pairs(ContestedBases) do
 
     local sqd = base.."-cap"
     local sqd_gci = base.."-gci"
-    local sqdName = { sqd }
+    local sqdName = { "su-30-base-cap", "mig-31-base-cap", "jf-17-base-cap" }
 
     if GROUP:FindByName(sqd) ~= nil then
       utils.log("Creating a2a group: "..base)
@@ -361,7 +361,7 @@ for _, base in pairs(ContestedBases) do
       -- A2ADispatcher.SetSquadronFuelThreshold(sqd, 0.01)
       A2ADispatcher:SetSquadronLandingNearAirbase( sqd )
       A2ADispatcher:SetSquadronCap( sqd, zone, 10000, 25000, 500, 800, 600, 1200, "BARO")
-      A2ADispatcher:SetSquadronCapInterval( sqd, 1, 2, 300, 1)
+      A2ADispatcher:SetSquadronCapInterval( sqd, 1, 120, 500, 1)
       A2ADispatcher:SetSquadronCapRacetrack(sqd, 10000, 20000, 90, 180, 5*60, 10*60)
 
       A2ADispatcher:SetSquadron( sqd_gci, base, {"su-30-base-gci"} )
