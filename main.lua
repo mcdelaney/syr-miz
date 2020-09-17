@@ -434,31 +434,6 @@ for _, base in pairs(ContestedBases) do
           A2GDispatcher:SetDefaultTakeoffInAir( sqd_bai )
           A2GDispatcher:SetSquadronLandingAtRunway( sqd_bai )
 
-          -- local sqd_bai = base.."-bai"
-          -- A2GDispatcher:SetSquadron(sqd_bai, base,  { "ka-50-bai" }, 10 )
-          -- A2GDispatcher:SetSquadronGrouping( sqd_bai, 1 )
-          -- A2GDispatcher:SetSquadronBaiPatrol2(sqd_bai, cas_zone,  50, 80, 600, 700, "BARO", 200, 230, 30, 30, "RADIO" )
-          -- A2GDispatcher:SetSquadronBaiPatrolInterval( sqd_bai, 1, 30, 60, 1 )
-          -- A2GDispatcher:SetSquadronOverhead(sqd_bai, 0.15)
-          -- A2GDispatcher:SetDefaultTakeoffInAir( sqd_bai )
-          -- A2GDispatcher:SetSquadronLandingNearAirbase( sqd_bai )
-
-
-          -- local sqd_strike = base.."-sead"
-          -- A2GDispatcher:SetSquadron(sqd_strike, base,  { "ka-50-bai" }, 10 )
-          -- A2GDispatcher:SetSquadronGrouping( sqd_strike, 1 )
-          -- A2GDispatcher:SetSquadronCasPatrol2(sqd_strike, cas_zone,  50, 80, 600, 700, "BARO", 200, 230, 30, 30, "RADIO" )
-          -- A2GDispatcher:SetSquadronCasPatrolInterval( sqd_strike, 1, 30, 60, 1 )
-          -- A2GDispatcher:SetSquadronOverhead(sqd_strike, 0.15)
-          -- A2GDispatcher:SetDefaultTakeoffInAir( sqd_strike )
-          -- A2GDispatcher:SetSquadronLandingNearAirbase( sqd_strike )
-
-
-          -- A2GDispatcher:SetSquadron(sqd_strike, base, { "jf-17-strike" } )
-          -- A2GDispatcher:SetSquadronGrouping( sqd_strike, 1 )
-          -- A2GDispatcher:SetSquadronSead(sqd_strike, 250, 500, 10000, 25000 )
-          -- A2GDispatcher:SetDefaultTakeoffInAir( sqd_strike )
-          -- A2GDispatcher:SetSquadronLandingNearAirbase( sqd_strike )
         end
       end
     end
