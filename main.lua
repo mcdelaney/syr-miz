@@ -410,7 +410,7 @@ for _, base in pairs(ContestedBases) do
           A2GDispatcher:SetSquadron(sqd_cas, base,  { "ka-50-cas" }, 4 )
           A2GDispatcher:SetSquadronGrouping( sqd_cas, 1 )
           A2GDispatcher:SetSquadronCasPatrol(sqd_cas, cas_zone) --,  300, 500, 50, 80, 250, 300 )
-          A2GDispatcher:SetSquadronCasPatrolInterval( sqd_cas, 2, 30, 60, 1 )
+          A2GDispatcher:SetSquadronCasPatrolInterval( sqd_cas, 2, 120, 600, 1 )
           A2GDispatcher:SetSquadronOverhead(sqd_cas, 0.15)
           -- A2GDispatcher:SetDefaultPatrolTimeInterval(180)
           A2GDispatcher:SetDefaultTakeoffInAir( sqd_cas )
@@ -420,12 +420,19 @@ for _, base in pairs(ContestedBases) do
           A2GDispatcher:SetSquadron(sqd_sead, base,  { "jf-17-sead" }, 4 )
           A2GDispatcher:SetSquadronGrouping( sqd_sead, 1 )
           A2GDispatcher:SetSquadronSead(sqd_sead, 400, 1200, 10000, 30000)
-          -- A2GDispatcher:SetSquadronCasPatrolInterval( sqd_cas, 1, 30, 60, 1 )
           A2GDispatcher:SetSquadronOverhead(sqd_sead, 0.15)
           A2GDispatcher:SetDefaultTakeoffInAirAltitude(5000)
-          -- A2GDispatcher:SetDefaultPatrolTimeInterval(180)
           A2GDispatcher:SetDefaultTakeoffInAir( sqd_sead )
           A2GDispatcher:SetSquadronLandingAtRunway( sqd_sead )
+
+          local sqd_bai = base.."-bai"
+          A2GDispatcher:SetSquadron(sqd_bai, base,  { "su-34-cas" }, 4 )
+          A2GDispatcher:SetSquadronGrouping( sqd_bai, 1 )
+          A2GDispatcher:SetSquadronSead(sqd_bai, 400, 1200, 5000, 30000)
+          A2GDispatcher:SetSquadronOverhead(sqd_bai, 0.15)
+          A2GDispatcher:SetDefaultTakeoffInAirAltitude(5000)
+          A2GDispatcher:SetDefaultTakeoffInAir( sqd_bai )
+          A2GDispatcher:SetSquadronLandingAtRunway( sqd_bai )
 
           -- local sqd_bai = base.."-bai"
           -- A2GDispatcher:SetSquadron(sqd_bai, base,  { "ka-50-bai" }, 10 )
