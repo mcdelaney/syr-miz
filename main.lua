@@ -394,7 +394,7 @@ for _, base in pairs(ContestedBases) do
 
     local sqd = base.."-cap"
     local sqd_gci = base.."-gci"
-    local sqdName = { "su-30--cap", "mig-31-cap", "jf-17-cap" }
+    local sqdName = { "su-30-cap", "mig-31-cap", "jf-17-cap" }
 
     if GROUP:FindByName(sqd) ~= nil then
       utils.log("Creating a2a group: "..base)
