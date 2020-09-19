@@ -394,7 +394,7 @@ for _, base in pairs(ContestedBases) do
 
     local sqd = base.."-cap"
     local sqd_gci = base.."-gci"
-    local sqdName = { "su-30-base-cap", "mig-31-base-cap", "jf-17-base-cap" }
+    local sqdName = { "su-30--cap", "mig-31-cap", "jf-17-cap" }
 
     if GROUP:FindByName(sqd) ~= nil then
       utils.log("Creating a2a group: "..base)
@@ -412,6 +412,7 @@ for _, base in pairs(ContestedBases) do
 
       A2ADispatcher:SetSquadron( sqd_gci, base, {"su-30-base-gci"} )
       A2ADispatcher:SetSquadronGrouping( sqd_gci, 1 )
+      A2ADispatcher:SetSquadronTakeoffFromParkingHot(sqd_gci)
       A2ADispatcher:SetSquadronGci( sqd_gci, 900, 1200 )
 
     else
@@ -423,15 +424,15 @@ for _, base in pairs(ContestedBases) do
         if agBase == base then
           local cas_zone = ZONE_AIRBASE:New(base, 10000)
 
-          local sqd_cas = base.."-cas"
-          A2GDispatcher:SetSquadron(sqd_cas, base,  { "ka-50-cas" }, 4 )
-          A2GDispatcher:SetSquadronGrouping( sqd_cas, 1 )
-          A2GDispatcher:SetSquadronCasPatrol(sqd_cas, cas_zone) --,  300, 500, 50, 80, 250, 300 )
-          A2GDispatcher:SetSquadronCasPatrolInterval( sqd_cas, 2, 120, 600, 1 )
-          A2GDispatcher:SetSquadronOverhead(sqd_cas, 0.15)
-          -- A2GDispatcher:SetDefaultPatrolTimeInterval(180)
-          A2GDispatcher:SetDefaultTakeoffInAir( sqd_cas )
-          A2GDispatcher:SetSquadronLandingNearAirbase( sqd_cas )
+          -- local sqd_cas = base.."-cas"
+          -- A2GDispatcher:SetSquadron(sqd_cas, base,  { "ka-50-cas" }, 4 )
+          -- A2GDispatcher:SetSquadronGrouping( sqd_cas, 1 )
+          -- A2GDispatcher:SetSquadronCasPatrol(sqd_cas, cas_zone) --,  300, 500, 50, 80, 250, 300 )
+          -- A2GDispatcher:SetSquadronCasPatrolInterval( sqd_cas, 2, 120, 600, 1 )
+          -- A2GDispatcher:SetSquadronOverhead(sqd_cas, 0.15)
+          -- -- A2GDispatcher:SetDefaultPatrolTimeInterval(180)
+          -- A2GDispatcher:SetDefaultTakeoffInAir( sqd_cas )
+          -- A2GDispatcher:SetSquadronLandingNearAirbase( sqd_cas )
 
           local sqd_sead = base.."-sead"
           A2GDispatcher:SetSquadron(sqd_sead, base,  { "jf-17-sead" }, 4 )
