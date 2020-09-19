@@ -2,7 +2,7 @@ local io = require("io")
 local lfs = require("lfs")
 MODULE_FOLDER = lfs.writedir()..[[Scripts\syr-miz\]]
 package.path = MODULE_FOLDER .. "?.lua;" .. package.path
--- local ctld = require("ctld.lua")
+
 local ctld_config = require("ctld_config")
 local logging = require("logging")
 local utils = require("utils")
@@ -25,12 +25,15 @@ local DEBUG_DISPATCH_AG = false
 local DEBUG_IADS = false
 local A2G_ACTIVE = true
 
+ATIS = {}
+
+
 local ContestedBases = {
+  "Ramat David",
   "Aleppo",
   "Abu al-Duhur",
   "Hatay",
   "Haifa",
-  "Ramat David",
   "Rayak",
   "Bassel Al-Assad",
   "Beirut-Rafic Hariri",
@@ -135,6 +138,19 @@ local function setBaseRed(baseName)
 end
 
 
+local function configureATIS(baseName)
+  log:info("Configuring atis for $1", baseName)
+  local atis =ATIS:New(baseName, 131.70)
+  atis:SetRadioRelayUnitName("Radio Relay "..baseName)
+  atis:SetMetricUnits()
+  atis:SetActiveRunway("R")
+  atis:SetTowerFrequencies({251.05, 118.75})
+  atis:AddILS(110.9, "30")
+  atis:AddILS(110.1, "12")
+  atis:Start()
+end
+
+
 local function setBaseBlue(baseName, startup)
   utils.log("Setting "..baseName.." as blue...")
   local logUnitName = "logistic-"..baseName
@@ -154,7 +170,7 @@ local function setBaseBlue(baseName, startup)
   ctld.activatePickupZone(logZone)
 
   slotblock.configureSlotsForBase(baseName, "blue")
-
+  -- configureATIS(baseName)
   MESSAGE:New( baseName.." was captured by Blue!", 5):ToAll()
 end
 
@@ -390,7 +406,7 @@ for _, base in pairs(ContestedBases) do
       -- A2ADispatcher.SetSquadronFuelThreshold(sqd, 0.01)
       A2ADispatcher:SetSquadronLandingNearAirbase( sqd )
       A2ADispatcher:SetSquadronCap( sqd, zone, 10000, 25000, 500, 800, 600, 1200, "BARO")
-      A2ADispatcher:SetSquadronCapInterval( sqd, 1, 120, 500, 1)
+      A2ADispatcher:SetSquadronCapInterval( sqd, 1, 60*4, 60*10, 1)
       A2ADispatcher:SetSquadronCapRacetrack(sqd, 10000, 20000, 90, 180, 5*60, 10*60)
 
       A2ADispatcher:SetSquadron( sqd_gci, base, {"su-30-base-gci"} )
@@ -572,4 +588,3 @@ function EH1:OnEventDead(EventData)
   end
   utils.saveTable(_STATE, BASE_FILE)
 end
-
