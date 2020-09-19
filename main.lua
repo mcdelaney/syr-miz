@@ -401,12 +401,13 @@ for _, base in pairs(ContestedBases) do
 
       A2ADispatcher:SetSquadron( sqd, base, sqdName ) --, 10)
       A2ADispatcher:SetSquadronGrouping( sqd, 2 )
-      A2ADispatcher:SetSquadronTakeoffInAir(sqd)
-      A2ADispatcher:SetDefaultTakeoffInAirAltitude(1000)
+      -- A2ADispatcher:SetSquadronTakeoffInAir(sqd)
+      A2ADispatcher:SetSquadronTakeoffFromParkingHot(sqd)
+      -- A2ADispatcher:SetDefaultTakeoffInAirAltitude(1000)
       -- A2ADispatcher.SetSquadronFuelThreshold(sqd, 0.01)
       A2ADispatcher:SetSquadronLandingNearAirbase( sqd )
       A2ADispatcher:SetSquadronCap( sqd, zone, 10000, 25000, 500, 800, 600, 1200, "BARO")
-      A2ADispatcher:SetSquadronCapInterval( sqd, 1, 60*4, 60*10, 1)
+      A2ADispatcher:SetSquadronCapInterval( sqd, 1, 60*2, 60*10, 1)
       A2ADispatcher:SetSquadronCapRacetrack(sqd, 10000, 20000, 90, 180, 5*60, 10*60)
 
       A2ADispatcher:SetSquadron( sqd_gci, base, {"su-30-base-gci"} )
