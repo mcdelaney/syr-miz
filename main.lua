@@ -410,7 +410,7 @@ for _, base in pairs(ContestedBases) do
       A2ADispatcher:SetSquadronCapInterval( sqd, 1, 60*2, 60*10, 1)
       A2ADispatcher:SetSquadronCapRacetrack(sqd, 10000, 20000, 90, 180, 5*60, 10*60)
 
-      A2ADispatcher:SetSquadron( sqd_gci, base, {"su-30-base-gci"} )
+      A2ADispatcher:SetSquadron( sqd_gci, base, {"su-30-gci"} )
       A2ADispatcher:SetSquadronGrouping( sqd_gci, 1 )
       A2ADispatcher:SetSquadronTakeoffFromParkingHot(sqd_gci)
       A2ADispatcher:SetSquadronGci( sqd_gci, 900, 1200 )
