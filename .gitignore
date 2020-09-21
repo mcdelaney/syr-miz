@@ -1,3 +1,4 @@
 restart_dcs.ps1
 state.json
 syr_state.json
+__pycache__
