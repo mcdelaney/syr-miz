@@ -5,7 +5,7 @@ import inspect
 import logging
 import json
 from typing import Dict, Optional
-
+from pprint import pprint
 from logging import getLogger
 
 logging.basicConfig(level=logging.INFO)
@@ -94,6 +94,8 @@ for coalition in COALITIONS:
 STATE['static_objects'] = {}
 for static_obj_type in STATIC_OBJECT_TYPES:
     STATE['static_objects'][static_obj_type] = {}
+
+pprint(STATE)
 
 
 class RcpClientBase:
