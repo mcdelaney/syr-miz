@@ -536,8 +536,8 @@ function EH1:OnEventMarkRemoved(EventData)
   elseif EventData.text == 'hawk' then
     SPAWN:NewWithAlias("hawk-base", "mark-hawk-"..tostring(n_hawks)):SpawnFromCoordinate(EventData.MarkCoordinate)
     n_hawks = n_hawks + 1
-  -- elseif EventData.text == 'farp' then
-  --   SPAWNSTATIC:NewFrom("farp-static"):SpawnFromCoordinate(EventData.MarkCoordinate)
+  elseif EventData.text == 'farp' then
+    SPAWNSTATIC:NewFrom("farp-static"):SpawnFromCoordinate(EventData.MarkCoordinate)
   end
 end
 
