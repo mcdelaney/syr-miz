@@ -42,6 +42,7 @@ local ContestedBases = {
   "Hama"
 }
 
+
 local AG_BASES = {
   "Damascus",
   "Bassel Al-Assad",
@@ -135,19 +136,6 @@ local function setBaseRed(baseName)
   slotblock.configureSlotsForBase(baseName, "red")
 
   MESSAGE:New( baseName.." was captured by Red!", 5):ToAll()
-end
-
-
-local function configureATIS(baseName)
-  log:info("Configuring atis for $1", baseName)
-  local atis =ATIS:New(baseName, 131.70)
-  atis:SetRadioRelayUnitName("Radio Relay "..baseName)
-  atis:SetMetricUnits()
-  atis:SetActiveRunway("R")
-  atis:SetTowerFrequencies({251.05, 118.75})
-  atis:AddILS(110.9, "30")
-  atis:AddILS(110.1, "12")
-  atis:Start()
 end
 
 
@@ -401,9 +389,7 @@ for _, base in pairs(ContestedBases) do
 
       A2ADispatcher:SetSquadron( sqd, base, sqdName ) --, 10)
       A2ADispatcher:SetSquadronGrouping( sqd, 2 )
-      -- A2ADispatcher:SetSquadronTakeoffInAir(sqd)
       A2ADispatcher:SetSquadronTakeoffFromParkingHot(sqd)
-      -- A2ADispatcher:SetDefaultTakeoffInAirAltitude(1000)
       -- A2ADispatcher.SetSquadronFuelThreshold(sqd, 0.01)
       A2ADispatcher:SetSquadronLandingNearAirbase( sqd )
       A2ADispatcher:SetSquadronCap( sqd, zone, 10000, 25000, 500, 800, 600, 1200, "BARO")

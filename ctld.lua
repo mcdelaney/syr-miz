@@ -207,6 +207,12 @@ ctld.transportPilotNames = {
     "transportplane11",
     "transportplane12",
     "transportplane13",
+    "transportplane14",
+    "transportplane15",
+    "transportplane16",
+    "transportplane17",
+    "transportplane18",
+    "transportplane19",
 
     "helicargo1",
     "helicargo2",
@@ -304,6 +310,7 @@ ctld.vehicleTransportEnabled = {
     "TF-51D",
     "P-51D",
     "C-101",
+    "F-86",
     "L-39C",
 }
 
