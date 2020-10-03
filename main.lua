@@ -425,8 +425,9 @@ for _, base in pairs(ContestedBases) do
           A2GDispatcher:SetSquadronGrouping( sqd_sead, 1 )
           A2GDispatcher:SetSquadronSead(sqd_sead, 400, 1200, 10000, 30000)
           A2GDispatcher:SetSquadronOverhead(sqd_sead, 0.15)
-          A2GDispatcher:SetDefaultTakeoffInAirAltitude(5000)
-          A2GDispatcher:SetDefaultTakeoffInAir( sqd_sead )
+          A2GDispatcher:SetDefaultTakeoffFromParkingHot( sqd_sead )
+          -- A2GDispatcher:SetDefaultTakeoffInAir( sqd_sead )
+          -- A2GDispatcher:SetDefaultTakeoffInAirAltitude(5000)
           A2GDispatcher:SetSquadronLandingAtRunway( sqd_sead )
 
           local sqd_bai = base.."-bai"
@@ -434,8 +435,9 @@ for _, base in pairs(ContestedBases) do
           A2GDispatcher:SetSquadronGrouping( sqd_bai, 1 )
           A2GDispatcher:SetSquadronSead(sqd_bai, 400, 1200, 5000, 30000)
           A2GDispatcher:SetSquadronOverhead(sqd_bai, 0.15)
-          A2GDispatcher:SetDefaultTakeoffInAirAltitude(5000)
-          A2GDispatcher:SetDefaultTakeoffInAir( sqd_bai )
+          A2GDispatcher:SetDefaultTakeoffFromParkingHot( sqd_bai )
+          -- A2GDispatcher:SetDefaultTakeoffInAir( sqd_bai )
+          -- A2GDispatcher:SetDefaultTakeoffInAirAltitude(5000)
           A2GDispatcher:SetSquadronLandingAtRunway( sqd_bai )
 
         end
