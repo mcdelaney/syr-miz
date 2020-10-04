@@ -6,6 +6,7 @@ package.path = MODULE_FOLDER .. "?.lua;" .. package.path
 local ctld_config = require("ctld_config")
 local logging = require("logging")
 local utils = require("utils")
+local ground = require("ground")
 local log = logging.Logger:new("main", "info")
 trigger.action.setUserFlag("SSB", 100)
 
@@ -34,7 +35,7 @@ local ContestedBases = {
   "Abu al-Duhur",
   "Hatay",
   "Haifa",
-  "Rayak",
+  -- "An Nasiriyah",
   "Bassel Al-Assad",
   "Beirut-Rafic Hariri",
   "Damascus",
@@ -46,6 +47,7 @@ local ContestedBases = {
 local AG_BASES = {
   "Damascus",
   "Bassel Al-Assad",
+  -- "An Nasiriyah",
   -- "Al Qusayr",
 }
 
@@ -144,22 +146,25 @@ local function setBaseBlue(baseName, startup)
   local logUnitName = "logistic-"..baseName
   local logZone = 'logizone-'..baseName
   local logisticCoordZone = ZONE:FindByName(logZone, false)
-  if logisticCoordZone == nil then
-    MESSAGE:New("Trigger zone does not exist for "..logZone.."!", 5):ToAll()
+  if logisticCoordZone ~= nil then
     logisticCoordZone = ZONE_RADIUS:New(logZone, AIRBASE:FindByName(baseName):GetVec2(),1000)
+
+    local logisticCoord = logisticCoordZone:GetPointVec2()
+    local logisticUnit = SPAWNSTATIC:NewFromStatic("logisticBase", country.id.USA)
+    logisticUnit:SpawnFromCoordinate(logisticCoord, 10, logUnitName)
+    table.insert(ctld.logisticUnits, logUnitName)
+    ctld.activatePickupZone(logZone)
+    if logisticUnit == nil then
+      utils.log("Could not find base logistic unit")
+    end
+
+  else
+    MESSAGE:New("Trigger zone does not exist for "..logZone.."!", 5):ToAll()
   end
-  local logisticCoord = logisticCoordZone:GetPointVec2()
-  local logisticUnit = SPAWNSTATIC:NewFromStatic("logisticBase", country.id.USA)
-  if logisticUnit == nil then
-    utils.log("Could not find base logistic unit")
-  end
-  logisticUnit:SpawnFromCoordinate(logisticCoord, 10, logUnitName)
-  table.insert(ctld.logisticUnits, logUnitName)
-  ctld.activatePickupZone(logZone)
 
   slotblock.configureSlotsForBase(baseName, "blue")
-  -- configureATIS(baseName)
   MESSAGE:New( baseName.." was captured by Blue!", 5):ToAll()
+
 end
 
 
@@ -369,6 +374,19 @@ if A2G_ACTIVE then
 end
 
 
+SetCargoInfantry = SET_CARGO:New():FilterTypes( "InfantryType" ):FilterStart()
+SetAPC = SET_GROUP:New():FilterPrefixes( "red-apc-convoy" ):FilterStart()
+SetHeli = SET_GROUP:New():FilterPrefixes( "red-helos" ):FilterStart()
+SetDeployZones = SET_ZONE:New()
+SetPickupZones = SET_ZONE:New():FilterPrefixes( "redpickup" ):FilterStart()
+
+AICargoDispatcherAPC = AI_CARGO_DISPATCHER_APC:New( SetAPC, SetCargoInfantry, SetPickupZones, SetDeployZones)
+AICargoDispatcherAPC:Start()
+
+AICargoDispatcherHelicopter = AI_CARGO_DISPATCHER_HELICOPTER:New(SetHeli, SetCargoInfantry, SetPickupZones, SetDeployZones)
+AICargoDispatcherHelicopter:Start()
+
+
 for _, base in pairs(ContestedBases) do
   local base_obj = AIRBASE:FindByName(base)
 
@@ -390,7 +408,6 @@ for _, base in pairs(ContestedBases) do
       A2ADispatcher:SetSquadron( sqd, base, sqdName ) --, 10)
       A2ADispatcher:SetSquadronGrouping( sqd, 2 )
       A2ADispatcher:SetSquadronTakeoffFromParkingHot(sqd)
-      -- A2ADispatcher.SetSquadronFuelThreshold(sqd, 0.01)
       A2ADispatcher:SetSquadronLandingNearAirbase( sqd )
       A2ADispatcher:SetSquadronCap( sqd, zone, 10000, 25000, 500, 800, 600, 1200, "BARO")
       A2ADispatcher:SetSquadronCapInterval( sqd, 1, 60*2, 60*10, 1)
@@ -422,7 +439,7 @@ for _, base in pairs(ContestedBases) do
 
           local sqd_sead = base.."-sead"
           A2GDispatcher:SetSquadron(sqd_sead, base,  { "jf-17-sead" }, 4 )
-          A2GDispatcher:SetSquadronGrouping( sqd_sead, 1 )
+          A2GDispatcher:SetSquadronGrouping( sqd_sead, 2 )
           A2GDispatcher:SetSquadronSead(sqd_sead, 400, 1200, 10000, 30000)
           A2GDispatcher:SetSquadronOverhead(sqd_sead, 0.15)
           A2GDispatcher:SetDefaultTakeoffFromParkingHot( sqd_sead )
@@ -432,7 +449,7 @@ for _, base in pairs(ContestedBases) do
 
           local sqd_bai = base.."-bai"
           A2GDispatcher:SetSquadron(sqd_bai, base,  { "su-34-cas" }, 4 )
-          A2GDispatcher:SetSquadronGrouping( sqd_bai, 1 )
+          A2GDispatcher:SetSquadronGrouping( sqd_bai, 2 )
           A2GDispatcher:SetSquadronSead(sqd_bai, 400, 1200, 5000, 30000)
           A2GDispatcher:SetSquadronOverhead(sqd_bai, 0.15)
           A2GDispatcher:SetDefaultTakeoffFromParkingHot( sqd_bai )
@@ -497,6 +514,7 @@ local num_tanks = 1
 local num_sams = 1
 local n_hawks = 1
 local num_redtanks = 1
+local n_apc_convoys = 1
 
 EH1 = EVENTHANDLER:New()
 EH1:HandleEvent(EVENTS.MarkRemoved)
@@ -505,7 +523,7 @@ function EH1:OnEventMarkRemoved(EventData)
   if EventData.text == "tgt" then
     EventData.MarkCoordinate:Explosion(1000)
 
-  elseif EventData.text == 'spw' then
+  elseif EventData.text == 'blue-ground' then
     SPAWN:NewWithAlias("blue-ground", "blue-ground-"):SpawnFromCoordinate(EventData.MarkCoordinate)
 
   elseif EventData.text == 'tank' then
@@ -514,7 +532,7 @@ function EH1:OnEventMarkRemoved(EventData)
 
   elseif EventData.text == 'redtank' then
     SPAWN:NewWithAlias("redtank-base", "mark-redtank-"..tostring(num_redtanks)):SpawnFromCoordinate(EventData.MarkCoordinate)
-    log:info(DetectionSetGroup_G:Flush())
+    utils.info(DetectionSetGroup_G:Flush())
     num_redtanks = num_redtanks + 1
 
   elseif EventData.text == 'rapier' then
@@ -524,9 +542,15 @@ function EH1:OnEventMarkRemoved(EventData)
   elseif EventData.text == 'hawk' then
     SPAWN:NewWithAlias("hawk-base", "mark-hawk-"..tostring(n_hawks)):SpawnFromCoordinate(EventData.MarkCoordinate)
     n_hawks = n_hawks + 1
+
   elseif EventData.text == 'farp' then
     SPAWNSTATIC:NewFromStatic("farp-static"):SpawnFromCoordinate(EventData.MarkCoordinate)
+
+  elseif EventData.text == 'red-convoy' then
+    SPAWN:NewWithAlias("red-apc-convoy", "red-apc-convoy-"..tostring(n_apc_convoys)):SpawnFromCoordinate(EventData.MarkCoordinate)
+    n_apc_convoys = n_apc_convoys + 1
   end
+
 end
 
 EH1:HandleEvent(EVENTS.BaseCaptured)
@@ -539,6 +563,9 @@ function EH1:OnEventBaseCaptured(EventData)
     setBaseRed(EventData.PlaceName)
   else
     setBaseBlue(EventData.PlaceName)
+    ground.initRedGroundBaseAttack("Damascus",  EventData.PlaceName)
+    utils.log(SetDeployZones:Flush())
+
   end
   utils.saveTable(_STATE, BASE_FILE)
 end
