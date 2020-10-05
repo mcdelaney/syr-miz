@@ -6,7 +6,7 @@ package.path = MODULE_FOLDER .. "?.lua;" .. package.path
 local ctld_config = require("ctld_config")
 local logging = require("logging")
 local utils = require("utils")
-local ground = require("ground")
+-- local ground = require("ground")
 local log = logging.Logger:new("main", "info")
 trigger.action.setUserFlag("SSB", 100)
 
@@ -374,17 +374,17 @@ if A2G_ACTIVE then
 end
 
 
-SetCargoInfantry = SET_CARGO:New():FilterTypes( "InfantryType" ):FilterStart()
-SetAPC = SET_GROUP:New():FilterPrefixes( "red-apc-convoy" ):FilterStart()
-SetHeli = SET_GROUP:New():FilterPrefixes( "red-helos" ):FilterStart()
-SetDeployZones = SET_ZONE:New()
-SetPickupZones = SET_ZONE:New():FilterPrefixes( "redpickup" ):FilterStart()
+-- SetCargoInfantry = SET_CARGO:New():FilterTypes( "InfantryType" ):FilterStart()
+-- SetAPC = SET_GROUP:New():FilterPrefixes( "red-apc-convoy" ):FilterStart()
+-- SetHeli = SET_GROUP:New():FilterPrefixes( "red-helos" ):FilterStart()
+-- SetDeployZones = SET_ZONE:New()
+-- SetPickupZones = SET_ZONE:New():FilterPrefixes( "redpickup" ):FilterStart()
 
-AICargoDispatcherAPC = AI_CARGO_DISPATCHER_APC:New( SetAPC, SetCargoInfantry, SetPickupZones, SetDeployZones)
-AICargoDispatcherAPC:Start()
+-- AICargoDispatcherAPC = AI_CARGO_DISPATCHER_APC:New( SetAPC, SetCargoInfantry, SetPickupZones, SetDeployZones)
+-- AICargoDispatcherAPC:Start()
 
-AICargoDispatcherHelicopter = AI_CARGO_DISPATCHER_HELICOPTER:New(SetHeli, SetCargoInfantry, SetPickupZones, SetDeployZones)
-AICargoDispatcherHelicopter:Start()
+-- AICargoDispatcherHelicopter = AI_CARGO_DISPATCHER_HELICOPTER:New(SetHeli, SetCargoInfantry, SetPickupZones, SetDeployZones)
+-- AICargoDispatcherHelicopter:Start()
 
 
 for _, base in pairs(ContestedBases) do
