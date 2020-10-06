@@ -8,9 +8,11 @@ local log = logging.Logger:new("ground", "info")
 local function initRedGroundBaseAttack(depatureBase, targetBase)
     log:info("Creating spawn for red ground attack at "..depatureBase)
     log:info("Adding target zone...")
+
     SetDeployZones:AddZone( ZONE_AIRBASE:New( targetBase ) )
+
     local depart1 = ZONE:New('redpickup-'..depatureBase.."-1")
-    local depart2 = ZONE:New('redpickup-'..depatureBase.."-2")
+
     SpawnInfantry1 = SPAWN:New( "red-infantry" )
         :InitLimit( 5, 1 )
         :InitRandomizePosition(true, 250, 50)
