@@ -6,7 +6,7 @@ package.path = MODULE_FOLDER .. "?.lua;" .. package.path
 local ctld_config = require("ctld_config")
 local logging = require("logging")
 local utils = require("utils")
--- local ground = require("ground")
+local ground = require("ground")
 local log = logging.Logger:new("main", "info")
 trigger.action.setUserFlag("SSB", 100)
 
@@ -47,6 +47,7 @@ local ContestedBases = {
 local AG_BASES = {
   "Damascus",
   "Bassel Al-Assad",
+  "Hama",
   -- "An Nasiriyah",
   -- "Al Qusayr",
 }
@@ -185,11 +186,11 @@ else
     removeUnit(unit)
   end
 
-  for _, obj in pairs(_STATE["scenery"]) do
+  for i, obj in pairs(_STATE["scenery"]) do
     if obj then
       local unit = Unit.getByName(tostring(obj.id))
       if unit then
-        env.info("Destrying object: "..obj.id)
+        utils.log("Destrying object: "..obj.id)
         unit:destroy()
       end
     end
@@ -200,7 +201,7 @@ else
     for SceneryTypeName, SceneryData in pairs( searchZone:GetScannedScenery() ) do
       for SceneryName, SceneryObject in pairs( SceneryData ) do
         local SceneryObject = SceneryObject
-        env.info( "Scenery Destroyed: " .. SceneryObject:GetTypeName())
+        utils.log( "Scenery Destroyed: " .. SceneryObject:GetTypeName())
         SceneryObject:GetDCSObject():destroy()
         vec3:Explosion(200)
       end
@@ -306,7 +307,7 @@ for _, base in pairs(ContestedBases) do
     setBaseRed(base)
     for i=1,_NumAirbaseDefenders do
       local grp_name = "defenseBase-"..base.."-"..tostring(i)
-      local zone_base = ZONE_AIRBASE:New(base, 150):GetRandomPointVec2()
+      local zone_base = ZONE:New(base..'-defzone'):GetPointVec2()
       local baseDef = SPAWN:NewWithAlias( "defenseBase", grp_name )
       local is_valid = false
       local tries = 0
@@ -388,7 +389,6 @@ end
 
 
 for _, base in pairs(ContestedBases) do
-  local base_obj = AIRBASE:FindByName(base)
 
   if _STATE.bases[base] == coalition.side.RED then
     local zone_name = base.."-capzone"
@@ -398,35 +398,27 @@ for _, base in pairs(ContestedBases) do
       zone:SetName(zone_name)
     end
 
-    local sqd = base.."-cap"
+    utils.log("Creating a2a group from base: "..base)
+    local sqd_cap = base.."-cap"
+    A2ADispatcher:SetSquadron( sqd_cap, base, { "su-30-cap", "mig-31-cap", "jf-17-cap" } ) --, 10)
+    A2ADispatcher:SetSquadronGrouping( sqd_cap, 2 )
+    A2ADispatcher:SetSquadronTakeoffFromParkingHot(sqd_cap)
+    A2ADispatcher:SetSquadronLandingNearAirbase( sqd_cap )
+    A2ADispatcher:SetSquadronCap( sqd_cap, zone, 10000, 25000, 500, 800, 600, 1200, "BARO")
+    A2ADispatcher:SetSquadronCapInterval( sqd_cap, 1, 60, 60*7, 1)
+    A2ADispatcher:SetSquadronCapRacetrack(sqd_cap, 10000, 20000, 90, 180, 5*60, 10*60)
+
     local sqd_gci = base.."-gci"
-    local sqdName = { "su-30-cap", "mig-31-cap", "jf-17-cap" }
-
-    if GROUP:FindByName(sqd) ~= nil then
-      utils.log("Creating a2a group: "..base)
-
-      A2ADispatcher:SetSquadron( sqd, base, sqdName ) --, 10)
-      A2ADispatcher:SetSquadronGrouping( sqd, 2 )
-      A2ADispatcher:SetSquadronTakeoffFromParkingHot(sqd)
-      A2ADispatcher:SetSquadronLandingNearAirbase( sqd )
-      A2ADispatcher:SetSquadronCap( sqd, zone, 10000, 25000, 500, 800, 600, 1200, "BARO")
-      A2ADispatcher:SetSquadronCapInterval( sqd, 1, 60*2, 60*10, 1)
-      A2ADispatcher:SetSquadronCapRacetrack(sqd, 10000, 20000, 90, 180, 5*60, 10*60)
-
-      A2ADispatcher:SetSquadron( sqd_gci, base, {"su-30-gci"} )
-      A2ADispatcher:SetSquadronGrouping( sqd_gci, 1 )
-      A2ADispatcher:SetSquadronTakeoffFromParkingHot(sqd_gci)
-      A2ADispatcher:SetSquadronGci( sqd_gci, 600, 900 )
-
-    else
-      env.info("Could not spawn red a2a group: "..sqd.."!")
-    end
+    A2ADispatcher:SetSquadron( sqd_gci, base, {"su-30-gci"} )
+    A2ADispatcher:SetSquadronGrouping( sqd_gci, 1 )
+    A2ADispatcher:SetSquadronTakeoffFromParkingHot(sqd_gci)
+    A2ADispatcher:SetSquadronGci( sqd_gci, 600, 900 )
 
     if A2G_ACTIVE then
       for _, agBase in pairs(AG_BASES) do
         if agBase == base then
-          local cas_zone = ZONE_AIRBASE:New(base, 10000)
 
+          -- local cas_zone = ZONE_AIRBASE:New(base, 10000)
           -- local sqd_cas = base.."-cas"
           -- A2GDispatcher:SetSquadron(sqd_cas, base,  { "ka-50-cas" }, 4 )
           -- A2GDispatcher:SetSquadronGrouping( sqd_cas, 1 )
@@ -438,24 +430,22 @@ for _, base in pairs(ContestedBases) do
           -- A2GDispatcher:SetSquadronLandingNearAirbase( sqd_cas )
 
           local sqd_sead = base.."-sead"
-          A2GDispatcher:SetSquadron(sqd_sead, base,  { "jf-17-sead" }, 4 )
+          A2GDispatcher:SetSquadron(sqd_sead, base,  { "jf-17-sead" }, 50 )
           A2GDispatcher:SetSquadronGrouping( sqd_sead, 2 )
           A2GDispatcher:SetSquadronSead(sqd_sead, 400, 1200, 10000, 30000)
-          A2GDispatcher:SetSquadronOverhead(sqd_sead, 0.15)
-          A2GDispatcher:SetDefaultTakeoffFromParkingHot( sqd_sead )
-          -- A2GDispatcher:SetDefaultTakeoffInAir( sqd_sead )
-          -- A2GDispatcher:SetDefaultTakeoffInAirAltitude(5000)
-          A2GDispatcher:SetSquadronLandingAtRunway( sqd_sead )
+          A2GDispatcher:SetSquadronOverhead(sqd_sead, 0.25)
+          A2GDispatcher:SetDefaultTakeoffFromRunway( sqd_sead )
+          A2GDispatcher:SetSquadronLandingNearAirbase( sqd_sead )
 
           local sqd_bai = base.."-bai"
-          A2GDispatcher:SetSquadron(sqd_bai, base,  { "su-34-cas" }, 4 )
+          A2GDispatcher:SetSquadron(sqd_bai, base,  { "su-34-cas" },  50)
           A2GDispatcher:SetSquadronGrouping( sqd_bai, 2 )
           A2GDispatcher:SetSquadronSead(sqd_bai, 400, 1200, 5000, 30000)
-          A2GDispatcher:SetSquadronOverhead(sqd_bai, 0.15)
+          A2GDispatcher:SetSquadronOverhead(sqd_bai, 0.25)
           A2GDispatcher:SetDefaultTakeoffFromParkingHot( sqd_bai )
           -- A2GDispatcher:SetDefaultTakeoffInAir( sqd_bai )
           -- A2GDispatcher:SetDefaultTakeoffInAirAltitude(5000)
-          A2GDispatcher:SetSquadronLandingAtRunway( sqd_bai )
+          A2GDispatcher:SetSquadronLandingNearAirbase( sqd_bai )
 
         end
       end
