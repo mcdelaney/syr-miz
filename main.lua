@@ -415,7 +415,7 @@ for _, base in pairs(ContestedBases) do
 
       A2ADispatcher:SetSquadron( sqd_gci, base, {"su-30-gci"} )
       A2ADispatcher:SetSquadronGrouping( sqd_gci, 1 )
-      A2ADispatcher:SetSquadronTakeoffFromParkingCold(sqd_gci)
+      A2ADispatcher:SetSquadronTakeoffFromParkingHot(sqd_gci)
       A2ADispatcher:SetSquadronGci( sqd_gci, 600, 900 )
 
     else
