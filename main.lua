@@ -563,9 +563,7 @@ function EH1:OnEventBaseCaptured(EventData)
     setBaseRed(EventData.PlaceName)
   else
     setBaseBlue(EventData.PlaceName)
-    ground.initRedGroundBaseAttack("Damascus",  EventData.PlaceName)
-    utils.log(SetDeployZones:Flush())
-
+    -- ground.initRedGroundBaseAttack("Damascus",  EventData.PlaceName)
   end
   utils.saveTable(_STATE, BASE_FILE)
 end
