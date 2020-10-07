@@ -351,7 +351,11 @@ redIADS:getSAMSites():setEngagementZone(SkynetIADSAbstractRadarElement.GO_LIVE_W
 redIADS:getSAMSitesByPrefix("SA-10"):setActAsEW(true)
 redIADS:setupSAMSitesAndThenActivate()
 
-DetectionSetGroup = SET_GROUP:New():FilterPrefixes({"EWR", "redAWACS", "defenseBase-"}):FilterCoalitions("red"):FilterActive(true):FilterStart()
+DetectionSetGroup = SET_GROUP:New()
+  :FilterPrefixes({"EWR", "redAWACS", "defenseBase"})
+  :FilterCoalitions("red")
+  :FilterActive(true)
+  :FilterStart()
 Detection = DETECTION_AREAS:New( DetectionSetGroup, 30000 )
 BorderZone = ZONE_POLYGON:New( "RED-BORDER", GROUP:FindByName( "red-border" ) )
 
@@ -365,15 +369,20 @@ A2ADispatcher:SetGciRadius()
 A2ADispatcher:SetIntercept( 10 )
 
 if A2G_ACTIVE then
-  DetectionSetGroup_G = SET_GROUP:New():FilterPrefixes({"redAWACS", "mark-redtank", "defenseBase-"}):FilterCoalitions("red"):FilterActive(true):FilterStart()
+  redCommand_AG = COMMANDCENTER:New( GROUP:FindByName( "REDHQ-AG" ), "REDHQ-AG" )
+  DetectionSetGroup_G = SET_GROUP:New()
+    :FilterPrefixes({"redAWACS", "su-24-recon", "defenseBase"})
+    :FilterStart()
+
   Detection_G = DETECTION_AREAS:New( DetectionSetGroup_G, 1000 )
+  Detection_G:Start()
+
   A2GDispatcher = AI_A2G_DISPATCHER:New( Detection_G )
   A2GDispatcher:AddDefenseCoordinate( "ag-base", AIRBASE:FindByName( "Damascus" ):GetCoordinate() )
   A2GDispatcher:SetDefenseReactivityHigh()
-  A2GDispatcher:SetDefenseRadius( 200000 )
-  A2GDispatcher:SetCommandCenter(redCommand)
+  A2GDispatcher:SetDefenseRadius( 400000 )
+  A2GDispatcher:SetCommandCenter(redCommand_AG)
 end
-
 
 -- SetCargoInfantry = SET_CARGO:New():FilterTypes( "InfantryType" ):FilterStart()
 -- SetAPC = SET_GROUP:New():FilterPrefixes( "red-apc-convoy" ):FilterStart()
@@ -386,7 +395,6 @@ end
 
 -- AICargoDispatcherHelicopter = AI_CARGO_DISPATCHER_HELICOPTER:New(SetHeli, SetCargoInfantry, SetPickupZones, SetDeployZones)
 -- AICargoDispatcherHelicopter:Start()
-
 
 for _, base in pairs(ContestedBases) do
 
@@ -405,12 +413,13 @@ for _, base in pairs(ContestedBases) do
     A2ADispatcher:SetSquadronTakeoffFromParkingHot(sqd_cap)
     A2ADispatcher:SetSquadronLandingNearAirbase( sqd_cap )
     A2ADispatcher:SetSquadronCap( sqd_cap, zone, 10000, 25000, 500, 800, 600, 1200, "BARO")
-    A2ADispatcher:SetSquadronCapInterval( sqd_cap, 1, 60, 60*7, 1)
+    A2ADispatcher:SetSquadronCapInterval( sqd_cap, 1, 60*3, 60*7, 1)
     A2ADispatcher:SetSquadronCapRacetrack(sqd_cap, 10000, 20000, 90, 180, 5*60, 10*60)
 
     local sqd_gci = base.."-gci"
     A2ADispatcher:SetSquadron( sqd_gci, base, {"su-30-gci"} )
     A2ADispatcher:SetSquadronGrouping( sqd_gci, 1 )
+    A2ADispatcher:SetSquadronOverhead( sqd_gci, 0.5 )
     A2ADispatcher:SetSquadronTakeoffFromParkingHot(sqd_gci)
     A2ADispatcher:SetSquadronGci( sqd_gci, 600, 900 )
 
@@ -431,7 +440,7 @@ for _, base in pairs(ContestedBases) do
 
           local sqd_sead = base.."-sead"
           A2GDispatcher:SetSquadron(sqd_sead, base,  { "jf-17-sead" }, 50 )
-          A2GDispatcher:SetSquadronGrouping( sqd_sead, 2 )
+          A2GDispatcher:SetSquadronGrouping( sqd_sead, 1 )
           A2GDispatcher:SetSquadronSead(sqd_sead, 400, 1200, 10000, 30000)
           A2GDispatcher:SetSquadronOverhead(sqd_sead, 0.25)
           A2GDispatcher:SetDefaultTakeoffFromRunway( sqd_sead )
@@ -439,8 +448,8 @@ for _, base in pairs(ContestedBases) do
 
           local sqd_bai = base.."-bai"
           A2GDispatcher:SetSquadron(sqd_bai, base,  { "su-34-cas" },  50)
-          A2GDispatcher:SetSquadronGrouping( sqd_bai, 2 )
-          A2GDispatcher:SetSquadronSead(sqd_bai, 400, 1200, 5000, 30000)
+          A2GDispatcher:SetSquadronGrouping( sqd_bai, 1 )
+          A2GDispatcher:SetSquadronBai (sqd_bai, 400, 1200, 5000, 30000)
           A2GDispatcher:SetSquadronOverhead(sqd_bai, 0.25)
           A2GDispatcher:SetDefaultTakeoffFromParkingHot( sqd_bai )
           -- A2GDispatcher:SetDefaultTakeoffInAir( sqd_bai )
