@@ -45,9 +45,9 @@ local ContestedBases = {
 
 
 local AG_BASES = {
+  -- "Bassel Al-Assad",
+  -- "Hama",
   "Damascus",
-  "Bassel Al-Assad",
-  "Hama",
   -- "An Nasiriyah",
   -- "Al Qusayr",
 }
@@ -371,10 +371,11 @@ A2ADispatcher:SetIntercept( 10 )
 if A2G_ACTIVE then
   redCommand_AG = COMMANDCENTER:New( GROUP:FindByName( "REDHQ-AG" ), "REDHQ-AG" )
   DetectionSetGroup_G = SET_GROUP:New()
-    :FilterPrefixes({"redAWACS", "su-24-recon", "defenseBase"})
+    :FilterPrefixes({"redAWACS", "su-24-recon", "defenseBase", "redtank-base", "mark-redtank"})
     :FilterStart()
 
   Detection_G = DETECTION_AREAS:New( DetectionSetGroup_G, 1000 )
+  Detection_G:BoundDetectedZones()
   Detection_G:Start()
 
   A2GDispatcher = AI_A2G_DISPATCHER:New( Detection_G )
@@ -439,19 +440,19 @@ for _, base in pairs(ContestedBases) do
           -- A2GDispatcher:SetSquadronLandingNearAirbase( sqd_cas )
 
           local sqd_sead = base.."-sead"
-          A2GDispatcher:SetSquadron(sqd_sead, base,  { "jf-17-sead" }, 50 )
+          A2GDispatcher:SetSquadron(sqd_sead, base,  { "jf-17-sead" }, 10 )
           A2GDispatcher:SetSquadronGrouping( sqd_sead, 1 )
-          A2GDispatcher:SetSquadronSead(sqd_sead, 400, 1200, 10000, 30000)
-          A2GDispatcher:SetSquadronOverhead(sqd_sead, 0.25)
+          A2GDispatcher:SetSquadronSead(sqd_sead, 300, 600, 15000, 30000)
+          A2GDispatcher:SetSquadronOverhead(sqd_sead, 0.15)
           A2GDispatcher:SetDefaultTakeoffFromRunway( sqd_sead )
           A2GDispatcher:SetSquadronLandingNearAirbase( sqd_sead )
 
-          local sqd_bai = base.."-bai"
-          A2GDispatcher:SetSquadron(sqd_bai, base,  { "su-34-cas" },  50)
+          local sqd_bai = base.."-cas"
+          A2GDispatcher:SetSquadron(sqd_bai, base,  { "su-25-cas" },  10)
           A2GDispatcher:SetSquadronGrouping( sqd_bai, 1 )
-          A2GDispatcher:SetSquadronBai (sqd_bai, 400, 1200, 5000, 30000)
+          A2GDispatcher:SetSquadronCas(sqd_bai, 250, 600)
           A2GDispatcher:SetSquadronOverhead(sqd_bai, 0.25)
-          A2GDispatcher:SetDefaultTakeoffFromParkingHot( sqd_bai )
+          A2GDispatcher:SetDefaultTakeoffFromRunway( sqd_bai )
           -- A2GDispatcher:SetDefaultTakeoffInAir( sqd_bai )
           -- A2GDispatcher:SetDefaultTakeoffInAirAltitude(5000)
           A2GDispatcher:SetSquadronLandingNearAirbase( sqd_bai )
