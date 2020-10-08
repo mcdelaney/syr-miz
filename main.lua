@@ -24,7 +24,6 @@ local INIT = true
 local DEBUG_DISPATCH_AA = false
 local DEBUG_DISPATCH_AG = false
 local DEBUG_IADS = false
-local A2G_ACTIVE = true
 
 ATIS = {}
 
@@ -43,7 +42,6 @@ local ContestedBases = {
   "Hama"
 }
 
-
 local AG_BASES = {
   -- "Bassel Al-Assad",
   -- "Hama",
@@ -52,9 +50,7 @@ local AG_BASES = {
   -- "Al Qusayr",
 }
 
-
 local sceneryTargets = {"damascus-target-1", "damascus-target-2", "damascus-target-3"}
-
 local _NumAirbaseDefenders = 1
 
 if utils.file_exists(BASE_FILE) then
@@ -67,19 +63,6 @@ else
   utils.log("No state file exists..")
 end
 
-local function enumerateCTLD()
-  local CTLDstate = {}
-  utils.log("Enumerating CTLD")
-  for _groupname, _groupdetails in pairs(ctld.completeAASystems) do
-      local CTLDsite = {}
-      for k,v in pairs(_groupdetails) do
-          CTLDsite[v['unit']] = v['point']
-      end
-      CTLDstate[_groupname] = CTLDsite
-  end
-  _STATE["hawks"] = CTLDstate
-  utils.log("Done Enumerating CTLD")
-end
 
 ctld.addCallback(function(_args)
   if _args.action and _args.action == "unpack" then
@@ -98,36 +81,11 @@ ctld.addCallback(function(_args)
               pos={x=coord.x, y=coord.y, z=coord.z}
           })
 
-      enumerateCTLD()
+      utils.enumerateCTLD(_STATE)
       utils.saveTable(_STATE, BASE_FILE)
   end
 end)
 
-
-local function prune_enemies(Site, name)
-  local countTotal=Site:Count()
-  local sitesKeep = UTILS.Round(countTotal/100*70, 0)
-  local sitesDestroy = countTotal - sitesKeep
-  utils.log("Pruning from site " .. name..": "..tostring(sitesDestroy))
-    for i = 1, sitesDestroy do
-      local grpObj = Site:GetRandom()
-      grpObj:Destroy(true)
-    end
-  utils.log("Total after prune: "..name.." - "..tostring(Site:Count()))
-end
-
-local function removeUnit (unitName)
-  utils.log("Removing previously destroyed unit: "..unitName)
-  local grp = GROUP:FindByName(unitName)
-  if grp ~= nil then
-    grp:Destroy()
-  else
-    local unit = UNIT:FindByName(unitName)
-    if unit then
-      unit:Destroy()
-    end
-  end
-end
 
 local function setBaseRed(baseName)
   utils.log("Setting "..baseName.." as red...")
@@ -158,14 +116,12 @@ local function setBaseBlue(baseName, startup)
     if logisticUnit == nil then
       utils.log("Could not find base logistic unit")
     end
-
   else
     MESSAGE:New("Trigger zone does not exist for "..logZone.."!", 5):ToAll()
   end
 
   slotblock.configureSlotsForBase(baseName, "blue")
   MESSAGE:New( baseName.." was captured by Blue!", 5):ToAll()
-
 end
 
 
@@ -179,11 +135,11 @@ SAMS["EWR"] = SET_GROUP:New():FilterPrefixes("EWR"):FilterActive(true):FilterSta
 if INIT then
 
   for k, sam in pairs(SAMS) do
-    pcall(function(_args) prune_enemies(sam, k) end)
+    pcall(function(_args) utils.prune_enemies(sam, k) end)
   end
 else
   for _, unit in pairs(_STATE["dead"]) do
-    removeUnit(unit)
+    utils.removeUnit(unit)
   end
 
   for i, obj in pairs(_STATE["scenery"]) do
@@ -211,83 +167,7 @@ end
 
 
 utils.log("START: Spawning CTLD units from state")
-local ctld_unitIndex = ctld_config.unit_index
-for idx, data in ipairs(_STATE["ctld_units"]) do
-
-    local coords2D = { x = data.pos.x, y = data.pos.z}
-    local country = 2   --USA
-
-    if data.name == 'mlrs' then
-        local key = "M270_Index"
-        utils.init_ctld_units(ctld_config.unit_config["MLRS M270"], coords2D, country, ctld_unitIndex, key)
-    end
-
-    if data.name == 'M-109' then
-        local key = "M109_Index"
-        utils.init_ctld_units(ctld_config.unit_config["M109 Paladin"], coords2D, country, ctld_unitIndex, key)
-    end
-
-    if data.name == 'abrams' then
-        local key = "M1A1_Index"
-        utils.init_ctld_units(ctld_config.unit_config["M1A1 Abrams"], coords2D, country, ctld_unitIndex, key)
-    end
-
-    if data.name == 'jtac' then
-        local key = "JTAC_Index"
-        local _spawnedGroup = utils.init_ctld_units(ctld_config.unit_config["HMMWV JTAC"], coords2D, country, ctld_unitIndex, key)
-
-        local _code = table.remove(ctld.jtacGeneratedLaserCodes, 1)
-        table.insert(ctld.jtacGeneratedLaserCodes, _code)
-        ctld.JTACAutoLase(_spawnedGroup:getName(), _code)
-    end
-
-    if data.name == 'ammo' then
-        local key = "M818_Index"
-        utils.init_ctld_units(ctld_config.unit_config["M818 Transport"], coords2D, country, ctld_unitIndex, key)
-    end
-
-    if data.name == 'stinger' then
-      local key = "Stinger_Index"
-      utils.init_ctld_units(ctld_config.unit_config["Stinger"], coords2D, country, ctld_unitIndex, key)
-    end
-
-    if data.name == 'gepard' then
-        local key = "Gepard_Index"
-        utils.init_ctld_units(ctld_config.unit_config["Flugabwehrkanonenpanzer Gepard"], coords2D, country, ctld_unitIndex, key)
-    end
-
-    if data.name == 'vulcan' then
-        local key = "Vulcan_Index"
-        utils.init_ctld_units(ctld_config.unit_config["M163 Vulcan"], coords2D, country, ctld_unitIndex, key)
-    end
-
-    if data.name == 'avenger' then
-        local key = "Avenger_Index"
-        utils.init_ctld_units(ctld_config.unit_config["M1097 Avenger"], coords2D, country, ctld_unitIndex, key)
-    end
-
-    if data.name == 'chaparral' then
-        local key = "Chaparral_Index"
-        utils.init_ctld_units(ctld_config.unit_config["M48 Chaparral"], coords2D, country, ctld_unitIndex, key)
-    end
-
-    if data.name == 'roland' then
-        local key = "Roland_Index"
-        utils.init_ctld_units(ctld_config.unit_config["Roland ADS"], coords2D, country, ctld_unitIndex, key)
-    end
-
-    if data.name == 'ipv' then
-      local key = "IPV_Index"
-      utils.init_ctld_units(ctld_config.unit_config["IPV LAV-25"], coords2D, country, ctld_unitIndex, key)
-  end
-end
-
-if  _STATE["hawks"] ~= nil then
-    for k,v in pairs( _STATE["hawks"]) do
-        utils.respawnHAWKFromState(v)
-    end
-end
-
+utils.restoreCtldUnits(_STATE, ctld_config)
 
 -- For reach numbered group, for each airbase,
 -- Attempt to find the group, destroying it if the airbase is blue, and activating it
@@ -305,41 +185,17 @@ for _, base in pairs(ContestedBases) do
     setBaseBlue(base)
   else
     setBaseRed(base)
-    for i=1,_NumAirbaseDefenders do
+    for i=1, _NumAirbaseDefenders do
       local grp_name = "defenseBase-"..base.."-"..tostring(i)
       local zone_base = ZONE:New(base..'-defzone'):GetPointVec2()
       local baseDef = SPAWN:NewWithAlias( "defenseBase", grp_name )
-      local is_valid = false
-      local tries = 0
-      local despawn = true
-      while is_valid == false and tries < 5 do
-        local units = baseDef:SpawnFromPointVec2(zone_base)
-        if tries == 4 then
-          despawn = false
-        end
-        if base_obj:CheckOnRunWay(units, 10, despawn) == false then
-          is_valid = true
-        end
-        tries = tries + 1
-      end
+      baseDef:SpawnFromPointVec2(zone_base)
     end
   end
 end
 
 
 redIADS = SkynetIADS:create('SYRIA')
-if DEBUG_IADS then
-  local iadsDebug = redIADS:getDebugSettings()
-  iadsDebug.IADSStatus = true
-  iadsDebug.samWentDark = false
-  iadsDebug.contacts = true
-  iadsDebug.radarWentLive = true
-  iadsDebug.noWorkingCommmandCenter = true
-  iadsDebug.ewRadarNoConnection = true
-  iadsDebug.addedEWRadar = true
-  redIADS:addRadioMenu()
-end
-
 
 commandCenter1 = StaticObject.getByName('RED-HQ-2')
 redIADS:addCommandCenter(commandCenter1)
@@ -352,7 +208,7 @@ redIADS:getSAMSitesByPrefix("SA-10"):setActAsEW(true)
 redIADS:setupSAMSitesAndThenActivate()
 
 DetectionSetGroup = SET_GROUP:New()
-  :FilterPrefixes({"EWR", "redAWACS", "defenseBase"})
+  :FilterPrefixes({"EWR", "redAWACS", "defenseBase", "SAM"})
   :FilterCoalitions("red")
   :FilterActive(true)
   :FilterStart()
@@ -367,23 +223,24 @@ A2ADispatcher:SetCommandCenter(redCommand)
 A2ADispatcher:SetEngageRadius()
 A2ADispatcher:SetGciRadius()
 A2ADispatcher:SetIntercept( 10 )
+A2ADispatcher:Start()
 
-if A2G_ACTIVE then
-  redCommand_AG = COMMANDCENTER:New( GROUP:FindByName( "REDHQ-AG" ), "REDHQ-AG" )
-  DetectionSetGroup_G = SET_GROUP:New()
-    :FilterPrefixes({"redAWACS", "su-24-recon", "defenseBase", "redtank-base", "mark-redtank"})
-    :FilterStart()
 
-  Detection_G = DETECTION_AREAS:New( DetectionSetGroup_G, 1000 )
-  Detection_G:BoundDetectedZones()
-  Detection_G:Start()
+redCommand_AG = COMMANDCENTER:New( GROUP:FindByName( "REDHQ-AG" ), "REDHQ-AG" )
+DetectionSetGroup_G = SET_GROUP:New()
+  :FilterPrefixes({"redAWACS", "su-24-recon", "defenseBase", "redtank-base", "mark-redtank", "SAM"})
+  :FilterStart()
 
-  A2GDispatcher = AI_A2G_DISPATCHER:New( Detection_G )
-  A2GDispatcher:AddDefenseCoordinate( "ag-base", AIRBASE:FindByName( "Damascus" ):GetCoordinate() )
-  A2GDispatcher:SetDefenseReactivityHigh()
-  A2GDispatcher:SetDefenseRadius( 400000 )
-  A2GDispatcher:SetCommandCenter(redCommand_AG)
-end
+Detection_G = DETECTION_AREAS:New( DetectionSetGroup_G, 1000 )
+Detection_G:BoundDetectedZones()
+Detection_G:Start()
+
+A2GDispatcher = AI_A2G_DISPATCHER:New( Detection_G )
+A2GDispatcher:AddDefenseCoordinate( "ag-base", AIRBASE:FindByName( "Damascus" ):GetCoordinate() )
+A2GDispatcher:SetDefenseReactivityHigh()
+A2GDispatcher:SetDefenseRadius( 400000 )
+A2GDispatcher:SetCommandCenter(redCommand_AG)
+A2GDispatcher:Start()
 
 -- SetCargoInfantry = SET_CARGO:New():FilterTypes( "InfantryType" ):FilterStart()
 -- SetAPC = SET_GROUP:New():FilterPrefixes( "red-apc-convoy" ):FilterStart()
@@ -424,51 +281,51 @@ for _, base in pairs(ContestedBases) do
     A2ADispatcher:SetSquadronTakeoffFromParkingHot(sqd_gci)
     A2ADispatcher:SetSquadronGci( sqd_gci, 600, 900 )
 
-    if A2G_ACTIVE then
-      for _, agBase in pairs(AG_BASES) do
-        if agBase == base then
 
-          -- local cas_zone = ZONE_AIRBASE:New(base, 10000)
-          -- local sqd_cas = base.."-cas"
-          -- A2GDispatcher:SetSquadron(sqd_cas, base,  { "ka-50-cas" }, 4 )
-          -- A2GDispatcher:SetSquadronGrouping( sqd_cas, 1 )
-          -- A2GDispatcher:SetSquadronCasPatrol(sqd_cas, cas_zone) --,  300, 500, 50, 80, 250, 300 )
-          -- A2GDispatcher:SetSquadronCasPatrolInterval( sqd_cas, 2, 120, 600, 1 )
-          -- A2GDispatcher:SetSquadronOverhead(sqd_cas, 0.15)
-          -- -- A2GDispatcher:SetDefaultPatrolTimeInterval(180)
-          -- A2GDispatcher:SetDefaultTakeoffInAir( sqd_cas )
-          -- A2GDispatcher:SetSquadronLandingNearAirbase( sqd_cas )
+    for _, agBase in pairs(AG_BASES) do
+      if agBase == base then
 
-          local sqd_sead = base.."-sead"
-          A2GDispatcher:SetSquadron(sqd_sead, base,  { "jf-17-sead" }, 10 )
-          A2GDispatcher:SetSquadronGrouping( sqd_sead, 1 )
-          A2GDispatcher:SetSquadronSead(sqd_sead, 300, 600, 15000, 30000)
-          A2GDispatcher:SetSquadronOverhead(sqd_sead, 0.15)
-          A2GDispatcher:SetDefaultTakeoffFromRunway( sqd_sead )
-          A2GDispatcher:SetSquadronLandingNearAirbase( sqd_sead )
+        -- local cas_zone = ZONE_AIRBASE:New(base, 10000)
+        -- local sqd_cas = base.."-cas"
+        -- A2GDispatcher:SetSquadron(sqd_cas, base,  { "ka-50-cas" }, 4 )
+        -- A2GDispatcher:SetSquadronGrouping( sqd_cas, 1 )
+        -- A2GDispatcher:SetSquadronCasPatrol(sqd_cas, cas_zone) --,  300, 500, 50, 80, 250, 300 )
+        -- A2GDispatcher:SetSquadronCasPatrolInterval( sqd_cas, 2, 120, 600, 1 )
+        -- A2GDispatcher:SetSquadronOverhead(sqd_cas, 0.15)
+        -- -- A2GDispatcher:SetDefaultPatrolTimeInterval(180)
+        -- A2GDispatcher:SetDefaultTakeoffInAir( sqd_cas )
+        -- A2GDispatcher:SetSquadronLandingNearAirbase( sqd_cas )
 
-          local sqd_bai = base.."-cas"
-          A2GDispatcher:SetSquadron(sqd_bai, base,  { "su-25-cas" },  10)
-          A2GDispatcher:SetSquadronGrouping( sqd_bai, 1 )
-          A2GDispatcher:SetSquadronCas(sqd_bai, 250, 600)
-          A2GDispatcher:SetSquadronOverhead(sqd_bai, 0.25)
-          A2GDispatcher:SetDefaultTakeoffFromRunway( sqd_bai )
-          -- A2GDispatcher:SetDefaultTakeoffInAir( sqd_bai )
-          -- A2GDispatcher:SetDefaultTakeoffInAirAltitude(5000)
-          A2GDispatcher:SetSquadronLandingNearAirbase( sqd_bai )
+        local sqd_sead = base.."-sead"
+        A2GDispatcher:SetSquadron(sqd_sead, base,  { "jf-17-sead" }, 10 )
+        A2GDispatcher:SetSquadronGrouping( sqd_sead, 2 )
+        A2GDispatcher:SetSquadronSead(sqd_sead, 300, 600, 15000, 30000)
+        A2GDispatcher:SetSquadronOverhead(sqd_sead, 0.15)
+        A2GDispatcher:SetDefaultTakeoffFromRunway( sqd_sead )
+        A2GDispatcher:SetSquadronLandingNearAirbase( sqd_sead )
 
-        end
+        local sqd_cas = base.."-cas"
+        A2GDispatcher:SetSquadron(sqd_cas, base,  { "su-25-cas" },  10)
+        A2GDispatcher:SetSquadronGrouping( sqd_cas, 2 )
+        A2GDispatcher:SetSquadronCas(sqd_cas, 250, 600)
+        A2GDispatcher:SetSquadronOverhead(sqd_cas, 0.15)
+        A2GDispatcher:SetDefaultTakeoffFromRunway( sqd_cas )
+        A2GDispatcher:SetSquadronLandingNearAirbase( sqd_cas )
+
+        local sqd_bai = base.."-bai"
+        A2GDispatcher:SetSquadron(sqd_bai, base,  { "su-25-cas" },  10)
+        A2GDispatcher:SetSquadronGrouping( sqd_bai, 1 )
+        A2GDispatcher:SetSquadronCas(sqd_bai, 250, 600)
+        A2GDispatcher:SetSquadronOverhead(sqd_bai, 0.15)
+        A2GDispatcher:SetDefaultTakeoffFromRunway( sqd_bai )
+        A2GDispatcher:SetSquadronLandingNearAirbase( sqd_bai )
+
       end
     end
   end
   utils.saveTable(_STATE, BASE_FILE)
 end
 
-A2ADispatcher:Start()
-
-if A2G_ACTIVE then
-  A2GDispatcher:Start()
-end
 
 local function ShowStatus(  )
   for i, name in pairs(sceneryTargets) do
@@ -510,47 +367,35 @@ local MenuCoalitionRed = MENU_COALITION:New( coalition.side.RED, "Mission Data" 
 MENU_COALITION_COMMAND:New( coalition.side.RED, "Toggle AA Debug", MenuCoalitionRed, ToggleDebugAA )
 MENU_COALITION_COMMAND:New( coalition.side.RED, "Toggle AG Debug", MenuCoalitionRed, ToggleDebugAG )
 
-local num_tanks = 1
-local num_sams = 1
-local n_hawks = 1
-local num_redtanks = 1
-local n_apc_convoys = 1
+local num_spawns = 1
 
 EH1 = EVENTHANDLER:New()
 EH1:HandleEvent(EVENTS.MarkRemoved)
 function EH1:OnEventMarkRemoved(EventData)
-
+  local new_spawn
   if EventData.text == "tgt" then
     EventData.MarkCoordinate:Explosion(1000)
-
-  elseif EventData.text == 'blue-ground' then
-    SPAWN:NewWithAlias("blue-ground", "blue-ground-"):SpawnFromCoordinate(EventData.MarkCoordinate)
-
-  elseif EventData.text == 'tank' then
-    SPAWN:NewWithAlias("tank-base", "mark-tank-"..tostring(num_tanks)):SpawnFromCoordinate(EventData.MarkCoordinate)
-    num_tanks = num_tanks + 1
-
-  elseif EventData.text == 'redtank' then
-    SPAWN:NewWithAlias("redtank-base", "mark-redtank-"..tostring(num_redtanks)):SpawnFromCoordinate(EventData.MarkCoordinate)
-    utils.info(DetectionSetGroup_G:Flush())
-    num_redtanks = num_redtanks + 1
-
-  elseif EventData.text == 'rapier' then
-    SPAWN:NewWithAlias("rapier-base", "mark-rapier-"..tostring(num_sams)):SpawnFromCoordinate(EventData.MarkCoordinate)
-    num_sams = num_sams + 1
-
-  elseif EventData.text == 'hawk' then
-    SPAWN:NewWithAlias("hawk-base", "mark-hawk-"..tostring(n_hawks)):SpawnFromCoordinate(EventData.MarkCoordinate)
-    n_hawks = n_hawks + 1
-
-  elseif EventData.text == 'farp' then
-    SPAWNSTATIC:NewFromStatic("farp-static"):SpawnFromCoordinate(EventData.MarkCoordinate)
-
-  elseif EventData.text == 'red-convoy' then
-    SPAWN:NewWithAlias("red-apc-convoy", "red-apc-convoy-"..tostring(n_apc_convoys)):SpawnFromCoordinate(EventData.MarkCoordinate)
-    n_apc_convoys = n_apc_convoys + 1
+    return
   end
 
+  if EventData.text == 'blue-ground' then
+    new_spawn = SPAWN:NewWithAlias("blue-ground", "blue-ground-"..tostring(num_spawns))
+  elseif EventData.text == 'tank' then
+    new_spawn = SPAWN:NewWithAlias("tank-base", "mark-tank-"..tostring(num_spawns))
+  elseif EventData.text == 'redtank' then
+    new_spawn = SPAWN:NewWithAlias("redtank-base", "mark-redtank-"..tostring(num_spawns))
+  elseif EventData.text == 'rapier' then
+    new_spawn = SPAWN:NewWithAlias("rapier-base", "mark-rapier-"..tostring(num_spawns))
+  elseif EventData.text == 'hawk' then
+    new_spawn = SPAWN:NewWithAlias("hawk-base", "mark-hawk-"..tostring(num_spawns))
+  elseif EventData.text == 'farp' then
+    new_spawn = SPAWNSTATIC:NewFromStatic("farp-static")
+  elseif EventData.text == 'red-convoy' then
+    SPAWN:NewWithAlias("red-apc-convoy", "red-apc-convoy-"..tostring(num_spawns))
+  end
+
+  new_spawn:SpawnFromCoordinate(EventData.MarkCoordinate)
+  num_spawns = num_spawns + 1
 end
 
 EH1:HandleEvent(EVENTS.BaseCaptured)
@@ -582,7 +427,6 @@ function EH1:OnEventDead(EventData)
     end
   end
 
-
   if EventData.IniUnit and EventData.IniObjectCategory==Object.Category.SCENERY then
     if EventData.IniUnitName ~= nil then
       local Scenery_Point = EventData.initiator:getPoint()
@@ -603,3 +447,16 @@ function EH1:OnEventDead(EventData)
   end
   utils.saveTable(_STATE, BASE_FILE)
 end
+
+if DEBUG_IADS then
+  local iadsDebug = redIADS:getDebugSettings()
+  iadsDebug.IADSStatus = true
+  iadsDebug.samWentDark = false
+  iadsDebug.contacts = true
+  iadsDebug.radarWentLive = true
+  iadsDebug.noWorkingCommmandCenter = true
+  iadsDebug.ewRadarNoConnection = true
+  iadsDebug.addedEWRadar = true
+  redIADS:addRadioMenu()
+end
+
