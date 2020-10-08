@@ -44,7 +44,7 @@ local ContestedBases = {
 
 local AG_BASES = {
   -- "Bassel Al-Assad",
-  -- "Hama",
+  "Hama",
   "Damascus",
   -- "An Nasiriyah",
   -- "Al Qusayr",
