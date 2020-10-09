@@ -8,9 +8,9 @@ local logging = require("logging")
 local utils = require("utils")
 local ground = require("ground")
 local log = logging.Logger:new("main", "info")
+local slotblock = require("slotblock")
 trigger.action.setUserFlag("SSB", 100)
 
-local slotblock = require("slotblock")
 
 local BASE_FILE = lfs.writedir() .. "Scripts\\syr-miz\\syr_state.json"
 local _STATE = {}
@@ -315,7 +315,7 @@ for _, base in pairs(ContestedBases) do
         local sqd_bai = base.."-bai"
         A2GDispatcher:SetSquadron(sqd_bai, base,  { "su-25-cas" },  10)
         A2GDispatcher:SetSquadronGrouping( sqd_bai, 1 )
-        A2GDispatcher:SetSquadronCas(sqd_bai, 250, 600)
+        A2GDispatcher:SetSquadronBai(sqd_bai, 250, 600)
         A2GDispatcher:SetSquadronOverhead(sqd_bai, 0.15)
         A2GDispatcher:SetDefaultTakeoffFromRunway( sqd_bai )
         A2GDispatcher:SetSquadronLandingNearAirbase( sqd_bai )
