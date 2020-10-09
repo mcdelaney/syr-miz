@@ -228,7 +228,7 @@ A2ADispatcher:Start()
 
 redCommand_AG = COMMANDCENTER:New( GROUP:FindByName( "REDHQ-AG" ), "REDHQ-AG" )
 DetectionSetGroup_G = SET_GROUP:New()
-  :FilterPrefixes({"redAWACS", "su-24-recon", "defenseBase", "redtank-base", "mark-redtank", "SAM"})
+  :FilterPrefixes({"redAWACS", "su-24-recon", "defenseBase", "redtank-base", "mark-redtank"})
   :FilterStart()
 
 Detection_G = DETECTION_AREAS:New( DetectionSetGroup_G, 1000 )
