@@ -9,7 +9,7 @@ local utils = require("utils")
 local ground = require("ground")
 local log = logging.Logger:new("main", "info")
 local slotblock = require("slotblock")
-trigger.action.setUserFlag("SSB", 100)
+-- trigger.action.setUserFlag("SSB", 100)
 
 
 local BASE_FILE = lfs.writedir() .. "Scripts\\syr-miz\\syr_state.json"

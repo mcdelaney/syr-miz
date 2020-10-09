@@ -3,7 +3,7 @@ local utils = require("utils")
 
 local M = {}
 M.slotEnabled = 0
-M.slotDisabled = 99
+M.slotDisabled = 100
 
 local log = logging.Logger:new("SlotBlocker", "info")
 
