@@ -298,7 +298,7 @@ for _, base in pairs(ContestedBases) do
 
         local sqd_sead = base.."-sead"
         A2GDispatcher:SetSquadron(sqd_sead, base,  { "jf-17-sead" }, 10 )
-        A2GDispatcher:SetSquadronGrouping( sqd_sead, 2 )
+        A2GDispatcher:SetSquadronGrouping( sqd_sead, 1 )
         A2GDispatcher:SetSquadronSead(sqd_sead, 300, 600, 15000, 30000)
         A2GDispatcher:SetSquadronOverhead(sqd_sead, 0.15)
         A2GDispatcher:SetDefaultTakeoffFromRunway( sqd_sead )
