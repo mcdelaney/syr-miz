@@ -6,8 +6,8 @@ package.path = MODULE_FOLDER .. "?.lua;" .. package.path
 local ctld_config = require("ctld_config")
 local logging = require("logging")
 local utils = require("utils")
-local ground = require("ground")
-local log = logging.Logger:new("main", "info")
+-- local ground = require("ground")
+local blue_ground = require("blue_ground")
 local slotblock = require("slotblock")
 -- trigger.action.setUserFlag("SSB", 100)
 
@@ -195,6 +195,15 @@ for _, base in pairs(ContestedBases) do
 end
 
 
+SPAWN:New("awacs-Carrier")
+  :InitLimit(1, 50)
+  :SpawnScheduled(4, 0)
+
+SPAWN:New("awacs-Incirlik")
+  :InitLimit(1, 50)
+  :SpawnScheduled(4, 0)
+
+
 redIADS = SkynetIADS:create('SYRIA')
 
 commandCenter1 = StaticObject.getByName('RED-HQ-2')
@@ -253,6 +262,13 @@ A2GDispatcher:Start()
 
 -- AICargoDispatcherHelicopter = AI_CARGO_DISPATCHER_HELICOPTER:New(SetHeli, SetCargoInfantry, SetPickupZones, SetDeployZones)
 -- AICargoDispatcherHelicopter:Start()
+
+-- BlueCargo = SET_CARGO:New()
+-- BlueCargoPlane = SET_GROUP:New()
+-- BlueCargoPickupZone = SET_ZONE:New()
+-- BlueCargoDeployZone = SET_ZONE:New()
+-- BlueCargoDispatcher = AI_CARGO_DISPATCHER_AIRPLANE:New(BlueCargoPlane, BlueCargo, BlueCargoPickupZone, BlueCargoDeployZone)
+-- BlueCargoDispatcher:Start()
 
 for _, base in pairs(ContestedBases) do
 
@@ -341,7 +357,6 @@ local function ShowStatus(  )
   end
 end
 
-
 local function ToggleDebugAA(  )
   if DEBUG_DISPATCH_AA then
     DEBUG_DISPATCH_AA = false
@@ -360,21 +375,33 @@ local function ToggleDebugAG(  )
   A2GDispatcher:SetTacticalDisplay(DEBUG_DISPATCH_AG)
 end
 
-local MenuCoalitionBlue = MENU_COALITION:New( coalition.side.BLUE, "Mission Data" )
-MENU_COALITION_COMMAND:New( coalition.side.BLUE, "Show Objectives", MenuCoalitionBlue, ShowStatus )
+local function DeployForces(DestinationBase)
+  blue_ground.deployBlueC130(DestinationBase)
+  -- BlueCargoDispatcher:Start()
+end
 
-local MenuCoalitionRed = MENU_COALITION:New( coalition.side.RED, "Mission Data" )
-MENU_COALITION_COMMAND:New( coalition.side.RED, "Toggle AA Debug", MenuCoalitionRed, ToggleDebugAA )
-MENU_COALITION_COMMAND:New( coalition.side.RED, "Toggle AG Debug", MenuCoalitionRed, ToggleDebugAG )
+BlueMissionData = MENU_COALITION:New( coalition.side.BLUE, "Mission Data" )
+MENU_COALITION_COMMAND:New( coalition.side.BLUE, "Show Objectives", BlueMissionData, ShowStatus )
+
+GroundDeployBlue = MENU_COALITION:New( coalition.side.BLUE, "Deploy C-130 To Base" )
+MENU_COALITION_COMMAND:New( coalition.side.BLUE, "Aleppo", GroundDeployBlue, DeployForces, "Hatay" )
+
+
+RedMissionData = MENU_COALITION:New( coalition.side.RED, "Mission Data" )
+MENU_COALITION_COMMAND:New( coalition.side.RED, "Toggle AA Debug", RedMissionData, ToggleDebugAA )
+MENU_COALITION_COMMAND:New( coalition.side.RED, "Toggle AG Debug", RedMissionData, ToggleDebugAG )
 
 local num_spawns = 1
-
 EH1 = EVENTHANDLER:New()
 EH1:HandleEvent(EVENTS.MarkRemoved)
 function EH1:OnEventMarkRemoved(EventData)
   local new_spawn
   if EventData.text == "tgt" then
     EventData.MarkCoordinate:Explosion(1000)
+    return
+  elseif utils.startswith(EventData.text, "kill-") then
+    local unit_name = string.sub(EventData.text, 6)
+    utils.destroyIfExists(unit_name)
     return
   end
 
@@ -460,3 +487,5 @@ if DEBUG_IADS then
   redIADS:addRadioMenu()
 end
 
+
+-- blue_ground.deployBlueC130("Aleppo")
