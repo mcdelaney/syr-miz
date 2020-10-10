@@ -57,8 +57,14 @@ local utils = require('utils')
 --     utils.log("Cargo dispatched...")
 -- end
 
+local function GoToBase(Group, baseName)
+    BASE:E("Sending c130 to "..baseName)
+    Group:RouteRTB(AIRBASE:FindByName(baseName))
+end
+
+
 local function deployBlueC130(targetBase)
-    utils.log("Sending c130 to capture "..targetBase)
+    -- utils.log("Sending c130 to capture "..targetBase)
     departureBase = "Incirlik"
     pickupZone = 'pickupzone-'..departureBase
 
@@ -68,25 +74,41 @@ local function deployBlueC130(targetBase)
     -- BlueCargoDeployZone:AddZone( ZONE_AIRBASE:New( targetBase ) )
 
     GroundGroup = SPAWN:New( "blue-ground-test" )
-    :InitLimit(1, 1)
-    :InitRandomizeZones( { ZONE:FindByName("logizone-"..departureBase) } )
-    :Spawn()
+        :InitLimit(1, 1)
+        :InitRandomizeZones( { ZONE:FindByName("logizone-"..departureBase) } )
+        :OnSpawnGroup(
+            function( SpawnGroup )
+                CARGO_GROUP:New(SpawnGroup, "Vehicles", SpawnGroup:GetName(), 2000, 10)
+            end
+        )
+        :Spawn()
     -- :SpawnAtAirbase( departure  )
-    GroupInstance = GROUP:FindByName(GroundGroup:GetName())
-    CargoGroup = CARGO_GROUP:New( GroupInstance, "Vehicles", "BlueGround-1", 150, 10)
+    -- GroupInstance = GROUP:FindByName(GroundGroup:GetName())
+    -- CargoGroup = CARGO_GROUP:New( GroupInstance, "Vehicles", "BlueGround-1", 150, 10)
 
     C130 = SPAWN:New("blue-c130")
-        :SpawnAtAirbase( departure)
-    C130Instance = GROUP:FindByName(C130:GetName())
-    CargoPlane = AI_CARGO_AIRPLANE:New(C130, CargoGroup)
-    CargoGroup:Board(CargoPlane)
-    CargoPlane:Pickup(ZONE_AIRBASE:New(departureBase))
+        :InitAirbase( departureBase) -- , SPAWN.Takeoff.Runway)
+        :Spawn()
+
+    -- Scheduler:Schedule(nil, GoToBase, { C130, "Aleppo" }, 10 )
+
+    -- C130Instance = GROUP:FindByName(C130:GetName())
+
+    -- CargoPlane = AI_CARGO_AIRPLANE:New(C130, CargoGroup)
+    -- CargoGroup:Board(CargoPlane)
+    -- CargoPlane:Pickup(ZONE_AIRBASE:New(departureBase))
 
     -- function CargoPlane:OnAfterLoaded( Airplane, From, Event, To, Cargo )
     --     CargoPlane:Deploy(0.2, dest:GetCoordinate(), math.random( 500, 750 ) )
     -- end
 
     -- CargoCarrier = CARGO:New(C130)
+    BlueCargoDispatcher = AI_CARGO_DISPATCHER_AIRPLANE:New(BlueCargoPlane, BlueCargo, BlueCargoPickupZone, BlueCargoDeployZone)
+    BlueCargoDispatcher:SetHomeZone( ZONE_AIRBASE:New( "Incirlik" ) )
+    BlueCargoDispatcher:Start()
+
+
+
     utils.log("Cargo dispatched...")
 end
 

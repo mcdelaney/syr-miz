@@ -25,6 +25,9 @@ local DEBUG_DISPATCH_AA = false
 local DEBUG_DISPATCH_AG = false
 local DEBUG_IADS = false
 
+-- BASE:TraceOnOff(true)
+-- BASE:TraceClass("AI_CARGO_DISPATCHER_AIRPLANE")
+
 ATIS = {}
 
 
@@ -194,13 +197,15 @@ for _, base in pairs(ContestedBases) do
   end
 end
 
-
+Scheduler = SCHEDULER:New( nil )
 SPAWN:New("awacs-Carrier")
   :InitLimit(1, 50)
+  :InitRepeatOnLanding()
   :SpawnScheduled(4, 0)
 
 SPAWN:New("awacs-Incirlik")
   :InitLimit(1, 50)
+  :InitRepeatOnLanding()
   :SpawnScheduled(4, 0)
 
 
@@ -247,7 +252,7 @@ Detection_G:Start()
 A2GDispatcher = AI_A2G_DISPATCHER:New( Detection_G )
 A2GDispatcher:AddDefenseCoordinate( "ag-base", AIRBASE:FindByName( "Damascus" ):GetCoordinate() )
 A2GDispatcher:SetDefenseReactivityHigh()
-A2GDispatcher:SetDefenseRadius( 400000 )
+A2GDispatcher:SetDefenseRadius( 200000 )
 A2GDispatcher:SetCommandCenter(redCommand_AG)
 A2GDispatcher:Start()
 
@@ -263,12 +268,14 @@ A2GDispatcher:Start()
 -- AICargoDispatcherHelicopter = AI_CARGO_DISPATCHER_HELICOPTER:New(SetHeli, SetCargoInfantry, SetPickupZones, SetDeployZones)
 -- AICargoDispatcherHelicopter:Start()
 
--- BlueCargo = SET_CARGO:New()
--- BlueCargoPlane = SET_GROUP:New()
--- BlueCargoPickupZone = SET_ZONE:New()
--- BlueCargoDeployZone = SET_ZONE:New()
--- BlueCargoDispatcher = AI_CARGO_DISPATCHER_AIRPLANE:New(BlueCargoPlane, BlueCargo, BlueCargoPickupZone, BlueCargoDeployZone)
--- BlueCargoDispatcher:Start()
+BlueCargo = SET_CARGO:New():FilterTypes("Vehicles"):FilterStart()
+BlueCargoPlane = SET_GROUP:New():FilterPrefixes("blue-c130"):FilterStart()
+
+BlueCargoPickupZone = SET_ZONE:New()
+BlueCargoPickupZone:AddZone( ZONE_AIRBASE:New( "Incirlik" ))
+
+BlueCargoDeployZone = SET_ZONE:New()
+BlueCargoDeployZone:AddZone( ZONE_AIRBASE:New( "Aleppo" ))
 
 for _, base in pairs(ContestedBases) do
 
@@ -293,7 +300,7 @@ for _, base in pairs(ContestedBases) do
     local sqd_gci = base.."-gci"
     A2ADispatcher:SetSquadron( sqd_gci, base, {"su-30-gci"} )
     A2ADispatcher:SetSquadronGrouping( sqd_gci, 1 )
-    A2ADispatcher:SetSquadronOverhead( sqd_gci, 0.5 )
+    A2ADispatcher:SetSquadronOverhead( sqd_gci, 0.25 )
     A2ADispatcher:SetSquadronTakeoffFromParkingHot(sqd_gci)
     A2ADispatcher:SetSquadronGci( sqd_gci, 600, 900 )
 
@@ -313,20 +320,20 @@ for _, base in pairs(ContestedBases) do
         -- A2GDispatcher:SetSquadronLandingNearAirbase( sqd_cas )
 
         local sqd_sead = base.."-sead"
-        A2GDispatcher:SetSquadron(sqd_sead, base,  { "jf-17-sead" }, 10 )
+        A2GDispatcher:SetSquadron(sqd_sead, base,  { "su-34-sead" }, 10 )
         A2GDispatcher:SetSquadronGrouping( sqd_sead, 1 )
         A2GDispatcher:SetSquadronSead(sqd_sead, 300, 600, 15000, 30000)
         A2GDispatcher:SetSquadronOverhead(sqd_sead, 0.15)
         A2GDispatcher:SetDefaultTakeoffFromRunway( sqd_sead )
         A2GDispatcher:SetSquadronLandingNearAirbase( sqd_sead )
 
-        local sqd_cas = base.."-cas"
-        A2GDispatcher:SetSquadron(sqd_cas, base,  { "su-25-cas" },  10)
-        A2GDispatcher:SetSquadronGrouping( sqd_cas, 2 )
-        A2GDispatcher:SetSquadronCas(sqd_cas, 250, 600)
-        A2GDispatcher:SetSquadronOverhead(sqd_cas, 0.15)
-        A2GDispatcher:SetDefaultTakeoffFromRunway( sqd_cas )
-        A2GDispatcher:SetSquadronLandingNearAirbase( sqd_cas )
+        -- local sqd_cas = base.."-cas"
+        -- A2GDispatcher:SetSquadron(sqd_cas, base,  { "su-25-cas" },  10)
+        -- A2GDispatcher:SetSquadronGrouping( sqd_cas, 2 )
+        -- A2GDispatcher:SetSquadronCas(sqd_cas, 250, 600)
+        -- A2GDispatcher:SetSquadronOverhead(sqd_cas, 0.15)
+        -- A2GDispatcher:SetDefaultTakeoffFromRunway( sqd_cas )
+        -- A2GDispatcher:SetSquadronLandingNearAirbase( sqd_cas )
 
         local sqd_bai = base.."-bai"
         A2GDispatcher:SetSquadron(sqd_bai, base,  { "su-25-cas" },  10)
