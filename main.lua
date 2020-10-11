@@ -7,7 +7,7 @@ local ctld_config = require("ctld_config")
 local logging = require("logging")
 local utils = require("utils")
 -- local ground = require("ground")
-local blue_ground = require("blue_ground")
+-- local blue_ground = require("blue_ground")
 local slotblock = require("slotblock")
 -- trigger.action.setUserFlag("SSB", 100)
 
@@ -24,9 +24,6 @@ local INIT = true
 local DEBUG_DISPATCH_AA = false
 local DEBUG_DISPATCH_AG = false
 local DEBUG_IADS = false
-
--- BASE:TraceOnOff(true)
--- BASE:TraceClass("AI_CARGO_DISPATCHER_AIRPLANE")
 
 ATIS = {}
 
@@ -222,7 +219,7 @@ redIADS:getSAMSitesByPrefix("SA-10"):setActAsEW(true)
 redIADS:setupSAMSitesAndThenActivate()
 
 DetectionSetGroup = SET_GROUP:New()
-  :FilterPrefixes({"EWR", "redAWACS", "defenseBase", "SAM"})
+  :FilterPrefixes({"EWR", "redAWACS", "defenseBase"})
   :FilterCoalitions("red")
   :FilterActive(true)
   :FilterStart()
@@ -268,14 +265,22 @@ A2GDispatcher:Start()
 -- AICargoDispatcherHelicopter = AI_CARGO_DISPATCHER_HELICOPTER:New(SetHeli, SetCargoInfantry, SetPickupZones, SetDeployZones)
 -- AICargoDispatcherHelicopter:Start()
 
-BlueCargo = SET_CARGO:New():FilterTypes("Vehicles"):FilterStart()
-BlueCargoPlane = SET_GROUP:New():FilterPrefixes("blue-c130"):FilterStart()
 
-BlueCargoPickupZone = SET_ZONE:New()
-BlueCargoPickupZone:AddZone( ZONE_AIRBASE:New( "Incirlik" ))
+-- PlaneCargo = SET_CARGO:New():FilterTypes("Heavy"):FilterStart()
+-- BlueCargoPlane = SET_GROUP:New():FilterPrefixes("cargo-plane"):FilterStart()
+-- BlueCargoPickupZone = SET_ZONE:New()
+-- BlueCargoPickupZone:AddZone(  ZONE_AIRBASE:New( "Incirlik" ) )
 
-BlueCargoDeployZone = SET_ZONE:New()
-BlueCargoDeployZone:AddZone( ZONE_AIRBASE:New( "Aleppo" ))
+-- BlueCargoDeployZone = SET_ZONE:New()
+
+-- BlueCargoDispatcherPlane = AI_CARGO_DISPATCHER_AIRPLANE:New(
+--     BlueCargoPlane,
+--     PlaneCargo,
+--     BlueCargoPickupZone,
+--     BlueCargoDeployZone
+-- )
+-- BlueCargoDispatcherPlane:Start()
+
 
 for _, base in pairs(ContestedBases) do
 
@@ -300,10 +305,9 @@ for _, base in pairs(ContestedBases) do
     local sqd_gci = base.."-gci"
     A2ADispatcher:SetSquadron( sqd_gci, base, {"su-30-gci"} )
     A2ADispatcher:SetSquadronGrouping( sqd_gci, 1 )
-    A2ADispatcher:SetSquadronOverhead( sqd_gci, 0.25 )
+    A2ADispatcher:SetSquadronOverhead( sqd_gci, 0.5 )
     A2ADispatcher:SetSquadronTakeoffFromParkingHot(sqd_gci)
     A2ADispatcher:SetSquadronGci( sqd_gci, 600, 900 )
-
 
     for _, agBase in pairs(AG_BASES) do
       if agBase == base then
@@ -323,7 +327,7 @@ for _, base in pairs(ContestedBases) do
         A2GDispatcher:SetSquadron(sqd_sead, base,  { "su-34-sead" }, 10 )
         A2GDispatcher:SetSquadronGrouping( sqd_sead, 1 )
         A2GDispatcher:SetSquadronSead(sqd_sead, 300, 600, 15000, 30000)
-        A2GDispatcher:SetSquadronOverhead(sqd_sead, 0.15)
+        A2GDispatcher:SetSquadronOverhead(sqd_sead, 0.25)
         A2GDispatcher:SetDefaultTakeoffFromRunway( sqd_sead )
         A2GDispatcher:SetSquadronLandingNearAirbase( sqd_sead )
 
@@ -382,16 +386,16 @@ local function ToggleDebugAG(  )
   A2GDispatcher:SetTacticalDisplay(DEBUG_DISPATCH_AG)
 end
 
-local function DeployForces(DestinationBase)
-  blue_ground.deployBlueC130(DestinationBase)
-  -- BlueCargoDispatcher:Start()
-end
+-- local function DeployForces(DestinationBase)
+--   blue_ground.deployBlueC130(DestinationBase)
+--   -- BlueCargoDispatcher:Start()
+-- end
 
 BlueMissionData = MENU_COALITION:New( coalition.side.BLUE, "Mission Data" )
 MENU_COALITION_COMMAND:New( coalition.side.BLUE, "Show Objectives", BlueMissionData, ShowStatus )
 
-GroundDeployBlue = MENU_COALITION:New( coalition.side.BLUE, "Deploy C-130 To Base" )
-MENU_COALITION_COMMAND:New( coalition.side.BLUE, "Aleppo", GroundDeployBlue, DeployForces, "Hatay" )
+-- GroundDeployBlue = MENU_COALITION:New( coalition.side.BLUE, "Deploy C-130 To Base" )
+-- MENU_COALITION_COMMAND:New( coalition.side.BLUE, "Aleppo", GroundDeployBlue, DeployForces, "Hatay" )
 
 
 RedMissionData = MENU_COALITION:New( coalition.side.RED, "Mission Data" )
