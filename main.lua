@@ -7,10 +7,8 @@ local ctld_config = require("ctld_config")
 local logging = require("logging")
 local utils = require("utils")
 -- local ground = require("ground")
--- local blue_ground = require("blue_ground")
+local blue_ground = require("blue_ground")
 local slotblock = require("slotblock")
--- trigger.action.setUserFlag("SSB", 100)
-
 
 local BASE_FILE = lfs.writedir() .. "Scripts\\syr-miz\\syr_state.json"
 local _STATE = {}
@@ -26,7 +24,6 @@ local DEBUG_DISPATCH_AG = false
 local DEBUG_IADS = false
 
 ATIS = {}
-
 
 local ContestedBases = {
   "Ramat David",
@@ -194,7 +191,11 @@ for _, base in pairs(ContestedBases) do
   end
 end
 
-Scheduler = SCHEDULER:New( nil )
+
+BlueMissionData = MENU_COALITION:New( coalition.side.BLUE, "Mission Data" )
+RedMissionData = MENU_COALITION:New( coalition.side.RED, "Mission Data" )
+
+-- Scheduler = SCHEDULER:New( nil )
 SPAWN:New("awacs-Carrier")
   :InitLimit(1, 50)
   :InitRepeatOnLanding()
@@ -236,7 +237,6 @@ A2ADispatcher:SetGciRadius()
 A2ADispatcher:SetIntercept( 10 )
 A2ADispatcher:Start()
 
-
 redCommand_AG = COMMANDCENTER:New( GROUP:FindByName( "REDHQ-AG" ), "REDHQ-AG" )
 DetectionSetGroup_G = SET_GROUP:New()
   :FilterPrefixes({"redAWACS", "su-24-recon", "defenseBase", "redtank-base", "mark-redtank"})
@@ -266,20 +266,8 @@ A2GDispatcher:Start()
 -- AICargoDispatcherHelicopter:Start()
 
 
--- PlaneCargo = SET_CARGO:New():FilterTypes("Heavy"):FilterStart()
--- BlueCargoPlane = SET_GROUP:New():FilterPrefixes("cargo-plane"):FilterStart()
--- BlueCargoPickupZone = SET_ZONE:New()
--- BlueCargoPickupZone:AddZone(  ZONE_AIRBASE:New( "Incirlik" ) )
-
--- BlueCargoDeployZone = SET_ZONE:New()
-
--- BlueCargoDispatcherPlane = AI_CARGO_DISPATCHER_AIRPLANE:New(
---     BlueCargoPlane,
---     PlaneCargo,
---     BlueCargoPickupZone,
---     BlueCargoDeployZone
--- )
--- BlueCargoDispatcherPlane:Start()
+blue_ground.InitBlueGroundPlaneDeployer()
+blue_ground.InitBlueGroundHeliDeployer()
 
 
 for _, base in pairs(ContestedBases) do
@@ -386,19 +374,9 @@ local function ToggleDebugAG(  )
   A2GDispatcher:SetTacticalDisplay(DEBUG_DISPATCH_AG)
 end
 
--- local function DeployForces(DestinationBase)
---   blue_ground.deployBlueC130(DestinationBase)
---   -- BlueCargoDispatcher:Start()
--- end
 
-BlueMissionData = MENU_COALITION:New( coalition.side.BLUE, "Mission Data" )
 MENU_COALITION_COMMAND:New( coalition.side.BLUE, "Show Objectives", BlueMissionData, ShowStatus )
 
--- GroundDeployBlue = MENU_COALITION:New( coalition.side.BLUE, "Deploy C-130 To Base" )
--- MENU_COALITION_COMMAND:New( coalition.side.BLUE, "Aleppo", GroundDeployBlue, DeployForces, "Hatay" )
-
-
-RedMissionData = MENU_COALITION:New( coalition.side.RED, "Mission Data" )
 MENU_COALITION_COMMAND:New( coalition.side.RED, "Toggle AA Debug", RedMissionData, ToggleDebugAA )
 MENU_COALITION_COMMAND:New( coalition.side.RED, "Toggle AG Debug", RedMissionData, ToggleDebugAG )
 
@@ -497,6 +475,3 @@ if DEBUG_IADS then
   iadsDebug.addedEWRadar = true
   redIADS:addRadioMenu()
 end
-
-
--- blue_ground.deployBlueC130("Aleppo")
