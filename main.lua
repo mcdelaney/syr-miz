@@ -3,15 +3,19 @@ local lfs = require("lfs")
 MODULE_FOLDER = lfs.writedir()..[[Scripts\syr-miz\]]
 package.path = MODULE_FOLDER .. "?.lua;" .. package.path
 
+local slotblock = require("slotblock")
 local ctld_config = require("ctld_config")
 local logging = require("logging")
 local utils = require("utils")
--- local ground = require("ground")
+-- local red_ground = require("red_ground")
 local blue_ground = require("blue_ground")
-local slotblock = require("slotblock")
+local red_menus = require("red_menus")
+local blue_menus = require("blue_menus")
 
-local BASE_FILE = lfs.writedir() .. "Scripts\\syr-miz\\syr_state.json"
-local _STATE = {}
+loadfile(lfs.writedir().."Scripts\\syr-miz\\event_handlers.lua")()
+
+BASE_FILE = lfs.writedir() .. "Scripts\\syr-miz\\syr_state.json"
+_STATE = {}
 _STATE["bases"] = {}
 _STATE["slots"] = {}
 _STATE["scenery"] = {}
@@ -19,14 +23,13 @@ _STATE["ctld_units"] = {}
 _STATE["hawks"] = {}
 _STATE["dead"] = {}
 local INIT = true
-local DEBUG_DISPATCH_AA = false
-local DEBUG_DISPATCH_AG = false
 local DEBUG_IADS = false
 
 ATIS = {}
 
 local ContestedBases = {
   "Ramat David",
+  "Incirlik",
   "Aleppo",
   "Abu al-Duhur",
   "Hatay",
@@ -47,7 +50,7 @@ local AG_BASES = {
   -- "Al Qusayr",
 }
 
-local sceneryTargets = {"damascus-target-1", "damascus-target-2", "damascus-target-3"}
+local SceneryTargets = {"damascus-target-1", "damascus-target-2", "damascus-target-3"}
 local _NumAirbaseDefenders = 1
 
 if utils.file_exists(BASE_FILE) then
@@ -92,8 +95,14 @@ local function setBaseRed(baseName)
   utils.destroyIfExists(logUnitName, true)
 
   slotblock.configureSlotsForBase(baseName, "red")
-
+  pcall(function()
+    BlueBases:RemoveAirbasesByName(baseName)
+  end)
+  pcall(function()
+    RedBases:AddAirbasesByName(baseName)
+  end)
   MESSAGE:New( baseName.." was captured by Red!", 5):ToAll()
+
 end
 
 
@@ -118,9 +127,18 @@ local function setBaseBlue(baseName, startup)
   end
 
   slotblock.configureSlotsForBase(baseName, "blue")
+  pcall(function()
+    RedBases:RemoveAirbasesByName(baseName)
+  end)
+  pcall(function()
+    BlueBases:AddAirbasesByName(baseName)
+  end)
   MESSAGE:New( baseName.." was captured by Blue!", 5):ToAll()
+
 end
 
+RedBases = SET_AIRBASE:New()
+BlueBases = SET_AIRBASE:New()
 
 local SAMS = {}
 SAMS["SA6sam"] = SET_GROUP:New():FilterPrefixes("SAM-SA6"):FilterActive(true):FilterOnce()
@@ -191,10 +209,6 @@ for _, base in pairs(ContestedBases) do
   end
 end
 
-
-BlueMissionData = MENU_COALITION:New( coalition.side.BLUE, "Mission Data" )
-RedMissionData = MENU_COALITION:New( coalition.side.RED, "Mission Data" )
-
 -- Scheduler = SCHEDULER:New( nil )
 SPAWN:New("awacs-Carrier")
   :InitLimit(1, 50)
@@ -235,11 +249,12 @@ A2ADispatcher:SetCommandCenter(redCommand)
 A2ADispatcher:SetEngageRadius()
 A2ADispatcher:SetGciRadius()
 A2ADispatcher:SetIntercept( 10 )
-A2ADispatcher:Start()
+-- A2ADispatcher:Start()
 
 redCommand_AG = COMMANDCENTER:New( GROUP:FindByName( "REDHQ-AG" ), "REDHQ-AG" )
 DetectionSetGroup_G = SET_GROUP:New()
-  :FilterPrefixes({"redAWACS", "su-24-recon", "defenseBase", "redtank-base", "mark-redtank"})
+  :FilterPrefixes({"redAWACS", "su-24-recon", "defenseBase"})
+  :FilterActive()
   :FilterStart()
 
 Detection_G = DETECTION_AREAS:New( DetectionSetGroup_G, 1000 )
@@ -251,7 +266,7 @@ A2GDispatcher:AddDefenseCoordinate( "ag-base", AIRBASE:FindByName( "Damascus" ):
 A2GDispatcher:SetDefenseReactivityHigh()
 A2GDispatcher:SetDefenseRadius( 200000 )
 A2GDispatcher:SetCommandCenter(redCommand_AG)
-A2GDispatcher:Start()
+-- A2GDispatcher:Start()
 
 -- SetCargoInfantry = SET_CARGO:New():FilterTypes( "InfantryType" ):FilterStart()
 -- SetAPC = SET_GROUP:New():FilterPrefixes( "red-apc-convoy" ):FilterStart()
@@ -341,128 +356,8 @@ for _, base in pairs(ContestedBases) do
   utils.saveTable(_STATE, BASE_FILE)
 end
 
-
-local function ShowStatus(  )
-  for i, name in pairs(sceneryTargets) do
-    local Zone = ZONE:New( name )
-    Zone:Scan( Object.Category.SCENERY )
-    for SceneryTypeName, SceneryData in pairs( Zone:GetScannedScenery() ) do
-      for SceneryName, SceneryObject in pairs( SceneryData ) do
-        local SceneryObject = SceneryObject
-        MESSAGE:NewType( "Targets: " .. SceneryObject:GetTypeName() .. ", Coord LL DMS: " .. SceneryObject:GetCoordinate():ToStringLLDMS(),
-          MESSAGE.Type.Information ):ToAll()
-      end
-    end
-  end
-end
-
-local function ToggleDebugAA(  )
-  if DEBUG_DISPATCH_AA then
-    DEBUG_DISPATCH_AA = false
-  else
-    DEBUG_DISPATCH_AA = true
-  end
-  A2ADispatcher:SetTacticalDisplay(DEBUG_DISPATCH_AA)
-end
-
-local function ToggleDebugAG(  )
-  if DEBUG_DISPATCH_AG then
-    DEBUG_DISPATCH_AG = false
-  else
-    DEBUG_DISPATCH_AG = true
-  end
-  A2GDispatcher:SetTacticalDisplay(DEBUG_DISPATCH_AG)
-end
-
-
-MENU_COALITION_COMMAND:New( coalition.side.BLUE, "Show Objectives", BlueMissionData, ShowStatus )
-
-MENU_COALITION_COMMAND:New( coalition.side.RED, "Toggle AA Debug", RedMissionData, ToggleDebugAA )
-MENU_COALITION_COMMAND:New( coalition.side.RED, "Toggle AG Debug", RedMissionData, ToggleDebugAG )
-
-local num_spawns = 1
-EH1 = EVENTHANDLER:New()
-EH1:HandleEvent(EVENTS.MarkRemoved)
-function EH1:OnEventMarkRemoved(EventData)
-  local new_spawn
-  if EventData.text == "tgt" then
-    EventData.MarkCoordinate:Explosion(1000)
-    return
-  elseif utils.startswith(EventData.text, "kill-") then
-    local unit_name = string.sub(EventData.text, 6)
-    utils.destroyIfExists(unit_name)
-    return
-  end
-
-  if EventData.text == 'blue-ground' then
-    new_spawn = SPAWN:NewWithAlias("blue-ground", "blue-ground-"..tostring(num_spawns))
-  elseif EventData.text == 'tank' then
-    new_spawn = SPAWN:NewWithAlias("tank-base", "mark-tank-"..tostring(num_spawns))
-  elseif EventData.text == 'redtank' then
-    new_spawn = SPAWN:NewWithAlias("redtank-base", "mark-redtank-"..tostring(num_spawns))
-  elseif EventData.text == 'rapier' then
-    new_spawn = SPAWN:NewWithAlias("rapier-base", "mark-rapier-"..tostring(num_spawns))
-  elseif EventData.text == 'hawk' then
-    new_spawn = SPAWN:NewWithAlias("hawk-base", "mark-hawk-"..tostring(num_spawns))
-  elseif EventData.text == 'farp' then
-    new_spawn = SPAWNSTATIC:NewFromStatic("farp-static")
-  elseif EventData.text == 'red-convoy' then
-    SPAWN:NewWithAlias("red-apc-convoy", "red-apc-convoy-"..tostring(num_spawns))
-  end
-
-  new_spawn:SpawnFromCoordinate(EventData.MarkCoordinate)
-  num_spawns = num_spawns + 1
-end
-
-EH1:HandleEvent(EVENTS.BaseCaptured)
-function EH1:OnEventBaseCaptured(EventData)
-  if _STATE.bases[EventData.PlaceName] == EventData.IniCoalition then
-    return
-  end
-  _STATE.bases[EventData.PlaceName] = EventData.IniCoalition
-  if EventData.IniCoalition == coalition.side.RED then
-    setBaseRed(EventData.PlaceName)
-  else
-    setBaseBlue(EventData.PlaceName)
-    -- ground.initRedGroundBaseAttack("Damascus",  EventData.PlaceName)
-  end
-  utils.saveTable(_STATE, BASE_FILE)
-end
-
-
-EH1:HandleEvent(EVENTS.Dead)
-function EH1:OnEventDead(EventData)
-  if EventData.IniCoalition == coalition.side.RED then
-    if EventData.IniGroupName ~= nil then
-      utils.log("Marking object dead: "..EventData.IniGroupName.." - "..EventData.IniUnitName)
-    end
-    if _STATE["dead"] == nil then
-      _STATE["dead"] = { EventData.IniUnitName }
-    else
-      table.insert(_STATE["dead"], EventData.IniUnitName)
-    end
-  end
-
-  if EventData.IniUnit and EventData.IniObjectCategory==Object.Category.SCENERY then
-    if EventData.IniUnitName ~= nil then
-      local Scenery_Point = EventData.initiator:getPoint()
-      local Scenery_Coordinate = COORDINATE:NewFromVec3(Scenery_Point)
-      local insdata = { x=Scenery_Coordinate.x, y=Scenery_Coordinate.y, z=Scenery_Coordinate.z, id=EventData.IniDCSUnit }
-      if _STATE["scenery"] then
-        table.insert(_STATE["scenery"], insdata)
-      else
-        _STATE["scenery"] = insdata
-      end
-    end
-    for id, name in pairs(sceneryTargets) do
-      if EventData.IniUnitName ~= nil and EventData.IniUnitName == id then
-        MESSAGE:New(name.." Destoyed!").ToAll()
-        table.remove(sceneryTargets, id)
-      end
-    end
-  end
-  utils.saveTable(_STATE, BASE_FILE)
-end
+blue_menus.Init()
+red_menus.Init()
 
 if DEBUG_IADS then
   local iadsDebug = redIADS:getDebugSettings()
