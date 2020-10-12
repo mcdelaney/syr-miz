@@ -6,7 +6,7 @@ local utils = require('utils')
 
 local function initRedGroundBaseAttack(depatureBase, targetBase)
 
-    utils.log"Creating spawn for red ground attack at $1", depatureBase)
+    -- utils.log"Creating spawn for red ground attack at "..depatureBase)
     SetDeployZones:AddZone( ZONE_AIRBASE:New( targetBase ) )
 
     local depart1 = ZONE:New('redpickup-'..depatureBase.."-1")
