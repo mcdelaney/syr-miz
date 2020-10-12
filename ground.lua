@@ -1,14 +1,12 @@
 local lfs = require("lfs")
 MODULE_FOLDER = lfs.writedir()..[[Scripts\syr-miz\]]
 package.path = MODULE_FOLDER .. "?.lua;" .. package.path
-local logging = require("logging")
-local log = logging.Logger:new("ground", "info")
+local utils = require('utils')
 
 
 local function initRedGroundBaseAttack(depatureBase, targetBase)
-    log:info("Creating spawn for red ground attack at "..depatureBase)
-    log:info("Adding target zone...")
 
+    utils.log"Creating spawn for red ground attack at $1", depatureBase)
     SetDeployZones:AddZone( ZONE_AIRBASE:New( targetBase ) )
 
     local depart1 = ZONE:New('redpickup-'..depatureBase.."-1")
@@ -36,7 +34,7 @@ local function initRedGroundBaseAttack(depatureBase, targetBase)
     --     :InitRandomizeZones({ depart2 })
     --     :SpawnScheduled( 10, 0 )
 
-    log:info("Red ground attack convoy created...")
+    utils.log("Red ground attack convoy created...")
 end
 
 
