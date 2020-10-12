@@ -4,7 +4,7 @@
 			"path": "."
 		},
 		{
-			// "path": "..\\..\\..\\..\\moose-dev"
+			"path": "..\\..\\..\\..\\MOOSE_Missions"
 		}
 	],
 	"settings": {
@@ -17,12 +17,16 @@
 			"GROUP",
 			"Group",
 			"mist",
+			"CARGO_GROUP",
+			"AI_CARGO_DISPATCHER_HELICOPTER",
 			"SPAWNSTATIC",
 			"ZONE",
 			"ZONE_RADIUS",
 			"AIRBASE",
 			"country",
 			"SET_GROUP",
+			"SET_ZONE",
+			"SET_CARGO",
 			"COMMANDCENTER",
 			"DETECTION_AREAS",
 			"StaticObject",
