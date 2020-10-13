@@ -249,7 +249,7 @@ A2ADispatcher:SetCommandCenter(redCommand)
 A2ADispatcher:SetEngageRadius()
 A2ADispatcher:SetGciRadius()
 A2ADispatcher:SetIntercept( 10 )
--- A2ADispatcher:Start()
+A2ADispatcher:Start()
 
 redCommand_AG = COMMANDCENTER:New( GROUP:FindByName( "REDHQ-AG" ), "REDHQ-AG" )
 DetectionSetGroup_G = SET_GROUP:New()
@@ -266,7 +266,7 @@ A2GDispatcher:AddDefenseCoordinate( "ag-base", AIRBASE:FindByName( "Damascus" ):
 A2GDispatcher:SetDefenseReactivityHigh()
 A2GDispatcher:SetDefenseRadius( 200000 )
 A2GDispatcher:SetCommandCenter(redCommand_AG)
--- A2GDispatcher:Start()
+A2GDispatcher:Start()
 
 -- SetCargoInfantry = SET_CARGO:New():FilterTypes( "InfantryType" ):FilterStart()
 -- SetAPC = SET_GROUP:New():FilterPrefixes( "red-apc-convoy" ):FilterStart()
