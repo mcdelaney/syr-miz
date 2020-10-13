@@ -12,7 +12,7 @@ local blue_ground = require("blue_ground")
 local red_menus = require("red_menus")
 local blue_menus = require("blue_menus")
 
-loadfile(lfs.writedir().."Scripts\\syr-miz\\event_handlers.lua")()
+
 
 BASE_FILE = lfs.writedir() .. "Scripts\\syr-miz\\syr_state.json"
 _STATE = {}
@@ -183,6 +183,8 @@ end
 
 utils.log("START: Spawning CTLD units from state")
 utils.restoreCtldUnits(_STATE, ctld_config)
+
+loadfile(lfs.writedir().."Scripts\\syr-miz\\event_handlers.lua")()
 
 -- For reach numbered group, for each airbase,
 -- Attempt to find the group, destroying it if the airbase is blue, and activating it
