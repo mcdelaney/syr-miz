@@ -74,6 +74,8 @@ function EH1:OnEventDead(EventData)
     else
       table.insert(_STATE["dead"], EventData.IniUnitName)
     end
+    utils.saveTable(_STATE, BASE_FILE)
+    return
   end
 
   if EventData.IniUnit and EventData.IniObjectCategory==Object.Category.SCENERY then
@@ -86,6 +88,8 @@ function EH1:OnEventDead(EventData)
       else
         _STATE["scenery"] = insdata
       end
+      utils.saveTable(_STATE, BASE_FILE)
+      return
     end
     for id, name in pairs(SceneryTargets) do
       if EventData.IniUnitName ~= nil and EventData.IniUnitName == id then
@@ -93,6 +97,7 @@ function EH1:OnEventDead(EventData)
         table.remove(SceneryTargets, id)
       end
     end
+    utils.saveTable(_STATE, BASE_FILE)
+    return
   end
-  utils.saveTable(_STATE, BASE_FILE)
 end
