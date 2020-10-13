@@ -145,14 +145,6 @@ local function InitBlueGroundHeliDeployer()
         BlueCargoHeliDeployZone:RemoveZonesByName(DeployZone:GetName())
     end
     BlueCargoDispatcherHeli:Start()
-
-    GroundDeployBlueHeli = MENU_COALITION:New( coalition.side.BLUE, "Deploy CH-59 To Base" )
-    MENU_COALITION_COMMAND:New( coalition.side.BLUE, "Aleppo", GroundDeployBlueHeli, deployGroundForcesByHeli, "Aleppo" )
-    MENU_COALITION_COMMAND:New( coalition.side.BLUE, "Hatay", GroundDeployBlueHeli, deployGroundForcesByHeli, "Hatay" )
-    MENU_COALITION_COMMAND:New( coalition.side.BLUE, "Adana Sakirpasa", GroundDeployBlueHeli, deployGroundForcesByHeli, "Adana Sakirpasa" )
-    MENU_COALITION_COMMAND:New( coalition.side.BLUE, "Hama", GroundDeployBlueHeli, deployGroundForcesByHeli, "Hama" )
-    MENU_COALITION_COMMAND:New( coalition.side.BLUE, "Beirut-Rafic Hariri", GroundDeployBlueHeli, deployGroundForcesByHeli, "Beirut-Rafic Hariri" )
-    MENU_COALITION_COMMAND:New( coalition.side.BLUE, "Al Qusayr", GroundDeployBlueHeli, deployGroundForcesByHeli, "Al Qusayr" )
 end
 
 
