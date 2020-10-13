@@ -60,7 +60,7 @@ local function deployGroundForcesByHeli(targetBase, targetCoord)
     --     destZone = ZONE_RADIUS:FindByName(deployZoneName)
     -- end)
 
-    local destZone = ZONE_RADIUS:New(deployZoneName, dest_location:GetVec2(), 50)
+    local destZone = ZONE_RADIUS:New(deployZoneName, dest_location:GetVec2(), 200)
 
     BlueCargoHeliDeployZone:AddZone( destZone )
     BlueCargoHeliPickupZone:AddZone( departZone )
@@ -130,13 +130,12 @@ local function InitBlueGroundHeliDeployer()
     end
 
     function BlueCargoDispatcherHeli:OnAfterUnloaded( From, Event, To, CarrierGroup, Cargo, CarrierUnit, PickupZone)
-
         local ground = Cargo:GetObject()
+        ground:Activate()
         local targetBase = RedBases:FindNearestAirbaseFromPointVec2(Cargo:GetPointVec2())
         ground:TaskRouteToVec2( targetBase:GetPointVec2(), 2)
         MESSAGE:NewType( "Deployed units marching to " .. targetBase.AirbaseName,
                  MESSAGE.Type.Information ):ToAll()
-        -- BlueCargoHeliPickupZone:RemoveZonesByName(PickupZone:GetName())
     end
 
     function BlueCargoDispatcherHeli:OnAfterDeployed( From, Event, To, CarrierGroup, DeployZone)
