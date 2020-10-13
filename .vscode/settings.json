@@ -50,6 +50,7 @@
         "PROFILER",
         "AI_CARGO_DISPATCHER_HELICOPTER",
         "CARGO_GROUP",
-        "SceneryTargets"
+        "SceneryTargets",
+        "BlueBases"
     ]
 }
