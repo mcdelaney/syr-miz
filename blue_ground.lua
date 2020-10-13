@@ -73,7 +73,7 @@ local function deployGroundForcesByHeli(targetBase, targetCoord)
         )
         :SpawnFromVec2(logizone:GetVec2())
 
-    local heli_spawn_coord = GroundGroup:GetPointVec3():AddX( 400 )
+    local heli_spawn_coord = GroundGroup:GetPointVec3():AddX( 500 )
     local heading heli_spawn_coord:HeadingTo(GroundGroup:GetCoordinate())
 
     Heli = SPAWN:NewWithAlias("blue-cargo-heli", "transport-heli-"..tostring(blue_heli_marks))
@@ -127,6 +127,16 @@ local function InitBlueGroundHeliDeployer()
         MESSAGE:NewType( CarrierGroup:GetName() .. " picked up cargo from " .. PickupZone:GetName(),
                          MESSAGE.Type.Information ):ToAll()
         BlueCargoHeliPickupZone:RemoveZonesByName(PickupZone:GetName())
+    end
+
+    function BlueCargoDispatcherHeli:OnAfterUnloaded( From, Event, To, CarrierGroup, Cargo, CarrierUnit, PickupZone)
+
+        local ground = Cargo:GetObject()
+        local targetBase = RedBases:FindNearestAirbaseFromPointVec2(Cargo:GetPointVec2())
+        ground:TaskRouteToVec2( targetBase:GetPointVec2(), 2)
+        MESSAGE:NewType( "Deployed units marching to " .. targetBase.AirbaseName,
+                 MESSAGE.Type.Information ):ToAll()
+        -- BlueCargoHeliPickupZone:RemoveZonesByName(PickupZone:GetName())
     end
 
     function BlueCargoDispatcherHeli:OnAfterDeployed( From, Event, To, CarrierGroup, DeployZone)
