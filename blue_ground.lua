@@ -131,9 +131,8 @@ local function InitBlueGroundHeliDeployer()
 
     function BlueCargoDispatcherHeli:OnAfterUnloaded( From, Event, To, CarrierGroup, Cargo, CarrierUnit, PickupZone)
         local ground = Cargo:GetObject()
-        ground:Activate()
         local targetBase = RedBases:FindNearestAirbaseFromPointVec2(Cargo:GetPointVec2())
-        ground:TaskRouteToVec2( targetBase:GetPointVec2(), 2)
+        ground:TaskRouteToZone(ZONE_AIRBASE:New(targetBase.AirbaseName), false, 5, FORMATION.Cone)
         MESSAGE:NewType( "Deployed units marching to " .. targetBase.AirbaseName,
                  MESSAGE.Type.Information ):ToAll()
     end

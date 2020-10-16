@@ -3,6 +3,8 @@ local lfs = require("lfs")
 MODULE_FOLDER = lfs.writedir()..[[Scripts\syr-miz\]]
 package.path = MODULE_FOLDER .. "?.lua;" .. package.path
 
+-- mist.debug.dump_G("dump.txt")
+
 local slotblock = require("slotblock")
 local ctld_config = require("ctld_config")
 local logging = require("logging")
@@ -329,7 +331,7 @@ for _, base in pairs(ContestedBases) do
         local sqd_sead = base.."-sead"
         A2GDispatcher:SetSquadron(sqd_sead, base,  { "su-34-sead" }, 10 )
         A2GDispatcher:SetSquadronGrouping( sqd_sead, 1 )
-        A2GDispatcher:SetSquadronEngageLimit( sqd_sead, 2 )
+        -- A2GDispatcher:SetSquadronEngageLimit( sqd_sead, 2 )
 
         A2GDispatcher:SetSquadronSead(sqd_sead, 300, 600, 15000, 30000)
         A2GDispatcher:SetSquadronOverhead(sqd_sead, 0.25)
@@ -349,7 +351,7 @@ for _, base in pairs(ContestedBases) do
         A2GDispatcher:SetSquadronGrouping( sqd_bai, 1 )
         A2GDispatcher:SetSquadronBai(sqd_bai, 250, 600)
         A2GDispatcher:SetSquadronOverhead(sqd_bai, 0.15)
-        A2GDispatcher:SetSquadronEngageLimit( sqd_bai, 2 )
+        -- A2GDispatcher:SetSquadronEngageLimit( sqd_bai, 2 )
         A2GDispatcher:SetDefaultTakeoffFromParkingHot( sqd_bai )
         A2GDispatcher:SetSquadronLandingNearAirbase( sqd_bai )
 
@@ -471,3 +473,4 @@ function EH1:OnEventDead(EventData)
     return
   end
 end
+
