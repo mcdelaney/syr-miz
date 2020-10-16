@@ -413,7 +413,7 @@ ctld.spawnableCrates = {
         { weight = 551, desc = "HAWK PCP", unit = "Hawk pcp" , side = 2 }, -- Remove this if on 1.2
         { weight = 552, desc = "HAWK Repair", unit = "HAWK Repair" , side = 2 },
         -- End of HAWK
-        { weight = 400, desc = "M1097 Avenger", unit = "M1097 Avenger", side = 2, cratesRequired = 2 },
+        { weight = 400, desc = "M1097 Avenger", unit = "M1097 Avenger", side = 2, cratesRequired = 1 },
     },
 }
 
