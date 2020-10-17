@@ -23,7 +23,7 @@ _STATE["ctld_units"] = {}
 _STATE["hawks"] = {}
 _STATE["dead"] = {}
 local INIT = true
-local ENABLE_RED_AIR = false
+local ENABLE_RED_AIR = true
 local DEBUG_IADS = false
 
 ATIS = {}
