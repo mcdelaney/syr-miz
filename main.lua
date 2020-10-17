@@ -14,8 +14,6 @@ local blue_ground = require("blue_ground")
 local red_menus = require("red_menus")
 local blue_menus = require("blue_menus")
 
-
-
 BASE_FILE = lfs.writedir() .. "Scripts\\syr-miz\\syr_state.json"
 _STATE = {}
 _STATE["bases"] = {}

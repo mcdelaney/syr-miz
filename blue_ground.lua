@@ -56,10 +56,6 @@ local function deployGroundForcesByHeli(targetBase, targetCoord)
         dest_location = departureBase:GetCoordinate():GetIntermediateCoordinate(dest_location, 0.98):GetClosestPointToRoad()
     end
 
-    -- pcall(function()
-    --     destZone = ZONE_RADIUS:FindByName(deployZoneName)
-    -- end)
-
     local destZone = ZONE_RADIUS:New(deployZoneName, dest_location:GetVec2(), 200)
 
     BlueCargoHeliDeployZone:AddZone( destZone )
@@ -76,7 +72,7 @@ local function deployGroundForcesByHeli(targetBase, targetCoord)
     local heli_spawn_coord = GroundGroup:GetPointVec3():AddX( 500 )
     local heading heli_spawn_coord:HeadingTo(GroundGroup:GetCoordinate())
 
-    Heli = SPAWN:NewWithAlias("blue-cargo-heli", "transport-heli-"..tostring(blue_heli_marks))
+    Heli = SPAWN:NewWithAlias("blue-cargo-heli-1", "transport-heli-"..tostring(blue_heli_marks))
         :InitHeading(heading)
         :SpawnFromPointVec3(heli_spawn_coord)
 
@@ -127,6 +123,17 @@ local function InitBlueGroundHeliDeployer()
         MESSAGE:NewType( CarrierGroup:GetName() .. " picked up cargo from " .. PickupZone:GetName(),
                          MESSAGE.Type.Information ):ToAll()
         BlueCargoHeliPickupZone:RemoveZonesByName(PickupZone:GetName())
+
+        local EscortApache = SPAWN:New("blue-escort-heli-1")
+            :SpawnInZone(PickupZone)
+
+        local EscortSet = SET_GROUP:New():FilterPrefixes("blue-escort-heli-1"):FilterStart()
+        local LeaderUnit = CarrierGroup:GetFirstUnitAlive()
+
+        Escort = AI_ESCORT:New( LeaderUnit, EscortSet , "Escort Attack", "Briefing" )
+        Escort:FormationLine( 100, 100 , 0 )
+        Escort:MenusHelicopters()
+        Escort:__Start( 5 )
     end
 
     function BlueCargoDispatcherHeli:OnAfterUnloaded( From, Event, To, CarrierGroup, Cargo, CarrierUnit, PickupZone)
@@ -135,6 +142,7 @@ local function InitBlueGroundHeliDeployer()
         ground:TaskRouteToZone(ZONE_AIRBASE:New(targetBase.AirbaseName), false, 5, FORMATION.Cone)
         MESSAGE:NewType( "Deployed units marching to " .. targetBase.AirbaseName,
                  MESSAGE.Type.Information ):ToAll()
+        Escort:__Stop( 5 )
     end
 
     function BlueCargoDispatcherHeli:OnAfterDeployed( From, Event, To, CarrierGroup, DeployZone)
@@ -142,6 +150,7 @@ local function InitBlueGroundHeliDeployer()
                          MESSAGE.Type.Information ):ToAll()
         CarrierGroup:Destroy()
         BlueCargoHeliDeployZone:RemoveZonesByName(DeployZone:GetName())
+        Escort:__Stop( 5 )
     end
     BlueCargoDispatcherHeli:Start()
 end
