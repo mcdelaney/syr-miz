@@ -34,7 +34,6 @@ local ContestedBases = {
   "Aleppo",
   "Abu al-Duhur",
   "Hatay",
-  "Taftanaz",
   "Haifa",
   "Bassel Al-Assad",
   "Beirut-Rafic Hariri",
