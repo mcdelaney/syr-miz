@@ -1,3 +1,9 @@
+local io = require("io")
+local lfs = require("lfs")
+MODULE_FOLDER = lfs.writedir()..[[Scripts\syr-miz\]]
+package.path = MODULE_FOLDER .. "?.lua;" .. package.path
+
+local utils = require("utils")
 
 local ctld_config = {}
 
@@ -92,6 +98,30 @@ ctld_config.unit_config = {
 		["skill"] = "Excellent",
 	}
 }
+
+
+ctld.addCallback(function(_args)
+	if _args.action and _args.action == "unpack" then
+		local name
+		local groupname = _args.spawnedGroup:getName()
+
+	  if string.match(groupname, "Soldier stinger") then
+		  name = "stinger"
+		else
+		  name = groupname:lower()
+		end
+
+		local coord = GROUP:FindByName(groupname):GetCoordinate()
+		table.insert(_STATE["ctld_units"], {
+				name=name,
+				pos={x=coord.x, y=coord.y, z=coord.z}
+			})
+
+		utils.enumerateCTLD(_STATE)
+		utils.saveTable(_STATE, BASE_FILE)
+	end
+  end)
+
 
 ctld_config.unit_index = {
 	M270_Index = 1,

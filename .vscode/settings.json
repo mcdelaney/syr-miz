@@ -51,6 +51,7 @@
         "AI_CARGO_DISPATCHER_HELICOPTER",
         "CARGO_GROUP",
         "SceneryTargets",
-        "BlueBases"
+        "BlueBases",
+        "POINT_VEC3"
     ]
 }

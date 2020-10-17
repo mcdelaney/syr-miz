@@ -23,6 +23,7 @@ _STATE["ctld_units"] = {}
 _STATE["hawks"] = {}
 _STATE["dead"] = {}
 local INIT = true
+local ENABLE_RED_AIR = false
 local DEBUG_IADS = false
 
 ATIS = {}
@@ -33,8 +34,8 @@ local ContestedBases = {
   "Aleppo",
   "Abu al-Duhur",
   "Hatay",
+  "Taftanaz",
   "Haifa",
-  -- "An Nasiriyah",
   "Bassel Al-Assad",
   "Beirut-Rafic Hariri",
   "Damascus",
@@ -43,51 +44,16 @@ local ContestedBases = {
 }
 
 local AG_BASES = {
-  -- "Bassel Al-Assad",
   "Hama",
   "Damascus",
-  -- "An Nasiriyah",
   -- "Al Qusayr",
 }
 
 local SceneryTargets = {"damascus-target-1", "damascus-target-2", "damascus-target-3"}
 local _NumAirbaseDefenders = 1
 
-if utils.file_exists(BASE_FILE) then
-  _STATE = utils.readState(BASE_FILE)
-  if _STATE ~= nil then
-    MESSAGE:New("State file found... restoring...", 5):ToAll()
-    INIT = false
-  end
-else
-  utils.log("No state file exists..")
-end
 
-
-ctld.addCallback(function(_args)
-  if _args.action and _args.action == "unpack" then
-      local name
-      local groupname = _args.spawnedGroup:getName()
-
-    if string.match(groupname, "Soldier stinger") then
-        name = "stinger"
-      else
-        name = groupname:lower()
-      end
-
-      local coord = GROUP:FindByName(groupname):GetCoordinate()
-      table.insert(_STATE["ctld_units"], {
-              name=name,
-              pos={x=coord.x, y=coord.y, z=coord.z}
-          })
-
-      utils.enumerateCTLD(_STATE)
-      utils.saveTable(_STATE, BASE_FILE)
-  end
-end)
-
-
-local function setBaseRed(baseName)
+local function setBaseRed(baseName, init_ground)
   utils.log("Setting "..baseName.." as red...")
   local logUnitName = "logistic-"..baseName
   local logZone = 'logizone-'..baseName
@@ -101,8 +67,17 @@ local function setBaseRed(baseName)
   pcall(function()
     RedBases:AddAirbasesByName(baseName)
   end)
-  MESSAGE:New( baseName.." was captured by Red!", 5):ToAll()
 
+  if init_ground == true then
+    for i=1, _NumAirbaseDefenders do
+      local grp_name = "defenseBase-"..baseName.."-"..tostring(i)
+      local zone_base = ZONE:New(baseName..'-defzone'):GetPointVec2()
+      local baseDef = SPAWN:NewWithAlias( "defenseBase", grp_name )
+      baseDef:SpawnFromPointVec2(zone_base)
+    end
+  end
+
+  MESSAGE:New( baseName.." was captured by Red!", 5):ToAll()
 end
 
 
@@ -137,6 +112,7 @@ local function setBaseBlue(baseName, startup)
 
 end
 
+
 RedBases = SET_AIRBASE:New()
 BlueBases = SET_AIRBASE:New()
 
@@ -146,6 +122,17 @@ SAMS["SA2sam"] = SET_GROUP:New():FilterPrefixes("SAM-SA2"):FilterActive(true):Fi
 SAMS["SA3sam"] = SET_GROUP:New():FilterPrefixes("SAM-SA3"):FilterActive(true):FilterOnce()
 SAMS["SA10sam"] = SET_GROUP:New():FilterPrefixes("SAM-SA10"):FilterActive(true):FilterOnce()
 SAMS["EWR"] = SET_GROUP:New():FilterPrefixes("EWR"):FilterActive(true):FilterStart()
+
+
+if utils.file_exists(BASE_FILE) then
+  _STATE = utils.readState(BASE_FILE)
+  if _STATE ~= nil then
+    MESSAGE:New("State file found... restoring...", 5):ToAll()
+    INIT = false
+  end
+else
+  utils.log("No state file exists..")
+end
 
 if INIT then
 
@@ -196,20 +183,14 @@ for _, base in pairs(ContestedBases) do
   if _STATE.bases[base] == coalition.side.BLUE then
     setBaseBlue(base)
   else
-    setBaseRed(base)
-    for i=1, _NumAirbaseDefenders do
-      local grp_name = "defenseBase-"..base.."-"..tostring(i)
-      local zone_base = ZONE:New(base..'-defzone'):GetPointVec2()
-      local baseDef = SPAWN:NewWithAlias( "defenseBase", grp_name )
-      baseDef:SpawnFromPointVec2(zone_base)
-    end
+    setBaseRed(base, true)
+
   end
 end
 
-utils.log("START: Spawning CTLD units from state")
+utils.log("Spawning CTLD units from state")
 utils.restoreCtldUnits(_STATE, ctld_config)
 
--- Scheduler = SCHEDULER:New( nil )
 SPAWN:New("awacs-Carrier")
   :InitLimit(1, 50)
   :InitRepeatOnLanding()
@@ -284,15 +265,13 @@ A2GDispatcher:Start()
 blue_ground.InitBlueGroundPlaneDeployer()
 blue_ground.InitBlueGroundHeliDeployer()
 
-
 for _, base in pairs(ContestedBases) do
 
-  if _STATE.bases[base] == coalition.side.RED then
+  if ENABLE_RED_AIR and _STATE.bases[base] == coalition.side.RED then
     local zone_name = base.."-capzone"
     local zone = ZONE:FindByName(zone_name)
     if zone == nil then
-      zone = ZONE_AIRBASE:New(base, 150000)
-      zone:SetName(zone_name)
+      zone = ZONE_AIRBASE:New(base, 150000):SetName(zone_name)
     end
 
     utils.log("Creating a2a group from base: "..base)
@@ -377,17 +356,16 @@ end
 
 local num_spawns = 1
 EH1 = EVENTHANDLER:New()
-EH1:HandleEvent(EVENTS.MarkRemoved)
-EH1:HandleEvent(EVENTS.MarkChange)
 
+EH1:HandleEvent(EVENTS.MarkChange)
 function EH1:OnEventMarkChange(EventData)
-  if EventData.text == 'deploy-heli' then
-    blue_ground.deployGroundForcesByHeli(nil, EventData.MarkCoordinate)
+  if EventData.text == 'deploy-heli' or EventData.Text == 'heli-deploy' then
+    blue_ground.deployGroundForcesByHeli(EventData.MarkCoordinate)
   end
 end
 
+EH1:HandleEvent(EVENTS.MarkRemoved)
 function EH1:OnEventMarkRemoved(EventData)
-  local new_spawn
   if EventData.text == "tgt" then
     EventData.MarkCoordinate:Explosion(1000)
     return
@@ -397,9 +375,8 @@ function EH1:OnEventMarkRemoved(EventData)
     return
   end
 
-  if EventData.text == 'blue-ground' then
-    new_spawn = SPAWN:NewWithAlias("blue-ground", "blue-ground-"..tostring(num_spawns))
-  elseif EventData.text == 'tank' then
+  local new_spawn
+  if EventData.text == 'bluetank' then
     new_spawn = SPAWN:NewWithAlias("tank-base", "mark-tank-"..tostring(num_spawns))
   elseif EventData.text == 'redtank' then
     new_spawn = SPAWN:NewWithAlias("redtank-base", "mark-redtank-"..tostring(num_spawns))
@@ -407,8 +384,6 @@ function EH1:OnEventMarkRemoved(EventData)
     new_spawn = SPAWN:NewWithAlias("rapier-base", "mark-rapier-"..tostring(num_spawns))
   elseif EventData.text == 'hawk' then
     new_spawn = SPAWN:NewWithAlias("hawk-base", "mark-hawk-"..tostring(num_spawns))
-  elseif EventData.text == 'farp' then
-    new_spawn = SPAWNSTATIC:NewFromStatic("farp-static")
   elseif EventData.text == 'red-convoy' then
     SPAWN:NewWithAlias("red-apc-convoy", "red-apc-convoy-"..tostring(num_spawns))
   end
@@ -424,10 +399,9 @@ function EH1:OnEventBaseCaptured(EventData)
   end
   _STATE.bases[EventData.PlaceName] = EventData.IniCoalition
   if EventData.IniCoalition == coalition.side.RED then
-    setBaseRed(EventData.PlaceName)
+    setBaseRed(EventData.PlaceName, false)
   else
     setBaseBlue(EventData.PlaceName)
-    -- ground.initRedGroundBaseAttack("Damascus",  EventData.PlaceName)
   end
   utils.saveTable(_STATE, BASE_FILE)
 end
