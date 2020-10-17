@@ -106,9 +106,9 @@ local function InitBlueGroundHeliDeployer()
         --                         POINT_VEC3.RoutePointAction.TurningPoint,
         --                         POINT_VEC3.RoutePointAction.TurningPoint, 300, 1)
 
-        local EngageZone = ZONE_AIRBASE:New(targetBase.AirbaseName, 5000)
+        local EngageZone = ZONE_AIRBASE:New(targetBase.AirbaseName, 10000)
 
-        local AICasZone = AI_CAS_ZONE:New( EngageZone, 500, 1000, 200, 600, EngageZone )
+        local AICasZone = AI_CAS_ZONE:New( EngageZone, 500, 1000, 100, 500, EngageZone )
         AICasZone:SetControllable( EscortGroup )
         AICasZone:__Start( 1 ) -- They should statup, and start patrolling in the PatrolZone.
         AICasZone:__Engage( 1, 100, 150 )
