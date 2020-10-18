@@ -201,6 +201,9 @@ SPAWN:New("awacs-Incirlik")
   :SpawnScheduled(4, 0)
 
 
+TexacoStennis=RECOVERYTANKER:New(UNIT:FindByName("CVN71"), "Texaco")
+TexacoStennis:Start()
+
 redIADS = SkynetIADS:create('SYRIA')
 
 commandCenter1 = StaticObject.getByName('RED-HQ-2')
