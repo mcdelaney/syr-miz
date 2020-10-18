@@ -52,6 +52,10 @@
         "CARGO_GROUP",
         "SceneryTargets",
         "BlueBases",
-        "POINT_VEC3"
-    ]
+        "POINT_VEC3",
+
+    ],
+    "Lua.workspace.library": {
+			"path": "./*.lua"
+		},
 }

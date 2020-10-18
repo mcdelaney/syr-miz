@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "..\\..\\..\\..\\MOOSE_Missions"
+		},
+		{
+			"path": "..\\..\\..\\..\\MOOSE\\Moose Development\\Moose"
 		}
 	],
 	"settings": {
