@@ -23,7 +23,7 @@ _STATE["ctld_units"] = {}
 _STATE["hawks"] = {}
 _STATE["dead"] = {}
 local INIT = true
-local ENABLE_RED_AIR = true
+local ENABLE_RED_AIR = false
 local DEBUG_IADS = false
 
 ATIS = {}
@@ -201,7 +201,7 @@ SPAWN:New("awacs-Incirlik")
   :SpawnScheduled(4, 0)
 
 
-TexacoStennis=RECOVERYTANKER:New(UNIT:FindByName("CVN71"), "Texaco")
+TexacoStennis = RECOVERYTANKER:New(UNIT:FindByName("CVN-71"), "Texaco")
 TexacoStennis:Start()
 
 redIADS = SkynetIADS:create('SYRIA')

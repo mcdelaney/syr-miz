@@ -18,8 +18,10 @@ end
 local function log(str)
   if str == nil then str = 'nil' end
   if logFile then
-      logFile:write(os.date("!%Y-%m-%dT%TZ") .. " | " .. str .."\r\n")
+      local output = os.date("!%Y-%m-%dT%TZ") .. " | " .. str .."\r\n"
+      logFile:write(output)
       logFile:flush()
+      env.info(output)
   end
 end
 

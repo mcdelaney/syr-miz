@@ -31,7 +31,8 @@ local function deployGroundForcesByPlane(targetBase)
         :InitUnControlled(true)
         :SpawnAtAirbase( AIRBASE:FindByName( departureBase ),
                      SPAWN.Takeoff.Parking)
-    MESSAGE:NewType("Deploying ground forces from "..departureBase.." to "..targetBase, MESSAGE.Type.Information):ToAll()
+    MESSAGE:NewType("Deploying ground forces from "..departureBase.." to "..targetBase,
+     MESSAGE.Type.Information):ToAll()
 end
 
 
@@ -72,18 +73,25 @@ local function InitBlueGroundHeliDeployer()
         BlueCargoHeliDeployZone
     )
 
-    BlueCargoDispatcherHeli:SetDeployHeight(5, 500)
-
+    BlueCargoDispatcherHeli:SetDeployHeight(5, 1000)
 
     function BlueCargoDispatcherHeli:OnAfterLoading( From, Event, To, CarrierGroup, Cargo, CarrierUnit, PickupZone )
+
+        local targetBase = RedBases:FindNearestAirbaseFromPointVec2(CarrierGroup:GetPointVec2())
+        CarrierGroup:SetState(CarrierGroup, "targetbase", targetBase)
+
+        local SpawnPoint = CarrierGroup:GetCoordinate():GetIntermediateCoordinate(targetBase:GetCoordinate(), 0.08)
+        SpawnPoint:SetAltitude(1000)
+
         local escort_prefix =  "escort"
-        local Escort = SPAWN:NewWithAlias("blue-apache", escort_prefix)
-            :SpawnInZone(PickupZone, true)
+        local EscortGroup = SPAWN:NewWithAlias("blue-apache", escort_prefix)
+            :SpawnFromCoordinate(SpawnPoint)
 
         local PointVec3 = POINT_VEC3:New( 100, 100, 100 )
-        local FollowDCSTask = Escort:TaskFollow( CarrierGroup, PointVec3:GetVec3() )
-        Escort:SetTask( FollowDCSTask, 1 )
-        CarrierGroup:SetState(CarrierGroup, "escort", Escort:GetName())
+        local FollowDCSTask = EscortGroup:TaskFollow( CarrierGroup, PointVec3:GetVec3() )
+        EscortGroup:SetTask( FollowDCSTask, 1 )
+        CarrierGroup:SetState(CarrierGroup, "escort", EscortGroup:GetName())
+
     end
 
     function BlueCargoDispatcherHeli:OnAfterLoad( From, Event, To, CarrierGroup, PickupZone)
@@ -92,44 +100,30 @@ local function InitBlueGroundHeliDeployer()
         BlueCargoHeliPickupZone:RemoveZonesByName(PickupZone:GetName())
     end
 
-
-    function BlueCargoDispatcherHeli:OnAfterUnloading( From, Event, To, CarrierGroup, Cargo, CarrierUnit, PickupZone)
-
+    function BlueCargoDispatcherHeli:OnAfterUnloading( From, Event, To, CarrierGroup, Cargo, CarrierUnit, DeployZone)
         local EscortGroup = GROUP:FindByName(CarrierGroup:GetState(CarrierGroup, "escort"))
         local targetBase = RedBases:FindNearestAirbaseFromPointVec2(EscortGroup:GetPointVec2())
-        if EscortGroup == nil then
-            MESSAGE:NewType( "Escort group could not be found!", MESSAGE.Type.Information ):ToAll()
-            return
-        end
+        local EngageZone = ZONE_AIRBASE:New(targetBase.AirbaseName, 5000)
+        local PatrolZone = ZONE_AIRBASE:New(targetBase.AirbaseName, 5000)
 
-        -- EscortGroup:RouteAirTo(targetBase:GetPointVec3(), POINT_VEC3.RoutePointAltType.BARO,
-        --                         POINT_VEC3.RoutePointAction.TurningPoint,
-        --                         POINT_VEC3.RoutePointAction.TurningPoint, 300, 1)
-
-        local EngageZone = ZONE_AIRBASE:New(targetBase.AirbaseName, 10000)
-
-        local AICasZone = AI_CAS_ZONE:New( EngageZone, 500, 1000, 100, 500, EngageZone )
-        AICasZone:SetControllable( EscortGroup )
-        AICasZone:__Start( 1 ) -- They should statup, and start patrolling in the PatrolZone.
-        AICasZone:__Engage( 1, 100, 150 )
-        -- EscortGroup:EnRouteTaskFac(10000, 1)
+        local AttackZone = AI_CAS_ZONE:New( PatrolZone, 150, 300, 300, 5000, EngageZone )
+        AttackZone:SetControllable( EscortGroup )
+        AttackZone:SetDetectionOn()
+        AttackZone:Start( )
+        AttackZone:__Engage( 1, 150, 250 )
 
     end
-    function BlueCargoDispatcherHeli:OnAfterUnloaded( From, Event, To, CarrierGroup, Cargo, CarrierUnit, PickupZone)
-        local ground = Cargo:GetObject()
-        local targetBase = RedBases:FindNearestAirbaseFromPointVec2(Cargo:GetPointVec2())
-        ground:TaskRouteToZone(ZONE_AIRBASE:New(targetBase.AirbaseName), false, 5, FORMATION.Cone)
 
-        -- local EscortSet = SET_GROUP:New():FilterPrefixes("escort"):FilterStart()
-        -- local EscortGroup = EscortSet:GetFirst()
-        -- EscortGroup:TaskRouteToZone(ZONE_AIRBASE:New(targetBase.AirbaseName,  false, 80, FORMATION.Cone))
+    function BlueCargoDispatcherHeli:OnAfterUnloaded( From, Event, To, CarrierGroup, Cargo, CarrierUnit, DeployZone)
+        local ground = Cargo:GetObject()
+        local targetBase = CarrierGroup:GetState(CarrierGroup, "targetbase")
+
+        ground:TaskRouteToZone(ZONE_AIRBASE:New(targetBase.AirbaseName), false, 20, FORMATION.Cone)
         MESSAGE:NewType( "Deployed units marching to " .. targetBase.AirbaseName,
                  MESSAGE.Type.Information ):ToAll()
     end
 
     function BlueCargoDispatcherHeli:OnAfterDeployed( From, Event, To, CarrierGroup, DeployZone)
-        MESSAGE:NewType( CarrierGroup:GetName() .. " deployed cargo to " .. DeployZone:GetName(),
-                         MESSAGE.Type.Information ):ToAll()
         CarrierGroup:Destroy()
         BlueCargoHeliDeployZone:RemoveZonesByName(DeployZone:GetName())
     end
@@ -157,6 +151,17 @@ local function deployGroundForcesByHeli(targetCoord)
             end
         )
         :SpawnFromVec2(logizone:GetVec2())
+
+
+        GroundGroup2 = SPAWN:NewWithAlias( "blue-ground-tow",
+                "blue-ground-heli-tow-"..tostring(blue_heli_marks) )
+        :OnSpawnGroup(
+        function( SpawnGroup )
+        CARGO_GROUP:New(SpawnGroup, "Light", SpawnGroup:GetName(), 100, 50)
+        end
+        )
+        :SpawnFromVec2(logizone:GetPointVec2():AddX(-30):AddY(-20):GetVec2())
+
 
     local heli_spawn_coord = GroundGroup:GetPointVec3():AddX( 500 )
     local heading heli_spawn_coord:HeadingTo(GroundGroup:GetCoordinate())
