@@ -27,10 +27,10 @@ local function deployGroundForcesByPlane(targetBase)
         )
         :Spawn()
 
-    Plane = SPAWN:New("blue-cargo-plane")
+    Plane = SPAWN:NewWithAlias("blue-cargo-plane", "cargo-plane")
         :InitUnControlled(true)
         :SpawnAtAirbase( AIRBASE:FindByName( departureBase ),
-                     SPAWN.Takeoff.Parking)
+                         SPAWN.Takeoff.Parking)
     MESSAGE:NewType("Deploying ground forces from "..departureBase.." to "..targetBase,
      MESSAGE.Type.Information):ToAll()
 end
@@ -47,13 +47,14 @@ local function InitBlueGroundPlaneDeployer()
         BlueCargoPlanePickupZone,
         BlueCargoPlaneDeployZone
     )
-    BlueCargoDispatcherPlane:Start()
+
     function BlueCargoDispatcherPlane:OneAfterDeployed( From, Event, To, CarrierGroup, DeployZone)
         MESSAGE:NewType( "Group " .. CarrierGroup:GetName() .. " deployed all cargo in zone " .. DeployZone:GetName(),
                          MESSAGE.Type.Information ):ToAll()
         CarrierGroup:Destroy(true)
     end
 
+    BlueCargoDispatcherPlane:Start()
     GroundDeployBluePlane = MENU_COALITION:New( coalition.side.BLUE, "Deploy C-130 To Base" )
     MENU_COALITION_COMMAND:New( coalition.side.BLUE, "Beirut-Rafic Hariri", GroundDeployBluePlane, deployGroundForcesByPlane, "Beirut-Rafic Hariri" )
     MENU_COALITION_COMMAND:New( coalition.side.BLUE, "Bassel Al-Assad", GroundDeployBluePlane, deployGroundForcesByPlane, "Bassel Al-Assad" )

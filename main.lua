@@ -2,17 +2,14 @@ local io = require("io")
 local lfs = require("lfs")
 MODULE_FOLDER = lfs.writedir()..[[Scripts\syr-miz\]]
 package.path = MODULE_FOLDER .. "?.lua;" .. package.path
-
--- mist.debug.dump_G("dump.txt")
-
 local slotblock = require("slotblock")
 local ctld_config = require("ctld_config")
 local logging = require("logging")
 local utils = require("utils")
--- local red_ground = require("red_ground")
 local blue_ground = require("blue_ground")
 local red_menus = require("red_menus")
 local blue_menus = require("blue_menus")
+-- local red_ground = require("red_ground")
 
 BASE_FILE = lfs.writedir() .. "Scripts\\syr-miz\\syr_state.json"
 _STATE = {}
@@ -27,6 +24,7 @@ local ENABLE_RED_AIR = true
 local DEBUG_IADS = false
 
 ATIS = {}
+
 
 local ContestedBases = {
   "Ramat David",
@@ -263,8 +261,7 @@ A2GDispatcher:Start()
 -- AICargoDispatcherHelicopter = AI_CARGO_DISPATCHER_HELICOPTER:New(SetHeli, SetCargoInfantry, SetPickupZones, SetDeployZones)
 -- AICargoDispatcherHelicopter:Start()
 
-
-blue_ground.InitBlueGroundPlaneDeployer()
+-- blue_ground.InitBlueGroundPlaneDeployer()
 blue_ground.InitBlueGroundHeliDeployer()
 
 for _, base in pairs(ContestedBases) do
