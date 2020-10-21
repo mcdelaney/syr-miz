@@ -2,6 +2,7 @@ local io = require("io")
 local lfs = require("lfs")
 MODULE_FOLDER = lfs.writedir()..[[Scripts\syr-miz\]]
 package.path = MODULE_FOLDER .. "?.lua;" .. package.path
+
 local slotblock = require("slotblock")
 local ctld_config = require("ctld_config")
 local logging = require("logging")
@@ -46,7 +47,7 @@ local AG_BASES = {
   -- "Al Qusayr",
 }
 
-local SceneryTargets = {"damascus-target-1", "damascus-target-2", "damascus-target-3"}
+SceneryTargets = {"damascus-target-1", "damascus-target-2", "damascus-target-3"}
 local _NumAirbaseDefenders = 1
 
 
@@ -109,7 +110,6 @@ local function setBaseBlue(baseName, startup)
 
 end
 
-
 RedBases = SET_AIRBASE:New()
 BlueBases = SET_AIRBASE:New()
 
@@ -155,7 +155,6 @@ else
 
     for SceneryTypeName, SceneryData in pairs( searchZone:GetScannedScenery() ) do
       for SceneryName, SceneryObject in pairs( SceneryData ) do
-        local SceneryObject = SceneryObject
         utils.log( "Scenery Destroyed: " .. SceneryObject:GetTypeName())
         SceneryObject:GetDCSObject():destroy()
         vec3:Explosion(200)
