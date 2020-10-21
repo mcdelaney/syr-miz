@@ -13,7 +13,14 @@
 			"missionCommands",
 			"net",
 			"DCS",
+			"StaticObject",
+			"Object",
+			"Unit",
+			"coord",
+			"Spot",
+			"atmosphere",
 		],
+
 		"Lua.diagnostics.disable": [
 			"lowercase-global"
 		]
