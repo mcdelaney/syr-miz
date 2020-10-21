@@ -3,6 +3,8 @@ MODULE_FOLDER = lfs.writedir()..[[Scripts\syr-miz\]]
 package.path = MODULE_FOLDER .. "?.lua;" .. package.path
 local utils = require('utils')
 
+local SetDeployZones = SET_ZONE:New()
+
 
 local function initRedGroundBaseAttack(depatureBase, targetBase)
 
