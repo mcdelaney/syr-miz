@@ -12,7 +12,7 @@ local red_menus = require("red_menus")
 local blue_menus = require("blue_menus")
 -- local red_ground = require("red_ground")
 
-BASE_FILE = lfs.writedir() .. "Scripts\\syr-miz\\syr_state.json"
+
 _STATE = {}
 _STATE["bases"] = {}
 _STATE["slots"] = {}
@@ -23,29 +23,57 @@ _STATE["dead"] = {}
 local INIT = true
 local ENABLE_RED_AIR = true
 local DEBUG_IADS = false
+if MISSION_VERSION == nil  then
+  MISSION_VERSION = ""
+end
+BASE_FILE = lfs.writedir() .. "Scripts\\syr-miz\\syr_state"..MISSION_VERSION ..".json"
 
 ATIS = {}
 
+if MISSION_VERSION == "South" then
 
-local ContestedBases = {
-  "Ramat David",
-  "Incirlik",
-  "Aleppo",
-  "Abu al-Duhur",
-  "Hatay",
-  "Haifa",
-  "Bassel Al-Assad",
-  "Beirut-Rafic Hariri",
-  "Damascus",
-  "Al Qusayr",
-  "Hama"
-}
+  ContestedBases = {
+    "Ramat David",
+    "Haifa",
+    "Beirut-Rafic Hariri",
+    "Damascus",
+    -- "Mezzeh",
+  }
+  AG_BASES = {  }
 
-local AG_BASES = {
-  "Hama",
-  "Damascus",
-  -- "Al Qusayr",
-}
+elseif MISSION_VERSION == "North" then
+
+  ContestedBases = {
+    "Ramat David",
+    "Incirlik",
+    "Aleppo",
+    "Abu al-Duhur",
+    "Hatay",
+    "Haifa",
+    "Bassel Al-Assad",
+    "Hama"
+  }
+  AG_BASES = {  }
+
+else
+  ContestedBases = {
+    "Ramat David",
+    "Incirlik",
+    "Aleppo",
+    "Abu al-Duhur",
+    "Hatay",
+    "Haifa",
+    "Bassel Al-Assad",
+    "Beirut-Rafic Hariri",
+    "Damascus",
+    "Al Qusayr",
+    "Hama"
+  }
+
+  AG_BASES = {  }
+
+end
+
 
 SceneryTargets = {"damascus-target-1", "damascus-target-2", "damascus-target-3"}
 local _NumAirbaseDefenders = 1
@@ -131,7 +159,7 @@ else
   utils.log("No state file exists..")
 end
 
-if INIT then
+if INIT and MISSION_VERSION == "" then
 
   for k, sam in pairs(SAMS) do
     pcall(function(_args) utils.prune_enemies(sam, k) end)
@@ -218,6 +246,7 @@ DetectionSetGroup = SET_GROUP:New()
   :FilterCoalitions("red")
   :FilterActive(true)
   :FilterStart()
+
 Detection = DETECTION_AREAS:New( DetectionSetGroup, 30000 )
 BorderZone = ZONE_POLYGON:New( "RED-BORDER", GROUP:FindByName( "red-border" ) )
 
@@ -241,12 +270,14 @@ Detection_G = DETECTION_AREAS:New( DetectionSetGroup_G, 1000 )
 Detection_G:BoundDetectedZones()
 Detection_G:Start()
 
-A2GDispatcher = AI_A2G_DISPATCHER:New( Detection_G )
-A2GDispatcher:AddDefenseCoordinate( "ag-base", AIRBASE:FindByName( "Damascus" ):GetCoordinate() )
-A2GDispatcher:SetDefenseReactivityHigh()
-A2GDispatcher:SetDefenseRadius( 200000 )
-A2GDispatcher:SetCommandCenter(redCommand_AG)
-A2GDispatcher:Start()
+if AG_BASES ~= nil then
+  A2GDispatcher = AI_A2G_DISPATCHER:New( Detection_G )
+  A2GDispatcher:AddDefenseCoordinate( "ag-base", AIRBASE:FindByName( "Damascus" ):GetCoordinate() )
+  A2GDispatcher:SetDefenseReactivityHigh()
+  A2GDispatcher:SetDefenseRadius( 200000 )
+  A2GDispatcher:SetCommandCenter(redCommand_AG)
+  A2GDispatcher:Start()
+end
 
 -- SetCargoInfantry = SET_CARGO:New():FilterTypes( "InfantryType" ):FilterStart()
 -- SetAPC = SET_GROUP:New():FilterPrefixes( "red-apc-convoy" ):FilterStart()

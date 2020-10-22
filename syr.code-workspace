@@ -10,6 +10,7 @@
 	"settings": {
 		"Lua.diagnostics.globals": [
 			"trigger",
+			"MISSION_VERSION",
 			"missionCommands",
 			"net",
 			"DCS",

@@ -1,3 +1,5 @@
 restart_dcs.ps1
 state.json
 syr_state.json
+syr_stateNorth.json
+syr_stateSouth.json
