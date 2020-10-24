@@ -128,6 +128,9 @@ local function InitBlueGroundHeliDeployer()
         CarrierGroup:Destroy()
         BlueCargoHeliDeployZone:RemoveZonesByName(DeployZone:GetName())
     end
+
+    -- function BlueCargoDispatcherHeli
+    -- BlueCargoHeliDeployZone:RemoveZonesByName(DeployZone:GetName())
     BlueCargoDispatcherHeli:Start()
 end
 
@@ -152,7 +155,6 @@ local function deployGroundForcesByHeli(targetCoord)
             end
         )
         :SpawnFromVec2(logizone:GetVec2())
-
 
         GroundGroup2 = SPAWN:NewWithAlias( "blue-ground-tow",
                 "blue-ground-heli-tow-"..tostring(blue_heli_marks) )
