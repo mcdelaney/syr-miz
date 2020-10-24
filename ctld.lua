@@ -312,6 +312,7 @@ ctld.vehicleTransportEnabled = {
     "C-101",
     "F-86",
     "L-39C",
+    "F-5E-3",
 }
 
 
