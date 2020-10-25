@@ -10,9 +10,10 @@ local utils = require("utils")
 local blue_ground = require("blue_ground")
 local red_menus = require("red_menus")
 local blue_menus = require("blue_menus")
+local blue_recon = require("blue_recon")
 -- local red_ground = require("red_ground")
 
-
+_MARKERS = {}
 _STATE = {}
 _STATE["bases"] = {}
 _STATE["slots"] = {}
@@ -20,6 +21,7 @@ _STATE["scenery"] = {}
 _STATE["ctld_units"] = {}
 _STATE["hawks"] = {}
 _STATE["dead"] = {}
+_STATE["marks"] = {}
 local INIT = true
 local ENABLE_RED_AIR = true
 local DEBUG_IADS = false
@@ -127,6 +129,14 @@ local function setBaseBlue(baseName, startup)
     MESSAGE:New("Trigger zone does not exist for "..logZone.."!", 5):ToAll()
   end
 
+  local reconZone = ZONE:FindByName(baseName.."-reconzone")
+  if reconZone ~= nil then
+    local spwn = SPAWN:NewWithAlias("blue-recon", "blue-recon-"..baseName)
+      :SpawnAtAirbase( AIRBASE:FindByName(baseName), SPAWN.Takeoff.Air, 25000)
+    spwn:PatrolZones({ reconZone }, 500, 1, 2)
+    MESSAGE:New("Spawning reaper drone to patrol from "..baseName, 5):ToAll()
+  end
+
   slotblock.configureSlotsForBase(baseName, "blue")
   pcall(function()
     RedBases:RemoveAirbasesByName(baseName)
@@ -150,7 +160,7 @@ SAMS["EWR"] = SET_GROUP:New():FilterPrefixes("EWR"):FilterActive(true):FilterSta
 
 
 if utils.file_exists(BASE_FILE) then
-  _STATE = utils.readState(BASE_FILE)
+  utils.readState(BASE_FILE)
   if _STATE ~= nil then
     MESSAGE:New("State file found... restoring...", 5):ToAll()
     INIT = false
@@ -181,13 +191,18 @@ else
     local searchZone = ZONE_RADIUS:New(tostring(i), vec3:GetVec2(), 1)
     searchZone:Scan( Object.Category.SCENERY )
 
-    for SceneryTypeName, SceneryData in pairs( searchZone:GetScannedScenery() ) do
-      for SceneryName, SceneryObject in pairs( SceneryData ) do
+    for _, SceneryData in pairs( searchZone:GetScannedScenery() ) do
+      for _, SceneryObject in pairs( SceneryData ) do
         utils.log( "Scenery Destroyed: " .. SceneryObject:GetTypeName())
         SceneryObject:GetDCSObject():destroy()
         vec3:Explosion(200)
       end
     end
+  end
+
+  for i, markCoord in pairs(_STATE["marks"]) do
+    _MARKERS[markCoord["name"]] = MARKER:New(COORDINATE:New(markCoord["x"], markCoord["y"], markCoord["z"]),
+                                             markCoord["name"]):ToAll()
   end
 end
 
@@ -366,6 +381,9 @@ for _, base in pairs(ContestedBases) do
   end
   utils.saveTable(_STATE, BASE_FILE)
 end
+BLUEHQ = GROUP:FindByName("BLUEHQ")
+BLUECC = COMMANDCENTER:New( BLUEHQ, "BLUEHQ" )
+blue_recon.InitBlueReconGroup(BLUECC)
 
 blue_menus.Init()
 red_menus.Init()
@@ -415,6 +433,8 @@ function EH1:OnEventMarkRemoved(EventData)
     new_spawn = SPAWN:NewWithAlias("hawk-base", "mark-hawk-"..tostring(num_spawns))
   elseif EventData.text == 'red-convoy' then
     SPAWN:NewWithAlias("red-apc-convoy", "red-apc-convoy-"..tostring(num_spawns))
+  else
+    return
   end
 
   new_spawn:SpawnFromCoordinate(EventData.MarkCoordinate)
@@ -446,6 +466,20 @@ function EH1:OnEventDead(EventData)
       _STATE["dead"] = { EventData.IniUnitName }
     else
       table.insert(_STATE["dead"], EventData.IniUnitName)
+    end
+    local deadGroup = UNIT:FindByName(EventData.IniUnitName):GetGroup()
+
+    if deadGroup == nil or deadGroup:CountAliveUnits() == 0 then
+      for i, Mark in pairs(_STATE["marks"]) do
+        if Mark["name"] == EventData.IniGroupName then
+          env.info("Removing marks for: "..deadGroup:GetName())
+          table.remove(_STATE["marks"], i)
+          -- _STATE["marks"] = utils.removebyKey(_STATE["marks"], markName)
+          _MARKERS[Mark["name"]]:Remove()
+        end
+      end
+    else
+      env.info("Not removing group.."..deadGroup:GetName().." from table.. has"..deadGroup:CountAliveUnits().." remaining units...")
     end
     utils.saveTable(_STATE, BASE_FILE)
     return

@@ -1,0 +1,51 @@
+local io = require("io")
+local lfs = require("lfs")
+MODULE_FOLDER = lfs.writedir()..[[Scripts\syr-miz\]]
+package.path = MODULE_FOLDER .. "?.lua;" .. package.path
+local utils = require("utils")
+
+local function InitBlueReconGroup(CC)
+
+    RecceSetGroup = SET_GROUP:New():FilterPrefixes( "blue-recon" ):FilterStart()
+    RecceDetection = DETECTION_UNITS:New( RecceSetGroup )
+    RecceDetection:InitDetectRadar(true)
+    RecceDetection:Start()
+
+    -- function RecceDetection:OnAfterDetect(From, Event, To)
+    --     local DetectionReport = RecceDetection:DetectedReportDetailed()
+    --     if DetectionReport ~= "" then
+    --         CC:MessageToAll( DetectionReport, 15, "" )
+    --     end
+    -- end
+
+    function RecceDetection:OnAfterDetected( From, Event, To, DetectedUnits )
+        for _, DetectedUnit in pairs( DetectedUnits ) do
+            local DetectedUnitGroup = DetectedUnit:GetGroup()
+            if DetectedUnitGroup:CountAliveUnits() == 0 then
+                return
+            end
+            local DetectedName = DetectedUnitGroup:GetName()
+            for _, Mark in pairs(_STATE["marks"]) do
+                if Mark["name"] == DetectedName then
+                    return
+                end
+            end
+            local DetectedCoord = DetectedUnitGroup:GetCoordinate():GetRandomCoordinateInRadius(150, 30)
+            local DetectedVec3 = DetectedCoord:GetVec3()
+            _MARKERS[DetectedName] = MARKER:New(DetectedCoord, DetectedName):ToAll()
+            table.insert(
+                _STATE["marks"], {
+                    name = DetectedName,
+                    x = DetectedVec3.x,
+                    y = DetectedVec3.y,
+                    z = DetectedVec3.z,
+                }
+            )
+            utils.saveTable(_STATE, BASE_FILE)
+        end
+    end
+end
+
+return {
+    InitBlueReconGroup = InitBlueReconGroup
+}

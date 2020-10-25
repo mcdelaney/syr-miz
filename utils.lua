@@ -34,14 +34,33 @@ local file_exists = function(name)
 end
 
 
-local readState = function (state_file)
-    log("Reading state...")
-    local statefile = io.open(state_file, "r")
-    local state = statefile:read("*all")
-    statefile:close()
-    local saved_game_state = json:decode(state)
-    return saved_game_state
+local readState = function (state_file, state_keys)
+  log("Reading state...")
+  local statefile = io.open(state_file, "r")
+  local state = statefile:read("*all")
+  statefile:close()
+  local saved_game_state = json:decode(state)
+  for key, val in pairs(saved_game_state) do
+    _STATE[key] = val
   end
+
+end
+
+
+local function removebyKey(tab, val)
+  local i = 1
+  for k, _ in pairs (tab) do
+      if k == val then
+        table.remove(tab, i)
+        return tab
+      end
+      i = i + 1
+  end
+  if tab == nil then
+    return {}
+  end
+  return tab
+end
 
 
 local tablefind = function(tab, el)
@@ -418,4 +437,5 @@ return {
   init_ctld_units = init_ctld_units,
   matchesBaseName = matchesBaseName,
   getBaseAndSideNamesFromGroupName = getBaseAndSideNamesFromGroupName,
+  removebyKey = removebyKey,
 }
