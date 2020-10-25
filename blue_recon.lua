@@ -6,7 +6,7 @@ local utils = require("utils")
 
 local function InitBlueReconGroup(CC)
 
-    RecceSetGroup = SET_GROUP:New():FilterPrefixes( {"blue-recon", "awacs-Carrier", "awacs-Incirlik"} ):FilterStart()
+    RecceSetGroup = SET_GROUP:New():FilterPrefixes( "blue-recon" ):FilterStart()
     RecceDetection = DETECTION_UNITS:New( RecceSetGroup ):FilterCategories( Unit.Category.GROUND_UNIT )
     RecceDetection:InitDetectRadar(true)
     RecceDetection:InitDetectOptical(true)
@@ -14,14 +14,8 @@ local function InitBlueReconGroup(CC)
     RecceDetection:InitDetectVisual(true)
     RecceDetection:Start()
 
-    -- function RecceDetection:OnAfterDetect(From, Event, To)
-    --     local DetectionReport = RecceDetection:DetectedReportDetailed()
-    --     if DetectionReport ~= "" then
-    --         CC:MessageToAll( DetectionReport, 15, "" )
-    --     end
-    -- end
-
     function RecceDetection:OnAfterDetected( From, Event, To, DetectedUnits )
+        env.info("Processing detected units..")
         for _, DetectedUnit in pairs( DetectedUnits ) do
             local DetectedUnitGroup = DetectedUnit:GetGroup()
             if DetectedUnitGroup:CountAliveUnits() == 0 then
@@ -44,6 +38,7 @@ local function InitBlueReconGroup(CC)
                     z = DetectedVec3.z,
                 }
             )
+            env.info( "New Detection: "..DetectedName)
             CC:MessageToAll( "New Detection: "..DetectedName.." at: "..DetectedCoord:ToStringLLDDM(), 15, "" )
             utils.saveTable(_STATE, BASE_FILE)
         end

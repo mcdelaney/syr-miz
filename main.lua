@@ -132,8 +132,11 @@ local function setBaseBlue(baseName, startup)
   local reconZone = ZONE:FindByName(baseName.."-reconzone")
   if reconZone ~= nil then
     local spwn = SPAWN:NewWithAlias("blue-recon", "blue-recon-"..baseName)
-      :SpawnAtAirbase( AIRBASE:FindByName(baseName), SPAWN.Takeoff.Air, 25000)
-    spwn:PatrolZones({ reconZone }, 500, 1, 2)
+      :SpawnAtAirbase( AIRBASE:FindByName(baseName), SPAWN.Takeoff.Air, 10000)
+
+    local reconPatrol = AI_PATROL_ZONE:New( reconZone, 12000, 18000, 150, 400 )
+    reconPatrol:SetControllable( spwn )
+    reconPatrol:__Start( 2 )
     MESSAGE:New("Spawning reaper drone to patrol from "..baseName, 5):ToAll()
   end
 
@@ -324,9 +327,9 @@ for _, base in pairs(ContestedBases) do
     A2ADispatcher:SetSquadronGrouping( sqd_cap, 2 )
     A2ADispatcher:SetSquadronTakeoffFromParkingHot(sqd_cap)
     A2ADispatcher:SetSquadronLandingNearAirbase( sqd_cap )
-    A2ADispatcher:SetSquadronCap( sqd_cap, zone, 10000, 25000, 500, 800, 600, 1200, "BARO")
+    A2ADispatcher:SetSquadronCap( sqd_cap, zone, 5000, 10000, 500, 800, 600, 1200, "BARO")
     A2ADispatcher:SetSquadronCapInterval( sqd_cap, 1, 60*3, 60*7, 1)
-    A2ADispatcher:SetSquadronCapRacetrack(sqd_cap, 10000, 20000, 90, 180, 5*60, 10*60)
+    A2ADispatcher:SetSquadronCapRacetrack(sqd_cap, 5000, 10000, 90, 180, 5*60, 10*60)
 
     local sqd_gci = base.."-gci"
     A2ADispatcher:SetSquadron( sqd_gci, base, {"su-30-gci"} )
