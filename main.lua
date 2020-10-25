@@ -132,12 +132,16 @@ local function setBaseBlue(baseName, startup)
   local reconZone = ZONE:FindByName(baseName.."-reconzone")
   if reconZone ~= nil then
     local spwn = SPAWN:NewWithAlias("blue-recon", "blue-recon-"..baseName)
-      :SpawnAtAirbase( AIRBASE:FindByName(baseName), SPAWN.Takeoff.Air, 10000)
+      :InitLimit(1, 50)
+      :InitRepeat()
+      :SpawnAtAirbase( AIRBASE:FindByName(baseName), SPAWN.Takeoff.Air, 12000)
 
-    local reconPatrol = AI_PATROL_ZONE:New( reconZone, 12000, 18000, 150, 400 )
-    reconPatrol:SetControllable( spwn )
-    reconPatrol:__Start( 2 )
-    MESSAGE:New("Spawning reaper drone to patrol from "..baseName, 5):ToAll()
+    if spwn ~= nil then
+      local reconPatrol = AI_PATROL_ZONE:New( reconZone, 12000, 18000, 150, 400 )
+      reconPatrol:SetControllable( spwn )
+      reconPatrol:__Start( 2 )
+      MESSAGE:New("Spawning reaper drone to patrol from "..baseName, 5):ToAll()
+    end
   end
 
   slotblock.configureSlotsForBase(baseName, "blue")
@@ -235,13 +239,13 @@ utils.restoreCtldUnits(_STATE, ctld_config)
 
 SPAWN:New("awacs-Carrier")
   :InitLimit(1, 50)
-  :InitRepeatOnLanding()
-  :SpawnScheduled(4, 0)
+  :InitRepeat()
+  :Spawn()
 
 SPAWN:New("awacs-Incirlik")
   :InitLimit(1, 50)
-  :InitRepeatOnLanding()
-  :SpawnScheduled(4, 0)
+  :InitRepeat()
+  :Spawn()
 
 
 TexacoStennis = RECOVERYTANKER:New(UNIT:FindByName("CVN-71"), "Texaco")

@@ -18,14 +18,15 @@ local function InitBlueReconGroup(CC)
         env.info("Processing detected units..")
         for _, DetectedUnit in pairs( DetectedUnits ) do
             local DetectedUnitGroup = DetectedUnit:GetGroup()
-            if DetectedUnitGroup:CountAliveUnits() == 0 then
-                return
-            end
             local DetectedName = DetectedUnitGroup:GetName()
             for _, Mark in pairs(_STATE["marks"]) do
                 if Mark["name"] == DetectedName then
                     return
                 end
+            end
+
+            if DetectedUnitGroup:CountAliveUnits() == 0 then
+                return
             end
             local DetectedCoord = DetectedUnitGroup:GetCoordinate():GetRandomCoordinateInRadius(150, 30)
             local DetectedVec3 = DetectedCoord:GetVec3()
