@@ -6,9 +6,12 @@ local utils = require("utils")
 
 local function InitBlueReconGroup(CC)
 
-    RecceSetGroup = SET_GROUP:New():FilterPrefixes( "blue-recon" ):FilterStart()
-    RecceDetection = DETECTION_UNITS:New( RecceSetGroup )
+    RecceSetGroup = SET_GROUP:New():FilterPrefixes( {"blue-recon", "awacs-Carrier", "awacs-Incirlik"} ):FilterStart()
+    RecceDetection = DETECTION_UNITS:New( RecceSetGroup ):FilterCategories( Unit.Category.GROUND_UNIT )
     RecceDetection:InitDetectRadar(true)
+    RecceDetection:InitDetectOptical(true)
+    RecceDetection:InitDetectIRST(true)
+    RecceDetection:InitDetectVisual(true)
     RecceDetection:Start()
 
     -- function RecceDetection:OnAfterDetect(From, Event, To)
@@ -41,6 +44,7 @@ local function InitBlueReconGroup(CC)
                     z = DetectedVec3.z,
                 }
             )
+            CC:MessageToAll( "New Detection: "..DetectedName.." at: "..DetectedCoord:ToStringLLDDM(), 15, "" )
             utils.saveTable(_STATE, BASE_FILE)
         end
     end
