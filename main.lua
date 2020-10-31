@@ -23,6 +23,7 @@ _STATE["hawks"] = {}
 _STATE["dead"] = {}
 _STATE["marks"] = {}
 _STATE["repairable"] = {}
+_STATE["deadgroups"] = {}
 local INIT = true
 local ENABLE_RED_AIR = true
 local DEBUG_IADS = false
@@ -184,7 +185,15 @@ if INIT and MISSION_VERSION == "" then
   end
 else
   for _, unit in pairs(_STATE["dead"]) do
-    utils.removeUnit(unit, true)
+    local smoke = true
+    if _STATE["deadgroups"] ~= nil then
+      for _, group in pairs(_STATE["deadgroups"]) do
+        if utils.startswith(unit, group) then
+          smoke = false
+        end
+      end
+    end
+    utils.removeUnit(unit, smoke)
   end
 
   for i, obj in pairs(_STATE["scenery"]) do
@@ -497,6 +506,7 @@ function EH1:OnEventDead(EventData)
     local deadGroup = UNIT:FindByName(EventData.IniUnitName):GetGroup()
 
     if deadGroup == nil or deadGroup:CountAliveUnits() == 0 then
+      table.insert(_STATE["deadgroups"], EventData.IniGroupName)
       for i, Mark in pairs(_STATE["marks"]) do
         if Mark["name"] == EventData.IniGroupName then
           env.info("Removing marks for: "..deadGroup:GetName())
