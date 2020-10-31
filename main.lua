@@ -287,7 +287,7 @@ A2ADispatcher = AI_A2A_DISPATCHER:New( Detection )
 A2ADispatcher:SetBorderZone( BorderZone )
 A2ADispatcher:SetCommandCenter(redCommand)
 A2ADispatcher:SetEngageRadius()
-A2ADispatcher:SetGciRadius()
+A2ADispatcher:SetGCiRadius(300000)
 A2ADispatcher:SetIntercept( 10 )
 A2ADispatcher:Start()
 
