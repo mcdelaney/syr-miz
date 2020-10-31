@@ -437,7 +437,8 @@ function EH1:OnEventMarkRemoved(EventData)
     utils.destroyIfExists(unit_name)
     return
   elseif EventData.text == "smoke" then
-    EventData.MarkCoordinate:BigSmokeSmall(0.75)
+    env.info("Smoking coordinate")
+    EventData.MarkCoordinate:BigSmokeHuge(0.75)
     return
   elseif utils.startswith(EventData.text, "respawn-") then
     local grp_name = string.sub(EventData.text, 9)
