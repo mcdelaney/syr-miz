@@ -436,6 +436,9 @@ function EH1:OnEventMarkRemoved(EventData)
     local unit_name = string.sub(EventData.text, 6)
     utils.destroyIfExists(unit_name)
     return
+  elseif EventData.text == "smoke" then
+    EventData.MarkCoordinate:BigSmokeSmall(0.75)
+    return
   elseif utils.startswith(EventData.text, "respawn-") then
     local grp_name = string.sub(EventData.text, 9)
     env.info("Respawning group: "..grp_name)

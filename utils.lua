@@ -318,7 +318,7 @@ local function removeUnit (unitName, smoke)
       -- end
       if smoke==true then
         env.info("Smoking dead unit location...")
-        unitPoint:BigSmokeSmall()
+        unitPoint:BigSmokeSmall(0.75)
       end
     end
   end
