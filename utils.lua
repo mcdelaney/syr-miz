@@ -310,13 +310,13 @@ local function removeUnit (unitName, smoke)
       local stc = SPAWNSTATIC:NewFromType(unit:GetTypeName(), unit:GetCategoryName(), country.id.RUSSIA)
       env.info("Spawning dead type "..unit:GetTypeName().." - "..unit:GetCategoryName())
       if stc ~= nil then
-        pcall(function()
+        -- pcall(function()
           stc.InitDead = true
           stc:SpawnFromCoordinate(unitPoint)
           env.info("Dead static spawn successful...")
-        end)
+        -- end)
       end
-      if smoke then
+      if smoke==true then
         unitPoint:BigSmokeSmall()
       end
     end
