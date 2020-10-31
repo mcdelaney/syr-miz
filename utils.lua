@@ -297,7 +297,7 @@ local function getBaseAndSideNamesFromGroupName(groupName)
 end
 
 
-local function removeUnit (unitName)
+local function removeUnit (unitName, smoke)
   log("Removing previously destroyed unit: "..unitName)
   local grp = GROUP:FindByName(unitName)
   if grp ~= nil then
@@ -305,7 +305,11 @@ local function removeUnit (unitName)
   else
     local unit = UNIT:FindByName(unitName)
     if unit then
+      local unitPoint = unit:GetCoordinate()
       unit:Destroy()
+      if smoke then
+        unitPoint:BigSmokeSmall()
+      end
     end
   end
 end

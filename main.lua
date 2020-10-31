@@ -22,6 +22,7 @@ _STATE["ctld_units"] = {}
 _STATE["hawks"] = {}
 _STATE["dead"] = {}
 _STATE["marks"] = {}
+_STATE["repairable"] = {}
 local INIT = true
 local ENABLE_RED_AIR = true
 local DEBUG_IADS = false
@@ -183,7 +184,7 @@ if INIT and MISSION_VERSION == "" then
   end
 else
   for _, unit in pairs(_STATE["dead"]) do
-    utils.removeUnit(unit)
+    utils.removeUnit(unit, true)
   end
 
   for i, obj in pairs(_STATE["scenery"]) do
@@ -230,7 +231,6 @@ for _, base in pairs(ContestedBases) do
     setBaseBlue(base)
   else
     setBaseRed(base, true)
-
   end
 end
 
@@ -427,6 +427,12 @@ function EH1:OnEventMarkRemoved(EventData)
     local unit_name = string.sub(EventData.text, 6)
     utils.destroyIfExists(unit_name)
     return
+  elseif utils.startswith(EventData.text, "respawn-") then
+    local grp_name = string.sub(EventData.text, 9)
+    env.info("Respawning group: "..grp_name)
+    local group = GROUP:FindByName(grp_name)
+    group:Respawn()
+    return
   end
 
   local new_spawn
@@ -481,12 +487,11 @@ function EH1:OnEventDead(EventData)
         if Mark["name"] == EventData.IniGroupName then
           env.info("Removing marks for: "..deadGroup:GetName())
           table.remove(_STATE["marks"], i)
-          -- _STATE["marks"] = utils.removebyKey(_STATE["marks"], markName)
           _MARKERS[Mark["name"]]:Remove()
         end
       end
     else
-      env.info("Not removing group.."..deadGroup:GetName().." from table.. has"..deadGroup:CountAliveUnits().." remaining units...")
+      env.info("Not removing group.."..deadGroup:GetName().." from table.. has "..deadGroup:CountAliveUnits().." remaining units...")
     end
     utils.saveTable(_STATE, BASE_FILE)
     return
