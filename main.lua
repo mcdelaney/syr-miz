@@ -432,6 +432,19 @@ function EH1:OnEventMarkRemoved(EventData)
     env.info("Respawning group: "..grp_name)
     local group = GROUP:FindByName(grp_name)
     group:Respawn()
+    local DeadGroups = mist.utils.deepCopy(_STATE["dead"])
+    for _, Dead in pairs(DeadGroups) do
+      env.info("testing if "..Dead.." starts with "..grp_name)
+      if utils.startswith(Dead, grp_name) then
+        env.info("Removing dead entry for unit: "..Dead)
+        for i, Name in pairs(_STATE["dead"]) do
+          if Name == Dead then
+            table.remove(_STATE["dead"], i)
+          end
+        end
+      end
+    end
+    utils.saveTable(_STATE, BASE_FILE)
     return
   end
 
@@ -480,6 +493,7 @@ function EH1:OnEventDead(EventData)
     else
       table.insert(_STATE["dead"], EventData.IniUnitName)
     end
+    utils.saveTable(_STATE, BASE_FILE)
     local deadGroup = UNIT:FindByName(EventData.IniUnitName):GetGroup()
 
     if deadGroup == nil or deadGroup:CountAliveUnits() == 0 then

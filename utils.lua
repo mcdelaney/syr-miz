@@ -431,7 +431,6 @@ local function prune_enemies(Site, name)
 end
 
 
-
 return {
   file_exists = file_exists,
   restoreCtldUnits = restoreCtldUnits,
