@@ -193,7 +193,7 @@ else
         end
       end
     end
-    utils.removeUnit(unit, smoke)
+    utils.removeUnit(unit, true)
   end
 
   for i, obj in pairs(_STATE["scenery"]) do
