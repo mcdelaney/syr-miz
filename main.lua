@@ -405,6 +405,8 @@ blue_recon.InitBlueReconGroup(BLUECC)
 blue_menus.Init()
 red_menus.Init()
 
+RedSamRepair = SCHEDULER:New( nil, utils.attemptSamRepair, {}, 90, 15*60 )
+
 if DEBUG_IADS then
   local iadsDebug = redIADS:getDebugSettings()
   iadsDebug.IADSStatus = true
@@ -441,6 +443,9 @@ function EH1:OnEventMarkRemoved(EventData)
   elseif EventData.text == "smoke" then
     env.info("Smoking coordinate")
     EventData.MarkCoordinate:BigSmokeHuge(0.75)
+    return
+  elseif EventData.text == "respawn" then
+    utils.attemptSamRepair()
     return
   elseif utils.startswith(EventData.text, "respawn-") then
     local grp_name = string.sub(EventData.text, 9)

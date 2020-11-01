@@ -437,7 +437,6 @@ local function respawnGroup(grp_name)
   group:Respawn()
   local DeadGroups = mist.utils.deepCopy(_STATE["dead"])
   for _, Dead in pairs(DeadGroups) do
-    env.info("testing if "..Dead.." starts with "..grp_name)
     if startswith(Dead, grp_name) then
       env.info("Removing dead entry for unit: "..Dead)
       for i, Name in pairs(_STATE["dead"]) do
@@ -452,7 +451,7 @@ local function respawnGroup(grp_name)
       table.remove(_STATE["repairable"], i)
     end
   end
-  MESSAGE:New( "Red forces have repaired sam installtion: "..grp_name.."!", 10):ToAll()
+  MESSAGE:New( "Red forces have repaired ground unit group: "..grp_name.."!", 10):ToAll()
   saveTable(_STATE, BASE_FILE)
 end
 
@@ -470,6 +469,7 @@ local function addRepairable(group_name)
     table.insert(_STATE["repairable"], group_name)
   end
 end
+
 
 local function addDeadGroup(group_name)
   local do_ins = true
@@ -500,6 +500,29 @@ local function addDeadGroup(group_name)
 end
 
 
+local function attemptSamRepair()
+  log("Attempting sam repair...")
+  if _STATE["repairable"] == nil then
+    log("No repairable sams found... exiting")
+    return
+  end
+
+  for i, group in pairs(_STATE["repairable"]) do
+    log("Checking for blue units around group: "..group)
+    local grp = GROUP:FindByName(group)
+    local zone = ZONE_GROUP:New(group, grp, 25000)
+    zone:Scan( {Object.Category.UNIT, Object.Category.BASE }, {Unit.Category.AIRPLANE, Unit.Category.GROUND_UNIT, Unit.Category.HELICOPTER})
+    if zone:CountScannedCoalitions() == 1 then
+      respawnGroup(group)
+      return
+    else
+      log("Scanned coaltions include blue")
+    end
+  end
+  log("No sams found without blue units nearby...")
+end
+
+
 return {
   file_exists = file_exists,
   restoreCtldUnits = restoreCtldUnits,
@@ -521,4 +544,5 @@ return {
   respawnGroup = respawnGroup,
   addRepairable = addRepairable,
   addDeadGroup = addDeadGroup,
+  attemptSamRepair = attemptSamRepair,
 }
