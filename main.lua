@@ -246,6 +246,7 @@ end
 utils.log("Spawning CTLD units from state")
 utils.restoreCtldUnits(_STATE, ctld_config)
 
+utils.log("Initializing blue awacs units..")
 SPAWN:New("awacs-Carrier")
   :InitLimit(1, 50)
   :InitRepeat()
@@ -260,6 +261,7 @@ SPAWN:New("awacs-Incirlik")
 TexacoStennis = RECOVERYTANKER:New(UNIT:FindByName("CVN-71"), "Texaco")
 TexacoStennis:Start()
 
+utils.log("Iads configuration start...")
 redIADS = SkynetIADS:create('SYRIA')
 
 commandCenter1 = StaticObject.getByName('RED-HQ-2')
@@ -287,7 +289,7 @@ A2ADispatcher = AI_A2A_DISPATCHER:New( Detection )
 A2ADispatcher:SetBorderZone( BorderZone )
 A2ADispatcher:SetCommandCenter(redCommand)
 A2ADispatcher:SetEngageRadius()
-A2ADispatcher:SetGCiRadius(300000)
+A2ADispatcher:SetGciRadius(300000)
 A2ADispatcher:SetIntercept( 10 )
 A2ADispatcher:Start()
 
@@ -324,7 +326,7 @@ end
 
 -- blue_ground.InitBlueGroundPlaneDeployer()
 blue_ground.InitBlueGroundHeliDeployer()
-
+utils.log("Restoring base ownership...")
 for _, base in pairs(ContestedBases) do
 
   if ENABLE_RED_AIR and _STATE.bases[base] == coalition.side.RED then
@@ -353,7 +355,6 @@ for _, base in pairs(ContestedBases) do
 
     for _, agBase in pairs(AG_BASES) do
       if agBase == base then
-
         -- local cas_zone = ZONE_AIRBASE:New(base, 10000)
         -- local sqd_cas = base.."-cas"
         -- A2GDispatcher:SetSquadron(sqd_cas, base,  { "ka-50-cas" }, 4 )
@@ -416,7 +417,7 @@ if DEBUG_IADS then
   redIADS:addRadioMenu()
 end
 
-
+utils.log("Initializing event handlers...")
 local num_spawns = 1
 EH1 = EVENTHANDLER:New()
 
@@ -429,6 +430,7 @@ end
 
 EH1:HandleEvent(EVENTS.MarkRemoved)
 function EH1:OnEventMarkRemoved(EventData)
+  utils.log("Destroying markpoint target...")
   if EventData.text == "tgt" then
     EventData.MarkCoordinate:Explosion(1000)
     return
@@ -442,22 +444,7 @@ function EH1:OnEventMarkRemoved(EventData)
     return
   elseif utils.startswith(EventData.text, "respawn-") then
     local grp_name = string.sub(EventData.text, 9)
-    env.info("Respawning group: "..grp_name)
-    local group = GROUP:FindByName(grp_name)
-    group:Respawn()
-    local DeadGroups = mist.utils.deepCopy(_STATE["dead"])
-    for _, Dead in pairs(DeadGroups) do
-      env.info("testing if "..Dead.." starts with "..grp_name)
-      if utils.startswith(Dead, grp_name) then
-        env.info("Removing dead entry for unit: "..Dead)
-        for i, Name in pairs(_STATE["dead"]) do
-          if Name == Dead then
-            table.remove(_STATE["dead"], i)
-          end
-        end
-      end
-    end
-    utils.saveTable(_STATE, BASE_FILE)
+    utils.respawnGroup(grp_name)
     return
   end
 
@@ -506,19 +493,14 @@ function EH1:OnEventDead(EventData)
     else
       table.insert(_STATE["dead"], EventData.IniUnitName)
     end
-    utils.saveTable(_STATE, BASE_FILE)
+
     local deadGroup = UNIT:FindByName(EventData.IniUnitName):GetGroup()
 
     if deadGroup == nil or deadGroup:CountAliveUnits() == 0 then
-      table.insert(_STATE["deadgroups"], EventData.IniGroupName)
-      for i, Mark in pairs(_STATE["marks"]) do
-        if Mark["name"] == EventData.IniGroupName then
-          env.info("Removing marks for: "..deadGroup:GetName())
-          table.remove(_STATE["marks"], i)
-          _MARKERS[Mark["name"]]:Remove()
-        end
-      end
+      -- Add to deadgroups table if not already added
+     utils.addDeadGroup(EventData.IniGroupName)
     else
+      utils.addRepairable(EventData.IniGroupName)
       env.info("Not removing group.."..deadGroup:GetName().." from table.. has "..deadGroup:CountAliveUnits().." remaining units...")
     end
     utils.saveTable(_STATE, BASE_FILE)

@@ -18,7 +18,7 @@ end
 local function log(str)
   if str == nil then str = 'nil' end
   if logFile then
-      local output = os.date("!%Y-%m-%dT%TZ") .. " | " .. str .."\r\n"
+      local output = os.date("!%Y-%m-%dT%TZ") .. " | " .. str ..""
       logFile:write(output)
       logFile:flush()
       env.info(output)
@@ -317,7 +317,6 @@ local function removeUnit (unitName, smoke)
       --   -- end)
       -- end
       if smoke==true then
-        env.info("Smoking dead unit location...")
         unitPoint:BigSmokeSmall(0.75)
       end
     end
@@ -432,6 +431,75 @@ local function prune_enemies(Site, name)
 end
 
 
+local function respawnGroup(grp_name)
+  env.info("Respawning group: "..grp_name)
+  local group = GROUP:FindByName(grp_name)
+  group:Respawn()
+  local DeadGroups = mist.utils.deepCopy(_STATE["dead"])
+  for _, Dead in pairs(DeadGroups) do
+    env.info("testing if "..Dead.." starts with "..grp_name)
+    if startswith(Dead, grp_name) then
+      env.info("Removing dead entry for unit: "..Dead)
+      for i, Name in pairs(_STATE["dead"]) do
+        if Name == Dead then
+          table.remove(_STATE["dead"], i)
+        end
+      end
+    end
+  end
+  for i, val in pairs(_STATE["repairable"]) do
+    if val == grp_name then
+      table.remove(_STATE["repairable"], i)
+    end
+  end
+  MESSAGE:New( "Red forces have repaired sam installtion: "..grp_name.."!", 10):ToAll()
+  saveTable(_STATE, BASE_FILE)
+end
+
+
+local function addRepairable(group_name)
+  log("Checking if already marked repairable...")
+  local do_ins = true
+  for _, val in pairs(_STATE["repairable"]) do
+    if val == group_name then
+      do_ins = false
+    end
+  end
+  if do_ins == true then
+    env.info("Marking group "..group_name.." as repairable...")
+    table.insert(_STATE["repairable"], group_name)
+  end
+end
+
+local function addDeadGroup(group_name)
+  local do_ins = true
+  for _, existing in pairs(_STATE["deadgroups"]) do
+    if existing == group_name then
+      do_ins = false
+    end
+  end
+  if do_ins then
+    table.insert(_STATE["deadgroups"], group_name)
+  end
+
+  for i, val in pairs(_STATE["repairable"]) do
+    if val == group_name then
+      env.info("Removing group "..group_name.." from repairables...")
+      table.remove(_STATE["repairable"], i)
+    end
+  end
+
+  for i, Mark in pairs(_STATE["marks"]) do
+    if Mark["name"] == group_name then
+      env.info("Removing marks for: "..group_name)
+      table.remove(_STATE["marks"], i)
+      _MARKERS[Mark["name"]]:Remove()
+    end
+  end
+  MESSAGE:New(group_name.." has been permanently destroyed!" ,10):ToAll()
+end
+
+
 return {
   file_exists = file_exists,
   restoreCtldUnits = restoreCtldUnits,
@@ -450,4 +518,7 @@ return {
   matchesBaseName = matchesBaseName,
   getBaseAndSideNamesFromGroupName = getBaseAndSideNamesFromGroupName,
   removebyKey = removebyKey,
+  respawnGroup = respawnGroup,
+  addRepairable = addRepairable,
+  addDeadGroup = addDeadGroup,
 }
