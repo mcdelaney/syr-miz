@@ -103,6 +103,8 @@ local function InitBlueGroundHeliDeployer()
 
     function BlueCargoDispatcherHeli:OnAfterUnloading( From, Event, To, CarrierGroup, Cargo, CarrierUnit, DeployZone)
         local EscortGroup = GROUP:FindByName(CarrierGroup:GetState(CarrierGroup, "escort"))
+        EscortGroup:OptionROTNoReaction()
+
         local targetBase = RedBases:FindNearestAirbaseFromPointVec2(EscortGroup:GetPointVec2())
         local EngageZone = ZONE_AIRBASE:New(targetBase.AirbaseName, 5000)
         local PatrolZone = ZONE_AIRBASE:New(targetBase.AirbaseName, 5000)
@@ -172,7 +174,7 @@ local function deployGroundForcesByHeli(targetCoord)
     Heli = SPAWN:NewWithAlias("blue-cargo-heli", "transport-heli-"..tostring(blue_heli_marks))
         :InitHeading(heading)
         :SpawnFromPointVec3(heli_spawn_coord)
-
+    Heli:OptionROTNoReaction()
     MESSAGE:NewType( "Spawning heli group for deployment at "..departureBase.AirbaseName,
         MESSAGE.Type.Information ):ToAll()
 end
