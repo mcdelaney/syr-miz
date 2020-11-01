@@ -298,7 +298,6 @@ end
 
 
 local function removeUnit (unitName, smoke)
-  log("Removing previously destroyed unit: "..unitName)
   local grp = GROUP:FindByName(unitName)
   if grp ~= nil then
     grp:Destroy()
