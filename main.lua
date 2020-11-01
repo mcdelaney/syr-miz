@@ -299,7 +299,7 @@ DetectionSetGroup_G = SET_GROUP:New()
   :FilterActive()
   :FilterStart()
 
-Detection_G = DETECTION_AREAS:New( DetectionSetGroup_G, 1000 )
+Detection_G = DETECTION_AREAS:New( DetectionSetGroup_G, 10000 )
 Detection_G:BoundDetectedZones()
 Detection_G:Start()
 
@@ -372,8 +372,8 @@ for _, base in pairs(ContestedBases) do
         -- A2GDispatcher:SetSquadronEngageLimit( sqd_sead, 2 )
 
         A2GDispatcher:SetSquadronSead(sqd_sead, 300, 600, 15000, 30000)
-        A2GDispatcher:SetSquadronOverhead(sqd_sead, 0.25)
-        A2GDispatcher:SetDefaultTakeoffFromParkingHot( sqd_sead )
+        A2GDispatcher:SetSquadronOverhead(sqd_sead, 1 )
+        A2GDispatcher:SetDefaultTakeoffFromParkingHot(  )
         A2GDispatcher:SetSquadronLandingNearAirbase( sqd_sead )
 
         -- local sqd_cas = base.."-cas"
@@ -388,9 +388,9 @@ for _, base in pairs(ContestedBases) do
         A2GDispatcher:SetSquadron(sqd_bai, base,  { "su-25-cas" },  10)
         A2GDispatcher:SetSquadronGrouping( sqd_bai, 1 )
         A2GDispatcher:SetSquadronBai(sqd_bai, 250, 600)
-        A2GDispatcher:SetSquadronOverhead(sqd_bai, 0.15)
+        A2GDispatcher:SetSquadronOverhead(sqd_bai, 1)
         -- A2GDispatcher:SetSquadronEngageLimit( sqd_bai, 2 )
-        A2GDispatcher:SetDefaultTakeoffFromParkingHot( sqd_bai )
+        -- A2GDispatcher:SetDefaultTakeoffFromParkingHot( sqd_bai )
         A2GDispatcher:SetSquadronLandingNearAirbase( sqd_bai )
 
       end
