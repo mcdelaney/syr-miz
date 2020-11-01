@@ -87,6 +87,8 @@ local function InitBlueGroundHeliDeployer()
         local escort_prefix =  "escort"
         local EscortGroup = SPAWN:NewWithAlias("blue-apache", escort_prefix)
             :SpawnFromCoordinate(SpawnPoint)
+        EscortGroup:OptionRTBBingoFuel(false)
+        EscortGroup:OptionROTNoReaction()
 
         local PointVec3 = POINT_VEC3:New( 100, 100, 100 )
         local FollowDCSTask = EscortGroup:TaskFollow( CarrierGroup, PointVec3:GetVec3() )
@@ -175,6 +177,7 @@ local function deployGroundForcesByHeli(targetCoord)
         :InitHeading(heading)
         :SpawnFromPointVec3(heli_spawn_coord)
     Heli:OptionROTNoReaction()
+    Heli:OptionRTBBingoFuel(false)
     MESSAGE:NewType( "Spawning heli group for deployment at "..departureBase.AirbaseName,
         MESSAGE.Type.Information ):ToAll()
 end
