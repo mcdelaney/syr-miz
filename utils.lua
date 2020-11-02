@@ -542,6 +542,7 @@ local function attemptBaseCap()
           :OnSpawnGroup(
             function( SpawnGroup )
                 SpawnGroup:TaskRouteToZone(zone, false,  200, FORMATION.Vee)
+                -- SpawnGroup:RouteRTB(candidate, 200)
             end
         )
         :Spawn()

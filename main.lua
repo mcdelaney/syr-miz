@@ -417,10 +417,6 @@ for _, base in pairs(ContestedBases) do
         -- A2GDispatcher:SetDefaultTakeoffFromParkingHot( sqd_bai )
         A2GDispatcher:SetSquadronLandingNearAirbase( sqd_bai )
 
-        -- A2GDispatcher:SetSquadronBaiPatrol( sqd_bai, ZONE_AIRBASE:New("Ramat David", 50000), 1000, 7500, 400, 1200, 400, 1200 )
-        -- A2GDispatcher:SetSquadronBaiPatrolInterval( sqd_bai, 2, 30, 250 )
-
-
       end
     end
   end
@@ -434,7 +430,7 @@ blue_menus.Init()
 red_menus.Init()
 
 RedSamRepair = SCHEDULER:New( nil, utils.attemptSamRepair, {}, 90, 15*60, 0.25 )
-BaseCapAttempt = SCHEDULER:New( nil, utils.attemptBaseCap, {}, 10*60, 30*60, 0.25 )
+-- BaseCapAttempt = SCHEDULER:New( nil, utils.attemptBaseCap, {}, 10*60, 30*60, 0.25 )
 
 
 if DEBUG_IADS then
