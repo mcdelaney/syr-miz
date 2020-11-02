@@ -32,6 +32,10 @@ if MISSION_VERSION == nil  then
 end
 BASE_FILE = lfs.writedir() .. "Scripts\\syr-miz\\syr_state"..MISSION_VERSION ..".json"
 
+BASE:TraceClass('A2GDispatcher')
+BASE:TraceOn()
+
+
 ATIS = {}
 
 if MISSION_VERSION == "South" then
@@ -43,7 +47,7 @@ if MISSION_VERSION == "South" then
     "Damascus",
     -- "Mezzeh",
   }
-  AG_BASES = {  }
+  AG_BASES = { "Damascus" }
 
 elseif MISSION_VERSION == "North" then
 
@@ -74,7 +78,7 @@ else
     "Hama"
   }
 
-  AG_BASES = {  }
+  AG_BASES = { "Damascus" }
 
 end
 
@@ -196,6 +200,7 @@ else
     utils.removeUnit(unit, true)
   end
 
+  utils.log( "Destroying previously killed scenery...")
   for i, obj in pairs(_STATE["scenery"]) do
     if obj then
       local unit = Unit.getByName(tostring(obj.id))
@@ -207,10 +212,9 @@ else
     local vec3 = COORDINATE:New(obj.x, obj.y, obj.z)
     local searchZone = ZONE_RADIUS:New(tostring(i), vec3:GetVec2(), 1)
     searchZone:Scan( Object.Category.SCENERY )
-
     for _, SceneryData in pairs( searchZone:GetScannedScenery() ) do
       for _, SceneryObject in pairs( SceneryData ) do
-        utils.log( "Scenery Destroyed: " .. SceneryObject:GetTypeName())
+
         SceneryObject:GetDCSObject():destroy()
         vec3:Explosion(200)
       end
@@ -293,22 +297,27 @@ A2ADispatcher:SetGciRadius(300000)
 A2ADispatcher:SetIntercept( 10 )
 A2ADispatcher:Start()
 
-redCommand_AG = COMMANDCENTER:New( GROUP:FindByName( "REDHQ-AG" ), "REDHQ-AG" )
-DetectionSetGroup_G = SET_GROUP:New()
-  :FilterPrefixes({"redAWACS", "su-24-recon", "defenseBase"})
-  :FilterActive()
-  :FilterStart()
-
-Detection_G = DETECTION_AREAS:New( DetectionSetGroup_G, 10000 )
-Detection_G:BoundDetectedZones()
-Detection_G:Start()
-
 if AG_BASES ~= nil then
+
+  redCommand_AG = COMMANDCENTER:New( GROUP:FindByName( "REDHQ-AG" ), "REDHQ-AG" )
+  DetectionSetGroup_G = SET_GROUP:New()
+    :FilterPrefixes({"redAWACS", "su-24-recon", "defenseBase"})
+    :FilterActive()
+    :FilterStart()
+
+  Detection_G = DETECTION_AREAS:New( DetectionSetGroup_G, 20000 )
+  Detection_G:BoundDetectedZones()
+  Detection_G:Start()
+
   A2GDispatcher = AI_A2G_DISPATCHER:New( Detection_G )
   A2GDispatcher:AddDefenseCoordinate( "ag-base", AIRBASE:FindByName( "Damascus" ):GetCoordinate() )
   A2GDispatcher:SetDefenseReactivityHigh()
-  A2GDispatcher:SetDefenseRadius( 200000 )
+  A2GDispatcher:SetDefenseRadius( 500000 )
+
+  -- A2GDispatcher:SetDefenseLimit(2)
+  A2GDispatcher:SetDefaultGrouping(2)
   A2GDispatcher:SetCommandCenter(redCommand_AG)
+  A2GDispatcher:SetDefaultTakeoffInAir(  )
   A2GDispatcher:Start()
 end
 
@@ -336,16 +345,18 @@ for _, base in pairs(ContestedBases) do
       zone = ZONE_AIRBASE:New(base, 150000):SetName(zone_name)
     end
 
-    utils.log("Creating a2a group from base: "..base)
+    utils.log("Creating A2A Cap group from base: "..base)
     local sqd_cap = base.."-cap"
     A2ADispatcher:SetSquadron( sqd_cap, base, { "su-30-cap", "mig-31-cap", "jf-17-cap" } ) --, 10)
     A2ADispatcher:SetSquadronGrouping( sqd_cap, 2 )
     A2ADispatcher:SetSquadronTakeoffFromParkingHot(sqd_cap)
     A2ADispatcher:SetSquadronLandingNearAirbase( sqd_cap )
     A2ADispatcher:SetSquadronCap( sqd_cap, zone, 5000, 10000, 500, 800, 600, 1200, "BARO")
+
     A2ADispatcher:SetSquadronCapInterval( sqd_cap, 1, 60*3, 60*7, 1)
     A2ADispatcher:SetSquadronCapRacetrack(sqd_cap, 5000, 10000, 90, 180, 5*60, 10*60)
 
+    utils.log("Creating A2A GCI group from base: "..base)
     local sqd_gci = base.."-gci"
     A2ADispatcher:SetSquadron( sqd_gci, base, {"su-30-gci"} )
     A2ADispatcher:SetSquadronGrouping( sqd_gci, 1 )
@@ -355,26 +366,17 @@ for _, base in pairs(ContestedBases) do
 
     for _, agBase in pairs(AG_BASES) do
       if agBase == base then
-        -- local cas_zone = ZONE_AIRBASE:New(base, 10000)
-        -- local sqd_cas = base.."-cas"
-        -- A2GDispatcher:SetSquadron(sqd_cas, base,  { "ka-50-cas" }, 4 )
-        -- A2GDispatcher:SetSquadronGrouping( sqd_cas, 1 )
-        -- A2GDispatcher:SetSquadronCasPatrol(sqd_cas, cas_zone) --,  300, 500, 50, 80, 250, 300 )
-        -- A2GDispatcher:SetSquadronCasPatrolInterval( sqd_cas, 2, 120, 600, 1 )
-        -- A2GDispatcher:SetSquadronOverhead(sqd_cas, 0.15)
-        -- -- A2GDispatcher:SetDefaultPatrolTimeInterval(180)
-        -- A2GDispatcher:SetDefaultTakeoffInAir( sqd_cas )
-        -- A2GDispatcher:SetSquadronLandingNearAirbase( sqd_cas )
 
+        utils.log("Creating A2G SEAD squadron from base: "..base)
         local sqd_sead = base.."-sead"
-        A2GDispatcher:SetSquadron(sqd_sead, base,  { "su-34-sead" }, 10 )
-        A2GDispatcher:SetSquadronGrouping( sqd_sead, 1 )
-        -- A2GDispatcher:SetSquadronEngageLimit( sqd_sead, 2 )
-
-        A2GDispatcher:SetSquadronSead(sqd_sead, 300, 600, 15000, 30000)
-        A2GDispatcher:SetSquadronOverhead(sqd_sead, 1 )
-        A2GDispatcher:SetDefaultTakeoffFromParkingHot(  )
+        A2GDispatcher:SetSquadron(sqd_sead, base,  { "su-34-sead-b", "jf-17-sead" }, 14 ) --"su-34-sead"
+        A2GDispatcher:SetSquadronGrouping( sqd_sead, 2 )
+        A2GDispatcher:SetSquadronSead(sqd_sead, 400, 600, 5000, 10000)
+        A2GDispatcher:SetSquadronOverhead(sqd_sead, 0.25 )
         A2GDispatcher:SetSquadronLandingNearAirbase( sqd_sead )
+
+        -- A2GDispatcher:SetSquadronSeadPatrol( sqd_sead, ZONE_AIRBASE:New("Ramat David", 50000), 5000, 7500, 400, 800, 400, 1200 )
+        -- A2GDispatcher:SetSquadronSeadPatrolInterval( sqd_sead, 2, 30, 250 )
 
         -- local sqd_cas = base.."-cas"
         -- A2GDispatcher:SetSquadron(sqd_cas, base,  { "su-25-cas" },  10)
@@ -388,10 +390,14 @@ for _, base in pairs(ContestedBases) do
         A2GDispatcher:SetSquadron(sqd_bai, base,  { "su-25-cas" },  10)
         A2GDispatcher:SetSquadronGrouping( sqd_bai, 1 )
         A2GDispatcher:SetSquadronBai(sqd_bai, 250, 600)
-        A2GDispatcher:SetSquadronOverhead(sqd_bai, 1)
+        A2GDispatcher:SetSquadronOverhead(sqd_bai, 0.25)
         -- A2GDispatcher:SetSquadronEngageLimit( sqd_bai, 2 )
         -- A2GDispatcher:SetDefaultTakeoffFromParkingHot( sqd_bai )
         A2GDispatcher:SetSquadronLandingNearAirbase( sqd_bai )
+
+        -- A2GDispatcher:SetSquadronBaiPatrol( sqd_bai, ZONE_AIRBASE:New("Ramat David", 50000), 1000, 7500, 400, 1200, 400, 1200 )
+        -- A2GDispatcher:SetSquadronBaiPatrolInterval( sqd_bai, 2, 30, 250 )
+
 
       end
     end
