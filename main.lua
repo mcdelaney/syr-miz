@@ -82,6 +82,13 @@ else
 
 end
 
+ReCapBases = {
+  "Beirut-Rafic Hariri",
+  "Al Qusayr",
+  "Hama",
+  "Bassel Al-Assad",
+  "Abu al-Duhur",
+}
 
 SceneryTargets = {"damascus-target-1", "damascus-target-2", "damascus-target-3"}
 local _NumAirbaseDefenders = 1
@@ -278,20 +285,37 @@ redIADS:getSAMSites():setEngagementZone(SkynetIADSAbstractRadarElement.GO_LIVE_W
 redIADS:getSAMSitesByPrefix("SA-10"):setActAsEW(true)
 redIADS:setupSAMSitesAndThenActivate()
 
+SPAWN:New("red-recce")
+  :InitLimit(1, 50)
+  :InitRepeat()
+  :OnSpawnGroup(
+    function(groupName)
+      local reconZone = ZONE:New("Damascus-reconzone")
+      local reconPatrol = AI_PATROL_ZONE:New( reconZone, 12000, 18000, 150, 400 )
+      reconPatrol:SetControllable( groupName )
+      reconPatrol:__Start( 2 )
+    end)
+  :InitAirbase("Damascus", SPAWN.Takeoff.Air)
+  :SpawnScheduled(5, 0.5)
+  :SpawnScheduleStart()
+
 DetectionSetGroup = SET_GROUP:New()
-  :FilterPrefixes({"EWR", "redAWACS", "defenseBase"})
-  :FilterCoalitions("red")
-  :FilterActive(true)
+  :FilterPrefixes({ "EWR", "redAWACS", "defenseBase" })
+  :FilterActive()
   :FilterStart()
 
 Detection = DETECTION_AREAS:New( DetectionSetGroup, 30000 )
+Detection:BoundDetectedZones()
+Detection:Start()
+
+
 BorderZone = ZONE_POLYGON:New( "RED-BORDER", GROUP:FindByName( "red-border" ) )
 
-redCommand = COMMANDCENTER:New( GROUP:FindByName( "REDHQ" ), "REDHQ" )
+RedCommand_AA = COMMANDCENTER:New( GROUP:FindByName( "REDHQ" ), "REDHQ" )
 
 A2ADispatcher = AI_A2A_DISPATCHER:New( Detection )
 A2ADispatcher:SetBorderZone( BorderZone )
-A2ADispatcher:SetCommandCenter(redCommand)
+A2ADispatcher:SetCommandCenter(RedCommand_AA)
 A2ADispatcher:SetEngageRadius()
 A2ADispatcher:SetGciRadius(300000)
 A2ADispatcher:SetIntercept( 10 )
@@ -299,9 +323,9 @@ A2ADispatcher:Start()
 
 if AG_BASES ~= nil then
 
-  redCommand_AG = COMMANDCENTER:New( GROUP:FindByName( "REDHQ-AG" ), "REDHQ-AG" )
+  RedCommand_AG = COMMANDCENTER:New( GROUP:FindByName( "REDHQ-AG" ), "REDHQ-AG" )
   DetectionSetGroup_G = SET_GROUP:New()
-    :FilterPrefixes({"redAWACS", "su-24-recon", "defenseBase"})
+    :FilterPrefixes({"redAWACS", "red-recce", "defenseBase"})
     :FilterActive()
     :FilterStart()
 
@@ -314,9 +338,7 @@ if AG_BASES ~= nil then
   A2GDispatcher:SetDefenseReactivityHigh()
   A2GDispatcher:SetDefenseRadius( 500000 )
 
-  -- A2GDispatcher:SetDefenseLimit(2)
-  A2GDispatcher:SetDefaultGrouping(2)
-  A2GDispatcher:SetCommandCenter(redCommand_AG)
+  A2GDispatcher:SetCommandCenter(RedCommand_AA)
   A2GDispatcher:SetDefaultTakeoffInAir(  )
   A2GDispatcher:Start()
 end
@@ -411,7 +433,9 @@ blue_recon.InitBlueReconGroup(BLUECC)
 blue_menus.Init()
 red_menus.Init()
 
-RedSamRepair = SCHEDULER:New( nil, utils.attemptSamRepair, {}, 90, 15*60 )
+RedSamRepair = SCHEDULER:New( nil, utils.attemptSamRepair, {}, 90, 15*60, 0.25 )
+BaseCapAttempt = SCHEDULER:New( nil, utils.attemptBaseCap, {}, 10*60, 30*60, 0.25 )
+
 
 if DEBUG_IADS then
   local iadsDebug = redIADS:getDebugSettings()

@@ -160,7 +160,7 @@ local function deployGroundForcesByHeli(targetCoord)
         )
         :SpawnFromVec2(logizone:GetVec2())
 
-        GroundGroup2 = SPAWN:NewWithAlias( "blue-ground-tow",
+    GroundGroup2 = SPAWN:NewWithAlias( "blue-ground-tow",
                 "blue-ground-heli-tow-"..tostring(blue_heli_marks) )
         :OnSpawnGroup(
         function( SpawnGroup )

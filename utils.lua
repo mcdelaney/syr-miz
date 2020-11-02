@@ -310,7 +310,7 @@ local function removeUnit (unitName, smoke)
       local unit_cat = unit:GetCategoryName()
       local stc = SPAWNSTATIC:NewFromType(unit_type, unit_cat, unit_country)
       unit:Destroy()
-      env.info("Spawning dead type "..unit:GetTypeName().." - "..unit:GetCategoryName())
+      -- env.info("Spawning dead type "..unit:GetTypeName().." - "..unit:GetCategoryName())
       if stc ~= nil then
         stc.InitDead = true
         stc:SpawnFromCoordinate(unitPoint)
@@ -525,6 +525,39 @@ local function attemptSamRepair()
 end
 
 
+RED_CAP_ATTEMPTS = 1
+
+
+local function attemptBaseCap()
+  log("Evaluating base capture...")
+  for _, base in pairs(ReCapBases) do
+    local candidate = AIRBASE:FindByName(base)
+    if candidate:GetCoalitionName() == "Blue" then
+      local zone = ZONE_AIRBASE:New(base, 10000)
+      zone:Scan( { Object.Category.UNIT }, { Unit.Category.GROUND_UNIT })
+      if zone:GetScannedSetUnit():Count() < 3 then
+        log("Creating invasion group to attack base: "..base)
+        SPAWN:NewWithAlias("red-basecap", "red-basecap-"..base.."-"..tostring(RED_CAP_ATTEMPTS))
+          :InitAirbase( "Damascus", SPAWN.Takeoff.Air)
+          :OnSpawnGroup(
+            function( SpawnGroup )
+                SpawnGroup:TaskRouteToZone(zone, false,  200, FORMATION.Vee)
+            end
+        )
+        :Spawn()
+        RED_CAP_ATTEMPTS = RED_CAP_ATTEMPTS + 1
+        return
+      else
+        log("Too many blue units inside base zone: "..base)
+      end
+    else
+      log("Base ".. base.." is "..candidate:GetCoalitionName().."...skipping")
+    end
+  end
+
+end
+
+
 return {
   file_exists = file_exists,
   restoreCtldUnits = restoreCtldUnits,
@@ -547,4 +580,5 @@ return {
   addRepairable = addRepairable,
   addDeadGroup = addDeadGroup,
   attemptSamRepair = attemptSamRepair,
+  attemptBaseCap = attemptBaseCap,
 }
