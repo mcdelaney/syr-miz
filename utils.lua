@@ -313,7 +313,7 @@ local function removeUnit (unitName, smoke)
       -- env.info("Spawning dead type "..unit:GetTypeName().." - "..unit:GetCategoryName())
       if stc ~= nil then
         stc.InitDead = true
-        stc:SpawnFromCoordinate(unitPoint)
+        -- stc:SpawnFromCoordinate(unitPoint)
         env.info("Dead static spawn successful...")
       else
         log("Could not create static unit: "..unit_type.." - "..unit_cat)
