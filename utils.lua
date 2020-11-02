@@ -305,16 +305,19 @@ local function removeUnit (unitName, smoke)
     local unit = UNIT:FindByName(unitName)
     if unit then
       local unitPoint = unit:GetCoordinate()
+      local unit_country = unit:GetCountry()
+      local unit_type = unit:GetTypeName()
+      local unit_cat = unit:GetCategoryName()
+      local stc = SPAWNSTATIC:NewFromType(unit_type, unit_cat, unit_country)
       unit:Destroy()
-      -- local stc = SPAWNSTATIC:NewFromType(unit:GetTypeName(), unit:GetCategoryName(), country.id.RUSSIA)
-      -- env.info("Spawning dead type "..unit:GetTypeName().." - "..unit:GetCategoryName())
-      -- if stc ~= nil then
-      --   -- pcall(function()
-      --     stc.InitDead = true
-      --     stc:SpawnFromCoordinate(unitPoint)
-      --     env.info("Dead static spawn successful...")
-      --   -- end)
-      -- end
+      env.info("Spawning dead type "..unit:GetTypeName().." - "..unit:GetCategoryName())
+      if stc ~= nil then
+        stc.InitDead = true
+        stc:SpawnFromCoordinate(unitPoint)
+        env.info("Dead static spawn successful...")
+      else
+        log("Could not create static unit: "..unit_type.." - "..unit_cat)
+      end
       if smoke==true then
         unitPoint:BigSmokeSmall(0.75)
       end

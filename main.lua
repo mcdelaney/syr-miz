@@ -442,6 +442,19 @@ function EH1:OnEventMarkRemoved(EventData)
   if EventData.text == "tgt" then
     EventData.MarkCoordinate:Explosion(1000)
     return
+  elseif utils.startswith(EventData.text, "test-") then
+    local grp = GROUP:FindByName(string.sub(EventData.text, 6))
+    local unit = grp:GetFirstUnitAlive()
+    env.info("Destroying unit: "..unit:GetName())
+    local unitPoint = unit:GetCoordinate()
+    local unit_country = unit:GetCountry()
+    unit:Destroy()
+    local stc = SPAWNSTATIC:NewFromType(unit:GetTypeName(), unit:GetCategoryName(), unit_country)
+    if stc ~= nil then
+      stc.InitDead = true
+      stc:SpawnFromCoordinate(unitPoint)
+    end
+    return
   elseif utils.startswith(EventData.text, "kill-") then
     local unit_name = string.sub(EventData.text, 6)
     utils.destroyIfExists(unit_name)
