@@ -429,9 +429,8 @@ blue_recon.InitBlueReconGroup(BLUECC)
 blue_menus.Init()
 red_menus.Init()
 
-RedSamRepair = SCHEDULER:New( nil, utils.attemptSamRepair, {}, 90, 15*60, 0.25 )
+RedSamRepair = SCHEDULER:New( nil, utils.attemptSamRepair, {}, 25*60, 25*60, 0.25 )
 -- BaseCapAttempt = SCHEDULER:New( nil, utils.attemptBaseCap, {}, 10*60, 30*60, 0.25 )
-
 
 if DEBUG_IADS then
   local iadsDebug = redIADS:getDebugSettings()
