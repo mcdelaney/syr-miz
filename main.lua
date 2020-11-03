@@ -382,7 +382,7 @@ for _, base in pairs(ContestedBases) do
     local sqd_gci = base.."-gci"
     A2ADispatcher:SetSquadron( sqd_gci, base, {"su-30-gci"} )
     A2ADispatcher:SetSquadronGrouping( sqd_gci, 1 )
-    A2ADispatcher:SetSquadronOverhead( sqd_gci, 1 )
+    A2ADispatcher:SetSquadronOverhead( sqd_gci, 0.5 )
     A2ADispatcher:SetSquadronTakeoffFromParkingHot(sqd_gci)
     A2ADispatcher:SetSquadronGci( sqd_gci, 600, 900 )
 
