@@ -516,6 +516,15 @@ function EH1:OnEventBaseCaptured(EventData)
   if _STATE.bases[EventData.PlaceName] == EventData.IniCoalition then
     return
   end
+  local not_contested = true
+  for _, Base in pairs(ContestedBases) do
+    if Base == EventData.PlaceName then
+      not_contested = false
+    end
+  end
+  if not_contested == true then
+    return
+  end
   _STATE.bases[EventData.PlaceName] = EventData.IniCoalition
   if EventData.IniCoalition == coalition.side.RED then
     setBaseRed(EventData.PlaceName, false)
