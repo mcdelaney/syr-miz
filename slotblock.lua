@@ -56,12 +56,12 @@ M.iterGroups(env.mission, function(group)
 end)
 
 local function disableSlot(groupName)
-    log:info("Disabling group '$1'", groupName)
+    -- log:info("Disabling group '$1'", groupName)
     trigger.action.setUserFlag(groupName, M.slotDisabled)
 end
 
 local function enableSlot(groupName)
-    log:info("Enabling group '$1'", groupName)
+    -- log:info("Enabling group '$1'", groupName)
     trigger.action.setUserFlag(groupName, M.slotEnabled)
 end
 

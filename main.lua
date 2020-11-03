@@ -300,7 +300,7 @@ SPAWN:New("red-recce")
   :SpawnScheduleStart()
 
 DetectionSetGroup = SET_GROUP:New()
-  :FilterPrefixes({ "EWR", "redAWACS", "defenseBase" })
+  :FilterPrefixes({ "EWR", "redAWACS" })
   :FilterActive()
   :FilterStart()
 
@@ -325,7 +325,7 @@ if AG_BASES ~= nil then
 
   RedCommand_AG = COMMANDCENTER:New( GROUP:FindByName( "REDHQ-AG" ), "REDHQ-AG" )
   DetectionSetGroup_G = SET_GROUP:New()
-    :FilterPrefixes({"redAWACS", "red-recce", "defenseBase"})
+    :FilterPrefixes({ "red-recce" })
     :FilterActive()
     :FilterStart()
 
@@ -336,7 +336,7 @@ if AG_BASES ~= nil then
   A2GDispatcher = AI_A2G_DISPATCHER:New( Detection_G )
   A2GDispatcher:AddDefenseCoordinate( "ag-base", AIRBASE:FindByName( "Damascus" ):GetCoordinate() )
   A2GDispatcher:SetDefenseReactivityHigh()
-  A2GDispatcher:SetDefenseRadius( 500000 )
+  A2GDispatcher:SetDefenseRadius( 400000 )
 
   A2GDispatcher:SetCommandCenter(RedCommand_AA)
   A2GDispatcher:SetDefaultTakeoffInAir(  )
