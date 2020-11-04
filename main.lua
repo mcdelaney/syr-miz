@@ -32,8 +32,8 @@ if MISSION_VERSION == nil  then
 end
 BASE_FILE = lfs.writedir() .. "Scripts\\syr-miz\\syr_state"..MISSION_VERSION ..".json"
 
-BASE:TraceClass('A2GDispatcher')
-BASE:TraceOn()
+-- BASE:TraceClass('A2GDispatcher')
+-- BASE:TraceOn()
 
 
 ATIS = {}
@@ -336,6 +336,7 @@ if AG_BASES ~= nil then
   A2GDispatcher = AI_A2G_DISPATCHER:New( Detection_G )
   A2GDispatcher:AddDefenseCoordinate( "ag-base", AIRBASE:FindByName( "Damascus" ):GetCoordinate() )
   A2GDispatcher:SetDefenseReactivityHigh()
+  A2GDispatcher:SetDefaultEngageLimit(3)
   A2GDispatcher:SetDefenseRadius( 400000 )
 
   A2GDispatcher:SetCommandCenter(RedCommand_AA)
