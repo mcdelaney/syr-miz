@@ -309,7 +309,7 @@ local function removeUnit (unitName, smoke)
       local unit_type = unit:GetTypeName()
       local unit_cat = unit:GetCategoryName()
       local stc = SPAWNSTATIC:NewFromType(unit_type, unit_cat, unit_country)
-      unit:Destroy()
+      unit:Destroy(false)
       -- env.info("Spawning dead type "..unit:GetTypeName().." - "..unit:GetCategoryName())
       if stc ~= nil then
         -- stc.InitDead = true
