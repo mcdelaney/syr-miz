@@ -310,6 +310,7 @@ local function removeUnit (unitName, smoke)
       local unit_cat = unit:GetCategoryName()
       local stc = SPAWNSTATIC:NewFromType(unit_type, unit_cat, unit_country)
       unit:Destroy(false)
+      unitPoint:BigSmokeSmall(0.75)
       -- env.info("Spawning dead type "..unit:GetTypeName().." - "..unit:GetCategoryName())
       if stc ~= nil then
         -- stc.InitDead = true
@@ -337,9 +338,9 @@ local function removeUnit (unitName, smoke)
       else
         log("Could not create static unit: "..unit_type.." - "..unit_cat)
       end
-      if smoke==true then
-        unitPoint:BigSmokeSmall(0.75)
-      end
+      -- if smoke==true then
+      --   unitPoint:BigSmokeSmall(0.75)
+      -- end
     end
   end
 end
