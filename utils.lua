@@ -312,8 +312,27 @@ local function removeUnit (unitName, smoke)
       unit:Destroy()
       -- env.info("Spawning dead type "..unit:GetTypeName().." - "..unit:GetCategoryName())
       if stc ~= nil then
-        stc.InitDead = true
+        -- stc.InitDead = true
+        -- stc.InitStaticCoordinate = unitPoint
+        -- stc:Spawn()
+
+        mist.dynAddStatic(
+          {
+            type = unit_type,
+            country = unit_country,
+            category = unit_cat,
+            x = unitPoint:GetVec2().x,
+            y = unitPoint:GetVec2().y,
+            groupName = unit:GetGroup():GetName(),
+            groupId = unit:GetGroup():GetID(),
+            name = "dead"..unitName,
+            clone = false,
+            dead = true,
+            heading = unit:GetHeading(),
+            }
+        )
         -- stc:SpawnFromCoordinate(unitPoint)
+
         env.info("Dead static spawn successful...")
       else
         log("Could not create static unit: "..unit_type.." - "..unit_cat)
