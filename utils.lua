@@ -502,6 +502,71 @@ local function addDeadGroup(group_name)
 end
 
 
+local function routeHelo(DestCoord, StartBase, RepairTarget)
+  log("Attempting helo route to ground point")
+  local StartZone = ZONE:FindByName("pickupzone-"..StartBase)
+  SPAWN:NewWithAlias("red-repair", "repair-"..RepairTarget)
+    :OnSpawnGroup(
+      function(Group)
+
+
+        local WaypointTo = DestCoord:WaypointAir(
+          "RADIO",
+          POINT_VEC3.RoutePointType.TurningPoint,
+          POINT_VEC3.RoutePointAction.TurningPoint,
+          Group:GetSpeedMax()*0.75,
+          true
+        )
+
+        local WaypointBack = StartZone:GetCoordinate():WaypointAir(
+          "RADIO",
+          POINT_VEC3.RoutePointType.TurningPoint,
+          POINT_VEC3.RoutePointAction.TurningPoint,
+          Group:GetSpeedMax()*0.75,
+          true
+        )
+        local Route = {}
+        Route[#Route+1] = WaypointTo
+        local LandingPoint = DestCoord:GetVec2()
+        LandingPoint.x = LandingPoint.x + 15
+        Route[#Route].task = Group:TaskCombo(
+          { Group:TaskLandAtVec2(LandingPoint, 60) } )
+
+        -- Route[#Route+1] = WaypointTo
+        local tasks = {}
+        tasks[1] = Group:TaskLandAtVec2( StartZone:GetCoordinate():GetVec2(), 10)
+
+        Route[#Route+1] = WaypointBack
+        Route[#Route].task = Group:TaskCombo( tasks )
+
+        Group:SetState(Group, "RepairTarget", RepairTarget)
+        Group:SetState(Group, "takeoffs", 0)
+        Group:SetState(Group, "landings", 0)
+
+        Group:HandleEvent(EVENTS.Takeoff)
+        function Group:OnEventTakeoff(EventData)
+          local takeoffs = EventData.IniGroup:GetState(EventData.IniGroup, "takeoffs") + 1
+          EventData.IniGroup:SetState(EventData.IniGroup, "takeoffs", takeoffs)
+          if takeoffs == 1 then
+            respawnGroup(EventData.IniGroup:GetState(EventData.IniGroup, "RepairTarget"))
+          end
+        end
+
+        Group:HandleEvent(EVENTS.Land)
+        function Group:OnEventLand(EventData)
+          local landings = EventData.IniGroup:GetState(EventData.IniGroup, "landings") + 1
+          EventData.IniGroup:SetState(EventData.IniGroup, "landings", landings)
+          if landings == 2 then
+            EventData.IniGroup:Destroy()
+          end
+        end
+
+        Group:Route( Route, 0 )
+      end)
+    :SpawnInZone(StartZone)
+end
+
+
 local function attemptSamRepair()
   log("Attempting sam repair...")
   if _STATE["repairable"] == nil then
@@ -515,7 +580,7 @@ local function attemptSamRepair()
     local zone = ZONE_GROUP:New(group, grp, 25000)
     zone:Scan( {Object.Category.UNIT, Object.Category.BASE }, {Unit.Category.AIRPLANE, Unit.Category.GROUND_UNIT, Unit.Category.HELICOPTER})
     if zone:CountScannedCoalitions() == 1 then
-      respawnGroup(group)
+        routeHelo(grp:GetCoordinate(), "Damascus", group)
       return
     else
       log("Scanned coaltions include blue")
@@ -582,4 +647,5 @@ return {
   addDeadGroup = addDeadGroup,
   attemptSamRepair = attemptSamRepair,
   attemptBaseCap = attemptBaseCap,
+  routeHelo = routeHelo,
 }
