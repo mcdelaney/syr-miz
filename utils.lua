@@ -319,7 +319,7 @@ local function removeUnit (unitName, smoke)
         log("Could not create static unit: "..unit_type.." - "..unit_cat)
       end
       if smoke==true then
-        unitPoint:BigSmokeSmall(0.75)
+        unitPoint:BigSmokeLarge(0.75)
       end
     end
   end
