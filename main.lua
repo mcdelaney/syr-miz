@@ -213,7 +213,7 @@ else
       local unit = Unit.getByName(tostring(obj.id))
       if unit then
         utils.log("Destrying object: "..obj.id)
-        unit:destroy()
+        unit:destroy(false)
       end
     end
     local vec3 = COORDINATE:New(obj.x, obj.y, obj.z)
@@ -259,14 +259,16 @@ utils.restoreCtldUnits(_STATE, ctld_config)
 
 utils.log("Initializing blue awacs units..")
 SPAWN:New("awacs-Carrier")
-  :InitLimit(1, 50)
-  :InitRepeat()
-  :Spawn()
+  :InitLimit(1, 0)
+  :InitRepeatOnLanding()
+  :InitDelayOff()
+  :SpawnScheduled(15, 0)
 
 SPAWN:New("awacs-Incirlik")
   :InitLimit(1, 50)
-  :InitRepeat()
-  :Spawn()
+  :InitRepeatOnLanding()
+  :InitDelayOff()
+  :SpawnScheduled(15, 0)
 
 
 TexacoStennis = RECOVERYTANKER:New(UNIT:FindByName("CVN-71"), "Texaco")
@@ -305,7 +307,7 @@ DetectionSetGroup = SET_GROUP:New()
   :FilterStart()
 
 Detection = DETECTION_AREAS:New( DetectionSetGroup, 30000 )
-Detection:BoundDetectedZones()
+-- Detection:BoundDetectedZones()
 Detection:Start()
 
 
@@ -330,7 +332,7 @@ if AG_BASES ~= nil then
     :FilterStart()
 
   Detection_G = DETECTION_AREAS:New( DetectionSetGroup_G, 20000 )
-  Detection_G:BoundDetectedZones()
+  -- Detection_G:BoundDetectedZones()
   Detection_G:Start()
 
   A2GDispatcher = AI_A2G_DISPATCHER:New( Detection_G )

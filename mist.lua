@@ -4,28 +4,19 @@ MIST Mission Scripting Tools.
 MIssion Scripting Tools (MIST) is a collection of Lua functions
 and databases that is intended to be a supplement to the standard
 Lua functions included in the simulator scripting engine.
-
 MIST functions and databases provide ready-made solutions to many common
 scripting tasks and challenges, enabling easier scripting and saving
 mission scripters time. The table mist.flagFuncs contains a set of
 Lua functions (that are similar to Slmod functions) that do not
 require detailed Lua knowledge to use.
-
 However, the majority of MIST does require knowledge of the Lua language,
 and, if you are going to utilize these components of MIST, it is necessary
 that you read the Simulator Scripting Engine guide on the official ED wiki.
-
 ## Links:
-
-
 ED Forum Thread: <http://forums.eagle.ru/showthread.php?t=98616>
-
 ##Github:
-
 Development <https://github.com/mrSkortch/MissionScriptingTools>
-
 Official Releases <https://github.com/mrSkortch/MissionScriptingTools/tree/master>
-
 @script MIST
 @author Speed
 @author Grimes
@@ -35,14 +26,14 @@ mist = {}
 
 -- don't change these
 mist.majorVersion = 4
-mist.minorVersion = 4
-mist.build = 88
+mist.minorVersion = 5
+mist.build = 94
 
 -- forward declaration of log shorthand
 local log
 
 local mistSettings = {
-	errorPopup = true, -- errors printed by mist logger will create popup warning you
+	errorPopup = false, -- errors printed by mist logger will create popup warning you
 	warnPopup = false,
 	infoPopup = false,
 	logLevel = 'warn',
@@ -92,11 +83,7 @@ do -- the main scope
 				end
 			end
 			-- if we add more coalition specific data then bullsye should be categorized by coaliton. For now its just the bullseye table
-			mist.DBs.missionData.bullseye = {red = {}, blue = {}}
-			mist.DBs.missionData.bullseye.red.x = env.mission.coalition.red.bullseye.x --should it be point.x?
-			mist.DBs.missionData.bullseye.red.y = env.mission.coalition.red.bullseye.y
-			mist.DBs.missionData.bullseye.blue.x = env.mission.coalition.blue.bullseye.x
-			mist.DBs.missionData.bullseye.blue.y = env.mission.coalition.blue.bullseye.y
+            mist.DBs.missionData.bullseye = {}
 		end
 
 		mist.DBs.zonesByName = {}
@@ -122,11 +109,19 @@ do -- the main scope
 		mist.DBs.navPoints = {}
 		mist.DBs.units = {}
 		--Build mist.db.units and mist.DBs.navPoints
-		for coa_name, coa_data in pairs(env.mission.coalition) do
-
-			if (coa_name == 'red' or coa_name == 'blue') and type(coa_data) == 'table' then
+		for coa_name_miz, coa_data in pairs(env.mission.coalition) do
+            local coa_name = coa_name_miz
+            if string.lower(coa_name_miz) == 'neutrals' then
+                coa_name = 'neutral'
+            end
+			if type(coa_data) == 'table' then
 				mist.DBs.units[coa_name] = {}
 
+                if coa_data.bullseye then
+                    mist.DBs.missionData.bullseye[coa_name] = {}
+                    mist.DBs.missionData.bullseye[coa_name].x = coa_data.bullseye.x
+                    mist.DBs.missionData.bullseye[coa_name].y = coa_data.bullseye.y
+                end
 				-- build nav points DB
 				mist.DBs.navPoints[coa_name] = {}
 				if coa_data.nav_points then --navpoints
@@ -440,6 +435,42 @@ do -- the main scope
 			["Small house 1A area"] = "domik1a-all",
 			["White_Flag"] = "H-Flag_W",
 			["Airshow_Cone"] = "Comp_cone",
+            ["Bulk Cargo Ship Ivanov"] = "barge-1",
+            ["Bulk Cargo Ship Yakushev"] = "barge-2",
+            ["Outpost"]="block",
+            ["Road outpost"]="block-onroad",
+            ["Container camo"] = "bw_container_cargo",
+            ["Tech Hangar A"] = "ceh_ang_a",
+            ["Bunker 1"] = "dot",
+            ["Bunker 2"] = "dot2",
+            ["Tanker Elnya 160"] = "elnya",
+            ["F-shape barrier"] = "f_bar_cargo",
+            ["Helipad Single"] = "farp",
+            ["FARP"] = "farps",
+            ["Fueltank"] = "fueltank_cargo",
+            ["Gate"] = "gate",
+            ["FARP Fuel Depot"] = "gsm rus",
+            ["Armed house"] = "home1_a",
+            ["FARP Command Post"] = "kp-ug",
+            ["Watch Tower Armed"] = "ohr-vyshka",
+            ["Oiltank"] = "oiltank_cargo",
+            ["Pipes small"] = "pipes_small_cargo",
+            ["Pipes big"] = "pipes_big_cargo",
+            ["Oil platform"] = "plavbaza",
+            ["Tetrapod"] = "tetrapod_cargo",
+            ["Fuel tank"] = "toplivo",
+            ["Trunks long"] = "trunks_long_cargo",
+            ["Trunks small"] = "trunks_small_cargo",
+            ["Passenger liner"] = "yastrebow",
+            ["Passenger boat"] = "zwezdny",
+            ["Oil rig"] = "oil_platform",
+            ["Gas platform"] = "gas_platform",
+            ["Container 20ft"] = "container_20ft",
+            ["Container 40ft"] = "container_40ft",
+            ["Downed pilot"] = "cadaver",
+            ["Parachute"] = "parash",
+            ["Pilot F15 Parachute"] = "pilot_f15_parachute",
+            ["Pilot standing"] = "pilot_parashut",
 		}
 
 
@@ -740,7 +771,7 @@ do -- the main scope
 
 				end
 			else -- its a static
-				newTable.category = 'static'
+                newTable.category = 'static'
 				newTable.units[1] = {}
 				newTable.units[1].unitName = newObject:getName()
 				newTable.units[1].category = 'static'
@@ -778,8 +809,9 @@ do -- the main scope
 						newTable.units[1].mass = data.mass
 						newTable.units[1].canCargo = data.canCargo
 						newTable.units[1].categoryStatic = data.categoryStatic
-						newTable.units[1].type = 'cargo1'
+						newTable.units[1].type = data.type
 						mistAddedObjects[index] = nil
+                        break
 					end
 				end
 			end
@@ -1140,15 +1172,48 @@ do -- the main scope
 				end
 			end
 		end
-
 	mist.addEventHandler(addClientsToActive)
 	]]
+    local function verifyDB()
+        --log:warn('verfy Run')
+        for coaName, coaId in pairs(coalition.side) do
+            --env.info(coaName)
+            local gps = coalition.getGroups(coaId)
+            for i = 1, #gps do
+                if gps[i] and Group.getSize(gps[i]) > 0 then
+                    local gName = Group.getName(gps[i])
+                    if not mist.DBs.groupsByName[gName] then
+                            --env.info(Unit.getID(gUnits[j]) .. ' Not found in DB yet')
+                        if not tempSpawnedGroups[gName] then
+                            --dbLog:info('added')
+                            tempSpawnedGroups[gName] = {type = 'group', gp = gps[i]}
+                            tempSpawnGroupsCounter = tempSpawnGroupsCounter + 1
+                        end
+                    end
+                end
+            end
+            local st = coalition.getStaticObjects(coaId)
+            for i = 1, #st do
+                local s = st[i]
+                if StaticObject.isExist(s) then
+                    if not mist.DBs.unitsByName[s:getName()] then
+                        --env.info(StaticObject.getID(s) .. ' Not found in DB yet')
+                        tempSpawnedGroups[s:getName()] = {type = 'static'}
+                        tempSpawnGroupsCounter = tempSpawnGroupsCounter + 1
+                    end
+                end
+            end
+
+        end
+
+    end
 
 	--- init function.
 	-- creates logger, adds default event handler
 	-- and calls main the first time.
 	-- @function mist.init
 	function mist.init()
+
 		-- create logger
 		mist.log = mist.Logger:new("MIST", mistSettings.logLevel)
 		dbLog = mist.Logger:new('MISTDB', 'warn')
@@ -1165,9 +1230,13 @@ do -- the main scope
 		mist.addEventHandler(groupSpawned)
 		mist.addEventHandler(addDeadObject)
 
+        log:warn('Init time: $1', timer.getTime())
+
 		-- call main the first time therafter it reschedules itself.
 		mist.main()
 		--log:msg('MIST version $1.$2.$3 loaded', mist.majorVersion, mist.minorVersion, mist.build)
+
+        mist.scheduleFunction(verifyDB, {}, timer.getTime() + 1)
 		return
 	end
 
@@ -1771,7 +1840,7 @@ do
 		end
 
 		for coa_name, coa_data in pairs(env.mission.coalition) do
-			if (coa_name == 'red' or coa_name == 'blue') and type(coa_data) == 'table' then
+			if  type(coa_data) == 'table' then
 				if coa_data.country then --there is a country table
 					for cntry_id, cntry_data in pairs(coa_data.country) do
 						for obj_type_name, obj_type_data in pairs(cntry_data) do
@@ -2033,16 +2102,13 @@ do
 	borrowed from Slmod. These shortcuts alleviate the problem of entering
 	huge lists of unit names by hand, and in many cases, they remove the
 	need to even know the names of the units in the first place!
-
 	These are the unit table "short-cut" commands:
-
 	Prefixes:
 			"[-u]<unit name>" - subtract this unit if its in the table
 			"[g]<group name>" - add this group to the table
 			"[-g]<group name>" - subtract this group from the table
 			"[c]<country name>"	- add this country's units
 			"[-c]<country name>" - subtract this country's units if any are in the table
-
 	Stand-alone identifiers
 			"[all]" - add all units
 			"[-all]" - subtract all units (not very useful by itself)
@@ -2050,7 +2116,6 @@ do
 			"[-blue]" - subtract all blue units
 			"[red]" - add all red coalition units
 			"[-red]" - subtract all red units
-
 	Compound Identifiers:
 			"[c][helicopter]<country name>"	- add all of this country's helicopters
 			"[-c][helicopter]<country name>" - subtract all of this country's helicopters
@@ -2060,7 +2125,6 @@ do
 			"[-c][ship]<country name>" - subtract all of this country's ships
 			"[c][vehicle]<country name>"	- add all of this country's vehicles
 			"[-c][vehicle]<country name>" - subtract all of this country's vehicles
-
 			"[all][helicopter]" -	add all helicopters
 			"[-all][helicopter]" - subtract all helicopters
 			"[all][plane]" - add all	planes
@@ -2069,7 +2133,6 @@ do
 			"[-all][ship]" - subtract all ships
 			"[all][vehicle]" - add all vehicles
 			"[-all][vehicle]" - subtract all vehicles
-
 			"[blue][helicopter]" -	add all blue coalition helicopters
 			"[-blue][helicopter]" - subtract all blue coalition helicopters
 			"[blue][plane]" - add all blue coalition planes
@@ -2078,7 +2141,6 @@ do
 			"[-blue][ship]" - subtract all blue coalition ships
 			"[blue][vehicle]" - add all blue coalition vehicles
 			"[-blue][vehicle]" - subtract all blue coalition vehicles
-
 			"[red][helicopter]" -	add all red coalition helicopters
 			"[-red][helicopter]" - subtract all red coalition helicopters
 			"[red][plane]" - add all red coalition planes
@@ -2087,7 +2149,6 @@ do
 			"[-red][ship]" - subtract all red coalition ships
 			"[red][vehicle]" - add all red coalition vehicles
 			"[-red][vehicle]" - subtract all red coalition vehicles
-
 	Country names to be used in [c] and [-c] short-cuts:
 			Turkey
 			Norway
@@ -2134,38 +2195,25 @@ do
 			Switzerland
 			Syria
 			USAF Aggressors
-
 	Do NOT use a '[u]' notation for single units. Single units are referenced
 	the same way as before: Simply input their names as strings.
-
 	These unit tables are evaluated in order, and you cannot subtract a unit
 	from a table before it is added. For example:
-
 			{'[blue]', '[-c]Georgia'}
-
 	will evaluate to all of blue coalition except those units owned by the
 	country named "Georgia"; however:
-
 			{'[-c]Georgia', '[blue]'}
-
 	will evaluate to all of the units in blue coalition, because the addition
 	of all units owned by blue coalition occurred AFTER the subtraction of all
 	units owned by Georgia (which actually subtracted nothing at all, since
 	there were no units in the table when the subtraction occurred).
-
 	More examples:
-
 			{'[blue][plane]', '[-c]Georgia', '[-g]Hawg 1'}
-
 	Evaluates to all blue planes, except those blue units owned by the country
 	named "Georgia" and the units in the group named "Hawg1".
-
-
 			{'[g]arty1', '[g]arty2', '[-u]arty1_AD', '[-u]arty2_AD', 'Shark 11' }
-
 	Evaluates to the unit named "Shark 11", plus all the units in groups named
 	"arty1" and "arty2" except those that are named "arty1\_AD" and "arty2\_AD".
-
 	@table UnitNameTable
 	]]
 
@@ -2174,7 +2222,7 @@ do
 	-- @treturn table @{UnitNameTable}
 	function mist.makeUnitTable(tbl)
 		--Assumption: will be passed a table of strings, sequential
-		log:info(tbl)
+		--log:info(tbl)
 		local units_by_name = {}
 
 		local l_munits = mist.DBs.units	--local reference for faster execution
@@ -2517,7 +2565,6 @@ function mist.pointInPolygon(point, poly, maxalt) --raycasting point in polygon.
 		poly = {'table'},
 		maxalt = {'number', 'nil'},
 		}
-
 	local err, errmsg = mist.utils.typeCheck('mist.pointInPolygon', type_tbl, {point, poly, maxalt})
 	assert(err, errmsg)
 	]]
@@ -2817,13 +2864,13 @@ function mist.getBRString(vars)
 	local metric = vars.metric
 	local avgPos = mist.getAvgPos(units)
 	if avgPos then
-		local vec = {x = avgPos.x - ref.x, y = avgPos.y - ref.y, z = avgPos.z - ref.z}
-		local dir = mist.utils.getDir(vec, ref)
-		local dist = mist.utils.get2DDist(avgPos, ref)
-		if alt then
-			alt = avgPos.y
-		end
-		return mist.tostringBR(dir, dist, alt, metric)
+        local vec = {x = avgPos.x - ref.x, y = avgPos.y - ref.y, z = avgPos.z - ref.z}
+        local dir = mist.utils.getDir(vec, ref)
+        local dist = mist.utils.get2DDist(avgPos, ref)
+        if alt then
+            alt = avgPos.y
+        end
+        return mist.tostringBR(dir, dist, alt, metric)
 	end
 end
 
@@ -2943,7 +2990,143 @@ function mist.getLeadingBRString(vars)
 	end
 end
 
+--[[getPathLength from GSH
+-- Returns the length between the defined set of points. Can also return the point index before the cutoff was achieved
+p - table of path points, vec2 or vec3
+cutoff - number distance after which to stop at
+topo  - boolean for if it should get the topographical distance
+]]
+
+function mist.getPathLength(p, cutoff, topo)
+    local l = 0
+    local cut = 0 or cutOff
+    local path = {}
+
+    for i = 1, #p do
+        if topo then
+            table.insert(path, mist.utils.makeVec3GL(p[i]))
+        else
+            table.insert(path, mist.utils.makeVec3(p[i]))
+        end
+    end
+
+    for i = 1, #path do
+        if i + 1 <= #path then
+            if topo then
+                l = mist.utils.get3DDist(path[i], path[i+1]) + l
+            else
+                l = mist.utils.get2DDist(path[i], path[i+1]) + l
+            end
+        end
+        if cut ~= 0 and l > cut  then
+            return l, i
+        end
+    end
+    return l
 end
+
+--[[
+Return a series of points to simplify the input table. Best used in conjunction with findPathOnRoads to turn the massive table into a list of X points.
+p - table of path points, can be vec2 or vec3
+num - number of segments.
+exact - boolean for whether or not it returns the exact distance or uses the first WP to that distance.
+]]
+
+function mist.getPathInSegments(p, num, exact)
+    local tot = mist.getPathLength(p)
+    local checkDist = tot/num
+    local typeUsed = 'vec2'
+
+    local points = {[1] = p[1]}
+    local curDist = 0
+    for i = 1, #p do
+        if i + 1 <= #p then
+            curDist = mist.utils.get2DDist(p[i], p[i+1]) + curDist
+            if curDist > checkDist then
+                curDist = 0
+                if exact then
+                    -- get avg point between the two
+                    -- insert into point table
+                    -- need to be accurate... maybe reassign the point for the value it is checking?
+                    -- insert into p table?
+                else
+                    table.insert(points, p[i])
+                end
+            end
+
+        end
+
+    end
+    return points
+
+end
+
+
+function mist.getPointAtDistanceOnPath(p, dist, r, rtn)
+    log:info('find distance: $1', dist)
+    local rType = r or 'roads'
+    local point = {x= 0, y = 0, z = 0}
+    local path = {}
+    local ret = rtn or 'vec2'
+    local l = 0
+    if p[1] and #p == 2 then
+        path = land.findPathOnRoads(rType, p[1].x, p[1].y, p[2].x, p[2].y)
+    else
+        path = p
+    end
+    for i = 1, #path do
+        if i + 1 <= #path then
+            nextPoint = path[i+1]
+            if topo then
+                l = mist.utils.get3DDist(path[i], path[i+1]) + l
+            else
+                l = mist.utils.get2DDist(path[i], path[i+1]) + l
+            end
+        end
+        if l > dist then
+            local diff = dist
+            if i ~= 1 then -- get difference
+                diff = l - dist
+            end
+            local dir = mist.utils.getHeadingPoints(mist.utils.makeVec3(path[i]), mist.utils.makeVec3(path[i+1]))
+            local x, y
+            if r then
+                x, y = land.getClosestPointOnRoads(rType, mist.utils.round((math.cos(dir) * diff) + path[i].x,1),  mist.utils.round((math.sin(dir) * diff) + path[i].y,1))
+            else
+                x, y = mist.utils.round((math.cos(dir) * diff) + path[i].x,1),  mist.utils.round((math.sin(dir) * diff) + path[i].y,1)
+            end
+
+            if ret == 'vec2' then
+                return {x = x, y = y}, dir
+            elseif ret == 'vec3' then
+                return {x = x, y = 0, z = y}, dir
+            end
+
+            return {x = x, y = y}, dir
+        end
+    end
+    log:warn('Find point at distance: $1, path distance $2', dist, l)
+    return false
+end
+
+
+function mist.projectPoint(point, dist, theta)
+    local newPoint = {}
+    if point.z then
+       newPoint.z = mist.utils.round(math.sin(theta) * dist + point.z, 3)
+       newPoint.y = mist.utils.deepCopy(point.y)
+    else
+       newPoint.y = mist.utils.round(math.sin(theta) * dist + point.y, 3)
+    end
+    newPoint.x = mist.utils.round(math.cos(theta) * dist + point.x, 3)
+
+    return newPoint
+end
+
+end
+
+
+
 
 --- Group functions.
 -- @section groups
@@ -3153,7 +3336,7 @@ do -- group functions scope
 
 		if gpId then
 			for coa_name, coa_data in pairs(env.mission.coalition) do
-				if (coa_name == 'red' or coa_name == 'blue') and type(coa_data) == 'table' then
+				if type(coa_data) == 'table' then
 					if coa_data.country then --there is a country table
 						for cntry_id, cntry_data in pairs(coa_data.country) do
 							for obj_type_name, obj_type_data in pairs(cntry_data) do
@@ -3190,7 +3373,7 @@ do -- group functions scope
     end
 
 	function mist.teleportToPoint(vars) -- main teleport function that all of teleport/respawn functions call
-		log:info(vars)
+		--log:info(vars)
         local point = vars.point
 		local gpName
 		if vars.gpName then
@@ -3231,27 +3414,35 @@ do -- group functions scope
 			newGroupData = vars.groupData
 		end
 
+        if vars.newGroupName then
+            newGroupData.groupName = vars.newGroupName
+        end
+
 		--log:info('get Randomized Point')
 		local diff = {x = 0, y = 0}
 		local newCoord, origCoord
 
         local validTerrain = {'LAND', 'ROAD', 'SHALLOW_WATER', 'WATER', 'RUNWAY'}
-        if string.lower(newGroupData.category) == 'ship' then
-            validTerrain = {'SHALLOW_WATER' , 'WATER'}
-        elseif string.lower(newGroupData.category) == 'vehicle' then
-            validTerrain = {'LAND', 'ROAD'}
+        if vars.validTerrain then
+            validTerrain = vars.validTerrain
+        else
+            if string.lower(newGroupData.category) == 'ship' then
+                validTerrain = {'SHALLOW_WATER' , 'WATER'}
+            elseif string.lower(newGroupData.category) == 'vehicle' then
+                validTerrain = {'LAND', 'ROAD'}
+            end
         end
         local offsets = {}
 		if point and radius >= 0 then
 			local valid = false
             -- new thoughts
-            -- Get AVG position of group and max radius distance to that avg point, otherwise use disperse data to get zone area to check
+            --[[ Get AVG position of group and max radius distance to that avg point, otherwise use disperse data to get zone area to check
             if disperse then
 
             else
 
             end
-            --
+            -- ]]
 
 
 
@@ -3281,14 +3472,14 @@ do -- group functions scope
 		end
         --log:info(point)
 		for unitNum, unitData in pairs(newGroupData.units) do
-			log:info(unitNum)
+			--log:info(unitNum)
             if disperse then
                 local unitCoord
                 if maxDisp and type(maxDisp) == 'number' and unitNum ~= 1 then
 					for i = 1, 100 do
                         unitCoord = mist.getRandPointInCircle(origCoord, maxDisp)
                         if mist.isTerrainValid(unitCoord, validTerrain) == true then
-                            log:warn('Index: $1, Itered: $2. AT: $3', unitNum, i, unitCoord)
+                            --log:warn('Index: $1, Itered: $2. AT: $3', unitNum, i, unitCoord)
                             break
                         end
                     end
@@ -3559,7 +3750,7 @@ do -- group functions scope
 		local units = passedUnits
 
 		if passedUnits.units then
-			units = passedUnits.units
+			units = passUnits.units
 		end
 
 		local exclude = {}
@@ -3600,7 +3791,7 @@ do -- group functions scope
 					end
 				end
 			else -- unitIndex is either to low, or to high: added to exclude list
-				excludeNum[unitIndex] = unitIndex
+				excludeNum[unitIndex] = unitId
 			end
 		end
 
@@ -3680,16 +3871,10 @@ do -- group functions scope
 	CA = {...}, -- looks just like coa.
 	unitTypes = { red = {}, blue = {}, all = {}, Russia = {},}
 }
-
-
 scope examples:
-
 {	units = { 'Hawg11', 'Hawg12' }, CA = {'blue'} }
-
 { countries = {'Georgia'}, unitTypes = {blue = {'A-10C', 'A-10A'}}}
-
 { coa = {'all'}}
-
 {unitTypes = { blue = {'A-10C'}}}
 ]]
 end
@@ -4004,6 +4189,13 @@ do -- mist.util scope
 		end
 	end
 
+    function mist.utils.getHeadingPoints(point1, point2, north) -- sick of writing this out.
+        if north then
+            return mist.utils.getDir(mist.vec.sub(mist.utils.makeVec3(point2), mist.utils.makeVec3(point1)), (mist.utils.makeVec3(point1)))
+        else
+            return mist.utils.getDir(mist.vec.sub(mist.utils.makeVec3(point2), mist.utils.makeVec3(point1)))
+        end
+    end
 	--- Returns heading-error corrected direction.
 	-- True-north corrected direction from point along vector vec.
 	-- @tparam Vec3 vec
@@ -4624,10 +4816,8 @@ zones = table or string,
 flag = number,
 stopflag = number or nil,
 req_num = number or nil
-
 AND used by function,
 initial_number
-
 ]]
 		-- type_tbl
 		local type_tbl = {
@@ -4689,10 +4879,8 @@ zone = table,
 flag = number,
 stopflag = number or nil,
 req_num = number or nil
-
 AND used by function,
 initial_number
-
 ]]
 		-- type_tbl
 		local type_tbl = {
@@ -5045,7 +5233,6 @@ flag
 toggle
 interval
 stopFlag
-
 ]]
 		local type_tbl = {
 			[{'group', 'groupname', 'gp', 'groupName'}] = 'string',
@@ -5246,12 +5433,11 @@ do -- mist.msg scope
 			if type(value) == 'table' then
 				for roleName, roleVal in pairs(value) do
 					for rIndex, rVal in pairs(roleVal) do
-						if rIndex == 'red' or rIndex == 'blue' then
-							if env.mission.groundControl[index][roleName][rIndex] > 0 then
-								caSlots = true
-								break
-							end
-						end
+                        if type(rVal) == 'number' and rVal > 0 then
+                            caSlots = true
+                            break
+                        end
+
 					end
 				end
 			elseif type(value) == 'boolean' and value == true then
@@ -5279,7 +5465,6 @@ do -- mist.msg scope
 		end
 
 		--[[if caSlots == true and caMSGtoGroup == true then
-
 		end]]
 
 
@@ -5422,9 +5607,7 @@ end]]
 			vars.displayTime = 20
 			vars.msgFor = {coa = {'red'}, countries = {'Ukraine', 'Georgia'}, unitTypes = {'A-10C'}}
 			mist.message.add(vars)
-
 			Displays the message for all red coalition players. Players belonging to Ukraine and Georgia, and all A-10Cs on the map
-
 			]]
 
 
@@ -5693,11 +5876,8 @@ vars.displayTime
 vars.msgFor - scope
 ]]
 	function mist.msgBullseye(vars)
-		if string.lower(vars.ref) == 'red' then
-			vars.ref = mist.DBs.missionData.bullseye.red
-			mist.msgBR(vars)
-		elseif string.lower(vars.ref) == 'blue' then
-			vars.ref = mist.DBs.missionData.bullseye.blue
+		if mist.DBs.missionData.bullseye[string.lower(vars.ref)] then
+			vars.ref = mist.DBs.missionData.bullseye[string.lower(vars.ref)]
 			mist.msgBR(vars)
 		end
 	end
@@ -5989,7 +6169,6 @@ do
 		Mark made for cliet A in Slot A. Client A leaves, Client B joins in slot A. What do they see?
 
 		May need to automate process...
-
 	]]
 	--[[
 	local typeBase = {
@@ -6027,9 +6206,7 @@ do
 		log:warn('markerFunc')
 		log:info('Pos: $1, Text: $2, markFor: $3, id: $4', pos, text, markFor, id)
 		if not id then
-
 		else
-
 		end
 		local markType = 'all'
 		local markForTable = {}
@@ -6041,7 +6218,6 @@ do
 		else
 			text = ''
 		end
-
 		if markFor then
 			if type(markFor) == 'number' then -- groupId
 				if mist.DBs.groupsById[markFor] then
@@ -6115,7 +6291,6 @@ do
 										end
 									end
 								end
-
 							end
 						end
 					end
@@ -6128,12 +6303,9 @@ do
 
 
 
-
-
 		if markType ~= 'table' then
 			local newId = iterate()
 			local data = {markId = newId, text = text, pos = pos, markType = markType, markFor = markFor}
-
 			-- create marks
 			if markType == 'coa' then
 				trigger.action.markToCoalition(newId, text, pos, markFor)
@@ -6392,6 +6564,7 @@ do -- group tasks scope
 	mist.air = {}
 	mist.air.fixedWing = {}
 	mist.air.heli = {}
+    mist.ship = {}
 
 	--- Tasks group to follow a route.
 	-- This sets the mission task for the given group.
@@ -6415,6 +6588,7 @@ do -- group tasks scope
 		if group then
 			local groupCon = group:getController()
 			if groupCon then
+                log:warn(misTask)
 				groupCon:setTask(misTask)
 				return true
 			end
@@ -6433,7 +6607,7 @@ do -- group tasks scope
 			end
 
 		for coa_name, coa_data in pairs(env.mission.coalition) do
-			if (coa_name == 'red' or coa_name == 'blue') and type(coa_data) == 'table' then
+			if type(coa_data) == 'table' then
 				if coa_data.country then --there is a country table
 					for cntry_id, cntry_data in pairs(coa_data.country) do
 						for obj_type_name, obj_type_data in pairs(cntry_data) do
@@ -6489,7 +6663,7 @@ do -- group tasks scope
 	-- function mist.ground.buildPath() end -- ????
 
 	function mist.ground.patrolRoute(vars)
-		log:info('patrol')
+		--log:info('patrol')
 		local tempRoute = {}
 		local useRoute = {}
 		local gpData = vars.gpData
@@ -6822,7 +6996,9 @@ do -- group tasks scope
 	end
 
 	function mist.getRandomPointInPoly(zone)
-		local avg = mist.getAvgPoint(zone)
+		--env.info('Zone Size: '.. #zone)
+        local avg = mist.getAvgPoint(zone)
+        log:warn(avg)
 		local radius = 0
 		local minR = math.huge
 		local newCoord = {}
@@ -6834,6 +7010,8 @@ do -- group tasks scope
 				minR = mist.utils.get2DDist(avg, zone[i])
 			end
 		end
+        --log:warn('Radius: $1', radius)
+        --log:warn('minR: $1', minR)
 		local lSpawnPos = {}
 		for j = 1, 100 do
 			newCoord = mist.getRandPointInCircle(avg, radius)
@@ -7304,5 +7482,3 @@ end
 -- initialize mist
 mist.init()
 env.info(('Mist version ' .. mist.majorVersion .. '.' .. mist.minorVersion .. '.' .. mist.build .. ' loaded.'))
-
--- vim: noet:ts=2:sw=2
