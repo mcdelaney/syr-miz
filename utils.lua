@@ -688,4 +688,5 @@ return {
   attemptSamRepair = attemptSamRepair,
   attemptBaseCap = attemptBaseCap,
   routeHelo = routeHelo,
+  findGoodLanding = findGoodLanding,
 }
