@@ -519,14 +519,30 @@ local function addDeadGroup(group_name)
   MESSAGE:New(group_name.." has been permanently destroyed!" ,10):ToAll()
 end
 
+local function findGoodLanding(Zone, tries)
+
+  for i=1,tries do
+    local testPoint = Zone:GetRandomCoordinate()
+    local units, statics, scenery, _, _, _ = testPoint:ScanObjects(20, true, true, true)
+    if units == false and statics == false and scenery == false then
+      return testPoint
+    end
+  end
+  log("Good landing zone not found!!!")
+  return Zone:GetRandomCoordinate()
+end
+
 
 local function routeHelo(DestCoord, StartBase, RepairTarget)
-  log("Attempting helo route to ground point")
+  log("Attempting helo route to ground point from base: "..StartBase)
   local StartZone = ZONE:FindByName("pickupzone-"..StartBase)
   SPAWN:NewWithAlias("red-repair", "repair-"..RepairTarget)
     :OnSpawnGroup(
       function(Group)
 
+        Group:SetState(Group, "RepairTarget", RepairTarget)
+        Group:SetState(Group, "takeoffs", 0)
+        Group:SetState(Group, "landings", 0)
 
         local WaypointTo = DestCoord:WaypointAir(
           "RADIO",
@@ -543,26 +559,20 @@ local function routeHelo(DestCoord, StartBase, RepairTarget)
           Group:GetSpeedMax()*0.75,
           true
         )
+
+        local landingZone = ZONE_RADIUS:New(nil, DestCoord:GetVec2(), 400)
+        local LandingPoint = findGoodLanding(landingZone, 50)
+
         local Route = {}
         Route[#Route+1] = WaypointTo
-        local LandingPoint = DestCoord:GetVec2()
-        LandingPoint.x = LandingPoint.x + 15
-        Route[#Route].task = Group:TaskCombo(
-          { Group:TaskLandAtVec2(LandingPoint, 60) } )
-
-        -- Route[#Route+1] = WaypointTo
-        local tasks = {}
-        tasks[1] = Group:TaskLandAtVec2( StartZone:GetCoordinate():GetVec2(), 10)
+        Route[#Route].task =  Group:TaskCombo( { Group:TaskLandAtVec2(LandingPoint:GetVec2(), 60) } )
 
         Route[#Route+1] = WaypointBack
-        Route[#Route].task = Group:TaskCombo( tasks )
-
-        Group:SetState(Group, "RepairTarget", RepairTarget)
-        Group:SetState(Group, "takeoffs", 0)
-        Group:SetState(Group, "landings", 0)
+        Route[#Route].task = Group:TaskCombo( { Group:TaskLandAtVec2( StartZone:GetCoordinate():GetVec2(), 10) } )
 
         Group:HandleEvent(EVENTS.Takeoff)
         function Group:OnEventTakeoff(EventData)
+          log("Repair helo has taken off...")
           local takeoffs = EventData.IniGroup:GetState(EventData.IniGroup, "takeoffs") + 1
           EventData.IniGroup:SetState(EventData.IniGroup, "takeoffs", takeoffs)
           if takeoffs == 1 then
@@ -572,11 +582,18 @@ local function routeHelo(DestCoord, StartBase, RepairTarget)
 
         Group:HandleEvent(EVENTS.Land)
         function Group:OnEventLand(EventData)
+          log("Repair helo has landed...")
           local landings = EventData.IniGroup:GetState(EventData.IniGroup, "landings") + 1
           EventData.IniGroup:SetState(EventData.IniGroup, "landings", landings)
           if landings == 2 then
             EventData.IniGroup:Destroy()
           end
+        end
+
+        Group:HandleEvent(EVENTS.Kill)
+        function Group:OnEventKill(EventData)
+          log("Repair helo has been killed by "..EventData.IniGroup:GetName())
+          respawnGroup(EventData.TargetGroup:GetState(EventData.TargetGroup, "RepairTarget"))
         end
 
         Group:Route( Route, 0 )
@@ -598,8 +615,13 @@ local function attemptSamRepair()
     local zone = ZONE_GROUP:New(group, grp, 25000)
     zone:Scan( {Object.Category.UNIT, Object.Category.BASE }, {Unit.Category.AIRPLANE, Unit.Category.GROUND_UNIT, Unit.Category.HELICOPTER})
     if zone:CountScannedCoalitions() == 1 then
-        routeHelo(grp:GetCoordinate(), "Damascus", group)
-      return
+      local close_base = RedBases:FindNearestAirbaseFromPointVec2(grp:GetPointVec2())
+      if close_base:GetCoordinate():Get2DDistance(grp:GetCoordinate())  < 32186 then
+        routeHelo(grp:GetCoordinate(), close_base:GetName(), group)
+        return
+      else
+        log("Closest base is "..close_base:GetName().." but is farther than 20 miles.")
+      end
     else
       log("Scanned coaltions include blue")
     end

@@ -168,7 +168,7 @@ local function setBaseBlue(baseName, startup)
 
 end
 
-RedBases = SET_AIRBASE:New()
+RedBases = SET_AIRBASE:New():FilterCoalitions("red"):FilterStart()
 BlueBases = SET_AIRBASE:New()
 
 local SAMS = {}
@@ -432,7 +432,8 @@ blue_recon.InitBlueReconGroup(BLUECC)
 blue_menus.Init()
 red_menus.Init()
 
-RedSamRepair = SCHEDULER:New( nil, utils.attemptSamRepair, {}, 25*60, 15*60, 0.25 )
+RedSamRepair = SCHEDULER:New( nil, utils.attemptSamRepair, {}, 60, 15*60, 0.25 )
+-- RedSamRepair = SCHEDULER:New( nil, utils.attemptSamRepair, {}, 25*60, 15*60, 0.25 )
 -- BaseCapAttempt = SCHEDULER:New( nil, utils.attemptBaseCap, {}, 10*60, 30*60, 0.25 )
 
 if DEBUG_IADS then
