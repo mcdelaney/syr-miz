@@ -107,7 +107,7 @@ local function InitBlueGroundHeliDeployer()
         local EscortGroup = GROUP:FindByName(CarrierGroup:GetState(CarrierGroup, "escort"))
         EscortGroup:OptionROTNoReaction()
 
-        local targetBase = RedBases:FindNearestAirbaseFromPointVec2(EscortGroup:GetPointVec2())
+        local targetBase = AllBases:FindNearestAirbaseFromPointVec2(EscortGroup:GetPointVec2())
         local EngageZone = ZONE_AIRBASE:New(targetBase.AirbaseName, 5000)
         local PatrolZone = ZONE_AIRBASE:New(targetBase.AirbaseName, 5000)
 
