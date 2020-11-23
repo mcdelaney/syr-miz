@@ -576,9 +576,28 @@ local function routeHelo(DestCoord, StartBase, RepairTarget)
           local takeoffs = EventData.IniGroup:GetState(EventData.IniGroup, "takeoffs") + 1
           EventData.IniGroup:SetState(EventData.IniGroup, "takeoffs", takeoffs)
           if takeoffs == 1 then
-            respawnGroup(EventData.IniGroup:GetState(EventData.IniGroup, "RepairTarget"))
+
+            if _STATE["repairable"] == nil then
+              log("No repairable sams found... exiting")
+            else
+              local do_repair = false
+              local repair_target = EventData.IniGroup:GetState(EventData.IniGroup, "RepairTarget")
+              for i, group in pairs(_STATE["repairable"]) do
+                if group == repair_target then
+                  do_repair = true
+                end
+              end
+
+              if do_repair == true then
+                respawnGroup(EventData.IniGroup:GetState(EventData.IniGroup, "RepairTarget"))
+              end
+
+            end
           end
         end
+
+
+
 
         Group:HandleEvent(EVENTS.Land)
         function Group:OnEventLand(EventData)
@@ -616,11 +635,11 @@ local function attemptSamRepair()
     zone:Scan( {Object.Category.UNIT, Object.Category.BASE }, {Unit.Category.AIRPLANE, Unit.Category.GROUND_UNIT, Unit.Category.HELICOPTER})
     if zone:CountScannedCoalitions() == 1 then
       local close_base = RedBases:FindNearestAirbaseFromPointVec2(grp:GetPointVec2())
-      if close_base:GetCoordinate():Get2DDistance(grp:GetCoordinate())  < 32186 then
+      if close_base:GetCoordinate():Get2DDistance(grp:GetCoordinate())  < 45000 then
         routeHelo(grp:GetCoordinate(), close_base:GetName(), group)
         return
       else
-        log("Closest base is "..close_base:GetName().." but is farther than 20 miles.")
+        log("Closest base is "..close_base:GetName().." but is farther than 25 miles.")
       end
     else
       log("Scanned coaltions include blue")
