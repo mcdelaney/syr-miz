@@ -635,7 +635,7 @@ local function attemptSamRepair()
     zone:Scan( {Object.Category.UNIT, Object.Category.BASE }, {Unit.Category.AIRPLANE, Unit.Category.GROUND_UNIT, Unit.Category.HELICOPTER})
     if zone:CountScannedCoalitions() == 1 then
       local close_base = RedBases:FindNearestAirbaseFromPointVec2(grp:GetPointVec2())
-      if close_base:GetCoordinate():Get2DDistance(grp:GetCoordinate())  < 45000 then
+      if close_base:GetCoordinate():Get2DDistance(grp:GetCoordinate())  < 32100 then
         routeHelo(grp:GetCoordinate(), close_base:GetName(), group)
         return
       else
