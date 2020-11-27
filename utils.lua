@@ -596,9 +596,6 @@ local function routeHelo(DestCoord, StartBase, RepairTarget)
           end
         end
 
-
-
-
         Group:HandleEvent(EVENTS.Land)
         function Group:OnEventLand(EventData)
           log("Repair helo has landed...")
