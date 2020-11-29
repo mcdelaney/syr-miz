@@ -373,17 +373,17 @@ for _, base in pairs(ContestedBases) do
 
     utils.log("Creating A2A Cap group from base: "..base)
     local sqd_cap = base.."-cap"
-    local cap_grp = 2
+    local cap_grp = 1
     if base == "Damascus" then
-      cap_grp = 3
+      cap_grp = 2
     end
     A2ADispatcher:SetSquadron( sqd_cap, base, { "su-30-cap", "mig-31-cap", "jf-17-cap" } ) --, 10)
-    A2ADispatcher:SetSquadronGrouping( sqd_cap, cap_grp )
+    A2ADispatcher:SetSquadronGrouping( sqd_cap, 2 )
     A2ADispatcher:SetSquadronTakeoffFromParkingHot(sqd_cap)
     A2ADispatcher:SetSquadronLandingNearAirbase( sqd_cap )
     A2ADispatcher:SetSquadronCap( sqd_cap, zone, 5000, 10000, 500, 800, 600, 1200, "BARO")
 
-    A2ADispatcher:SetSquadronCapInterval( sqd_cap, 1, 60*3, 60*7, 1)
+    A2ADispatcher:SetSquadronCapInterval( sqd_cap, cap_grp, 60*3, 60*7, 1)
     A2ADispatcher:SetSquadronCapRacetrack(sqd_cap, 5000, 10000, 90, 180, 5*60, 10*60)
 
     utils.log("Creating A2A GCI group from base: "..base)
