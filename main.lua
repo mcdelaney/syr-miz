@@ -308,7 +308,6 @@ DetectionSetGroup = SET_GROUP:New()
   :FilterStart()
 
 Detection = DETECTION_AREAS:New( DetectionSetGroup, 30000 )
--- Detection:BoundDetectedZones()
 Detection:Start()
 
 
@@ -320,7 +319,7 @@ A2ADispatcher = AI_A2A_DISPATCHER:New( Detection )
 A2ADispatcher:SetBorderZone( BorderZone )
 A2ADispatcher:SetCommandCenter(RedCommand_AA)
 A2ADispatcher:SetEngageRadius()
-A2ADispatcher:SetGciRadius(300000)
+A2ADispatcher:SetGciRadius(200000)
 A2ADispatcher:SetIntercept( 10 )
 A2ADispatcher:Start()
 
@@ -333,14 +332,13 @@ if AG_BASES ~= nil then
     :FilterStart()
 
   Detection_G = DETECTION_AREAS:New( DetectionSetGroup_G, 20000 )
-  -- Detection_G:BoundDetectedZones()
   Detection_G:Start()
 
   A2GDispatcher = AI_A2G_DISPATCHER:New( Detection_G )
   A2GDispatcher:AddDefenseCoordinate( "ag-base", AIRBASE:FindByName( "Damascus" ):GetCoordinate() )
   A2GDispatcher:SetDefenseReactivityHigh()
   A2GDispatcher:SetDefaultEngageLimit(3)
-  A2GDispatcher:SetDefenseRadius( 400000 )
+  A2GDispatcher:SetDefenseRadius( 100000 )
 
   A2GDispatcher:SetCommandCenter(RedCommand_AA)
   A2GDispatcher:SetDefaultTakeoffInAir(  )
