@@ -27,6 +27,7 @@ _STATE["deadgroups"] = {}
 local INIT = true
 local ENABLE_RED_AIR = true
 local DEBUG_IADS = false
+
 if MISSION_VERSION == nil  then
   MISSION_VERSION = ""
 end
@@ -280,13 +281,14 @@ redIADS = SkynetIADS:create('SYRIA')
 
 commandCenter1 = StaticObject.getByName('RED-HQ-2')
 redIADS:addCommandCenter(commandCenter1)
-redIADS:setUpdateInterval(15)
+redIADS:setUpdateInterval(10)
 redIADS:addEarlyWarningRadarsByPrefix('EWR')
-redIADS:addEarlyWarningRadarsByPrefix("redAWACS")
+--redIADS:addEarlyWarningRadarsByPrefix("redAWACS")
 redIADS:addSAMSitesByPrefix('SAM')
 redIADS:getSAMSites():setEngagementZone(SkynetIADSAbstractRadarElement.GO_LIVE_WHEN_IN_SEARCH_RANGE):setGoLiveRangeInPercent(80)
 redIADS:getSAMSitesByPrefix("SA-10"):setActAsEW(true)
 redIADS:setupSAMSitesAndThenActivate()
+-- redIADS:activate()
 
 SPAWN:New("red-recce")
   :InitLimit(1, 50)
@@ -435,7 +437,7 @@ blue_recon.InitBlueReconGroup(BLUECC)
 blue_menus.Init()
 red_menus.Init()
 
-RedSamRepair = SCHEDULER:New( nil, utils.attemptSamRepair, {}, 25*60, 15*60, 0.25 )
+RedSamRepair = SCHEDULER:New( nil, utils.attemptSamRepair, {}, 25*60, 10*60, 0.25 )
 -- BaseCapAttempt = SCHEDULER:New( nil, utils.attemptBaseCap, {}, 10*60, 30*60, 0.25 )
 
 if DEBUG_IADS then
