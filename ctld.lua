@@ -240,6 +240,36 @@ ctld.transportPilotNames = {
     "helicargo24",
     "helicargo25",
 
+    "Hatay-Huey-1",
+    "Hatay-Huey-2",
+    "Hatay-Huey-3",
+    "Hatay-Huey-4",
+
+    "Aleppo-Huey-1",
+    "Aleppo-Huey-2",
+    "Aleppo-Huey-3",
+    "Aleppo-Huey-4",
+
+    "Abu al-Duhur-Huey-1",
+    "Abu al-Duhur-Huey-2",
+    "Abu al-Duhur-Huey-3",
+    "Abu al-Duhur-Huey-4",
+
+    "Hama-Huey-1",
+    "Hama-Huey-2",
+    "Hama-Huey-3",
+    "Hama-Huey-4",
+
+    "Bassel Al-Assad-Huey-1",
+    "Bassel Al-Assad-Huey-2",
+    "Bassel Al-Assad-Huey-3",
+    "Bassel Al-Assad-Huey-4",
+
+    "Beirut-Rafic Hariri-Huey-1",
+    "Beirut-Rafic Hariri-Huey-2",
+    "Beirut-Rafic Hariri-Huey-3",
+    "Beirut-Rafic Hariri-Huey-4",
+
     "Aleppo-Hercules-1",
     "Incirlik-Hercules-1",
     "Hatay-Hercules-1",
