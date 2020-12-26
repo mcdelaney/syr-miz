@@ -375,6 +375,11 @@ local function restoreCtldUnits(_STATE, ctld_config)
           ctld.JTACAutoLase(_spawnedGroup:getName(), _code)
       end
 
+      if data.name == 'm 818' then
+        local key = "M818_Index"
+        init_ctld_units(ctld_config.unit_config["M818 Transport"], coords2D, country, ctld_unitIndex, key)
+      end
+
       if data.name == 'ammo' then
           local key = "M818_Index"
           init_ctld_units(ctld_config.unit_config["M818 Transport"], coords2D, country, ctld_unitIndex, key)
