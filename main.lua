@@ -24,6 +24,8 @@ _STATE["dead"] = {}
 _STATE["marks"] = {}
 _STATE["repairable"] = {}
 _STATE["deadgroups"] = {}
+_STATE["fobs"] = {}
+
 local INIT = true
 local ENABLE_RED_AIR = true
 local DEBUG_IADS = false
