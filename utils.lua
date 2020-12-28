@@ -351,7 +351,7 @@ local function restoreCtldUnits(_STATE, ctld_config)
       local coords2D = { x = data.pos.x, y = data.pos.z}
       local country = 2   --USA
 
-      if data.name.lower() == 'mlrs' then
+      if data.name == 'mlrs' then
           local key = "M270_Index"
           init_ctld_units(ctld_config.unit_config["MLRS M270"], coords2D, country, ctld_unitIndex, key)
       end
@@ -375,23 +375,23 @@ local function restoreCtldUnits(_STATE, ctld_config)
           ctld.JTACAutoLase(_spawnedGroup:getName(), _code)
       end
 
-      if data.name.lower() == 'm 818' then
+      if data.name == 'm 818' then
         local key = "M818_Index"
         init_ctld_units(ctld_config.unit_config["M818 Transport"], coords2D, country, ctld_unitIndex, key)
       end
 
 
-      if data.name.lower() == 'm818' then
+      if data.name == 'm818' then
         local key = "M818_Index"
         init_ctld_units(ctld_config.unit_config["M818 Transport"], coords2D, country, ctld_unitIndex, key)
       end
 
-      if data.name.lower() == 'ammo' then
+      if data.name == 'ammo' then
           local key = "M818_Index"
           init_ctld_units(ctld_config.unit_config["M818 Transport"], coords2D, country, ctld_unitIndex, key)
       end
 
-      if data.name.lower() == 'stinger' then
+      if data.name == 'stinger' then
         local key = "Stinger_Index"
         init_ctld_units(ctld_config.unit_config["Stinger"], coords2D, country, ctld_unitIndex, key)
       end
