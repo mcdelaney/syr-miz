@@ -348,6 +348,8 @@ local function restoreCtldUnits(_STATE, ctld_config)
   local ctld_unitIndex = ctld_config.unit_index
   for idx, data in ipairs(_STATE["ctld_units"]) do
 
+      log("Restoring CTLD unit: "..data.name)
+
       local coords2D = { x = data.pos.x, y = data.pos.z}
       local country = 2   --USA
 
@@ -380,7 +382,6 @@ local function restoreCtldUnits(_STATE, ctld_config)
         init_ctld_units(ctld_config.unit_config["M818 Transport"], coords2D, country, ctld_unitIndex, key)
       end
 
-
       if data.name == 'm818' then
         local key = "M818_Index"
         init_ctld_units(ctld_config.unit_config["M818 Transport"], coords2D, country, ctld_unitIndex, key)
@@ -409,6 +410,11 @@ local function restoreCtldUnits(_STATE, ctld_config)
       if data.name == 'avenger' then
           local key = "Avenger_Index"
           init_ctld_units(ctld_config.unit_config["M1097 Avenger"], coords2D, country, ctld_unitIndex, key)
+      end
+
+      if data.name == 'm1097 avenger' then
+        local key = "Avenger_Index"
+        init_ctld_units(ctld_config.unit_config["M1097 Avenger"], coords2D, country, ctld_unitIndex, key)
       end
 
       if data.name == 'chaparral' then
