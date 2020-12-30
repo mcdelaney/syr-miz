@@ -452,7 +452,8 @@ airbossCVN73:SetWelcomePlayers(false)
 airbossCVN73:AddRecoveryWindow("2:30", "22:00", 1)
 airbossCVN73:SetTACAN(73, "X", "TRK")
 airbossCVN73:SetICLS(11, "TRK")
-airbossCVN73:SetAutoSave(lfs.writedir() .."Scripts\\syr-miz\\traps", "CVN-73.csv")
+airbossCVN73:SetAutoSave(lfs.writedir() .."Scripts\\syr-miz\\traps", "summary.csv")
+airbossCVN73:SetTrapSheet(lfs.writedir() .."Scripts\\syr-miz\\traps")
 airbossCVN73:Start()
 
 
