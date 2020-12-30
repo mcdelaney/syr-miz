@@ -101,7 +101,7 @@ local _NumAirbaseDefenders = 1
 local airbossCVN73 = AIRBOSS:New("CVN-73", "CVN-73")
 airbossCVN73:AddRecoveryWindow("8:30", "22:00", 1)
 
-airbossCVN73:SetAutoSave("Scripts/syr-miz/traps/", "CVN-73")
+airbossCVN73:SetAutoSave(lfs.writedir() .."Scripts\\syr-miz\\traps", "CVN-73")
 airbossCVN73:Start()
 
 
