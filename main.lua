@@ -448,7 +448,8 @@ RedSamRepair = SCHEDULER:New( nil, utils.attemptSamRepair, {}, 25*60, 10*60, 0.2
 -- "CVN-71", "Stennis"
 local airbossCVN73 = AIRBOSS:New("CVN-73", "CVN-73")
 airbossCVN73:AddRecoveryWindow("2:30", "22:00", 1)
-
+airbossCVN73:SetTACAN(73, "X", "TRK")
+airbossCVN73:SetICLS(11, "TRK")
 airbossCVN73:SetAutoSave(lfs.writedir() .."Scripts\\syr-miz\\traps", "CVN-73")
 airbossCVN73:Start()
 
