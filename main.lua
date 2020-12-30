@@ -455,6 +455,7 @@ airbossCVN73:SetICLS(11, "TRK")
 airbossCVN73:SetAutoSave(lfs.writedir() .."Scripts\\syr-miz\\traps", "CVN-73.csv")
 airbossCVN73:Start()
 
+
 if DEBUG_IADS then
   local iadsDebug = redIADS:getDebugSettings()
   iadsDebug.IADSStatus = true
