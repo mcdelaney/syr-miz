@@ -96,13 +96,6 @@ ReCapBases = {
 SceneryTargets = {"damascus-target-1", "damascus-target-2", "damascus-target-3"}
 local _NumAirbaseDefenders = 1
 
--- AIRBOSS
--- "CVN-71", "Stennis"
-local airbossCVN73 = AIRBOSS:New("CVN-73", "CVN-73")
-airbossCVN73:AddRecoveryWindow("8:30", "22:00", 1)
-
-airbossCVN73:SetAutoSave(lfs.writedir() .."Scripts\\syr-miz\\traps", "CVN-73")
-airbossCVN73:Start()
 
 
 local function setBaseRed(baseName, init_ground)
@@ -449,6 +442,15 @@ red_menus.Init()
 
 RedSamRepair = SCHEDULER:New( nil, utils.attemptSamRepair, {}, 25*60, 10*60, 0.25 )
 -- BaseCapAttempt = SCHEDULER:New( nil, utils.attemptBaseCap, {}, 10*60, 30*60, 0.25 )
+
+
+-- AIRBOSS
+-- "CVN-71", "Stennis"
+local airbossCVN73 = AIRBOSS:New("CVN-73", "CVN-73")
+airbossCVN73:AddRecoveryWindow("2:30", "22:00", 1)
+
+airbossCVN73:SetAutoSave(lfs.writedir() .."Scripts\\syr-miz\\traps", "CVN-73")
+airbossCVN73:Start()
 
 if DEBUG_IADS then
   local iadsDebug = redIADS:getDebugSettings()
