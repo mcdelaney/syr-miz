@@ -450,7 +450,7 @@ local airbossCVN73 = AIRBOSS:New("CVN-73", "CVN-73")
 airbossCVN73:AddRecoveryWindow("2:30", "22:00", 1)
 airbossCVN73:SetTACAN(73, "X", "TRK")
 airbossCVN73:SetICLS(11, "TRK")
-airbossCVN73:SetAutoSave(lfs.writedir() .."Scripts\\syr-miz\\traps", "CVN-73")
+airbossCVN73:SetAutoSave(lfs.writedir() .."Scripts\\syr-miz\\traps", "CVN-73.csv")
 airbossCVN73:Start()
 
 if DEBUG_IADS then
