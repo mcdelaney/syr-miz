@@ -456,11 +456,12 @@ airbossCVN73:SetAutoSave(lfs.writedir() .."Scripts\\syr-miz\\traps", "summary.cs
 airbossCVN73:SetTrapSheet(lfs.writedir() .."Scripts\\syr-miz\\trapsheets")
 airbossCVN73:Start()
 
+
 local airbossCVN75 = AIRBOSS:New("CVN-75", "CVN-75")
 airbossCVN75:SetDefaultPlayerSkill("TOPGUN Graduate")
 airbossCVN75:SetWelcomePlayers(false)
 airbossCVN75:AddRecoveryWindow("2:30", "22:00", 1)
-airbossCVN75:SetTACAN(76, "X", "TRZ")
+airbossCVN75:SetTACAN(75, "X", "TRZ")
 airbossCVN75:SetICLS(12, "TRK")
 airbossCVN75:SetAutoSave(lfs.writedir() .."Scripts\\syr-miz\\traps", "summary.csv")
 airbossCVN75:SetTrapSheet(lfs.writedir() .."Scripts\\syr-miz\\trapsheets")
