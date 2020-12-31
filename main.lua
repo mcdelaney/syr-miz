@@ -456,7 +456,7 @@ airbossCVN73:SetAutoSave(lfs.writedir() .."Scripts\\syr-miz\\traps", "summary.cs
 airbossCVN73:SetTrapSheet(lfs.writedir() .."Scripts\\syr-miz\\trapsheets")
 airbossCVN73:Start()
 
-local airbossCVN73 = AIRBOSS:New("CVN-76", "CVN-76")
+local airbossCVN73 = AIRBOSS:New("CVN-75", "CVN-75")
 airbossCVN76:SetDefaultPlayerSkill("TOPGUN Graduate")
 airbossCVN76:SetWelcomePlayers(false)
 airbossCVN76:AddRecoveryWindow("2:30", "22:00", 1)
