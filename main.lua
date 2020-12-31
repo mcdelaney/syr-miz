@@ -456,6 +456,16 @@ airbossCVN73:SetAutoSave(lfs.writedir() .."Scripts\\syr-miz\\traps", "summary.cs
 airbossCVN73:SetTrapSheet(lfs.writedir() .."Scripts\\syr-miz\\trapsheets")
 airbossCVN73:Start()
 
+local airbossCVN73 = AIRBOSS:New("CVN-76", "CVN-76")
+airbossCVN76:SetDefaultPlayerSkill("TOPGUN Graduate")
+airbossCVN76:SetWelcomePlayers(false)
+airbossCVN76:AddRecoveryWindow("2:30", "22:00", 1)
+airbossCVN76:SetTACAN(76, "X", "TRZ")
+airbossCVN76:SetICLS(12, "TRK")
+airbossCVN76:SetAutoSave(lfs.writedir() .."Scripts\\syr-miz\\traps", "summary.csv")
+airbossCVN76:SetTrapSheet(lfs.writedir() .."Scripts\\syr-miz\\trapsheets")
+airbossCVN76:Start()
+
 
 if DEBUG_IADS then
   local iadsDebug = redIADS:getDebugSettings()
