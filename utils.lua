@@ -344,7 +344,7 @@ local function removeUnit (unitName, smoke)
 end
 
 
-local function restoreCtldUnits(_STATE, ctld_config)
+local function restoreCtldUnits(_STATE, ctld_config, include_ammo_and_avenger)
   local ctld_unitIndex = ctld_config.unit_index
   for idx, data in ipairs(_STATE["ctld_units"]) do
 
@@ -377,10 +377,12 @@ local function restoreCtldUnits(_STATE, ctld_config)
           ctld.JTACAutoLase(_spawnedGroup:getName(), _code)
       end
 
-      if startswith(data.name, 'm 818') then
+      
+      if include_ammo_and_avenger and startswith(data.name, 'm 818') then
         local key = "M818_Index"
         init_ctld_units(ctld_config.unit_config["M818 Transport"], coords2D, country, ctld_unitIndex, key)
       end
+    
 
       if data.name == 'm818' then
         local key = "M818_Index"
@@ -412,7 +414,7 @@ local function restoreCtldUnits(_STATE, ctld_config)
           init_ctld_units(ctld_config.unit_config["M1097 Avenger"], coords2D, country, ctld_unitIndex, key)
       end
 
-      if startswith(data.name, 'm1097') then
+      if include_ammo_and_avenger and startswith(data.name, 'm1097') then
         local key = "Avenger_Index"
         init_ctld_units(ctld_config.unit_config["M1097 Avenger"], coords2D, country, ctld_unitIndex, key)
       end
