@@ -436,9 +436,9 @@ ctld.spawnableCrates = {
 
         { weight = 100, desc = "2B11 Mortar", unit = "2B11 mortar" },
 
-        { weight = 255, desc = "M-109", unit = "M-109", side = 2, cratesRequired = 2 },
+        { weight = 255, desc = "M-109", unit = "M-109", side = 2, cratesRequired = 1 },
 
-        { weight = 253, desc = "M-818 Ammo Truck", unit = "M 818", side = 2, cratesRequired = 2 },
+        { weight = 253, desc = "M-818 Ammo Truck", unit = "M 818", side = 2, cratesRequired = 1 },
 
         { weight = 800, desc = "FOB Crate - Small", unit = "FOB-SMALL" }, -- Builds a FOB! - requires 3 * ctld.cratesRequiredForFOB
     },
