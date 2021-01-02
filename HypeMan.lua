@@ -1,4 +1,4 @@
--- Instructions: include HypeMan in a mission either with a DO SCRIPT FILE, or a 
+-- Instructions: include HypeMan in a mission either with a DO SCRIPT FILE, or a
 -- DO SCRIPT containing the following:
 -- assert(loadfile("C:/HypeMan/HypeMan.lua"))()
 --
@@ -16,7 +16,7 @@ MODULE_FOLDER = lfs.writedir()..[[Scripts\syr-miz\]]
 package.path = MODULE_FOLDER .. "?.lua;" .. package.path
 
 local jsonlib = lfs.writedir() .. "Scripts\\syr-miz\\json.lua"
-local json = loadfile(jsonlib)()
+local JSON = loadfile(jsonlib)()
 
 
 HypeMan = {}
@@ -61,7 +61,7 @@ HypeManHitTable = {}
 
 HypeMan.sendBotTable = function(tbl)
 	-- env.info(msg)  -- for debugging
-	local tbl_json_txt = JSON:encode(tbl)   
+	local tbl_json_txt = JSON:encode(tbl)
 	socket.try(HypeMan.UDPSendSocket:sendto(tbl_json_txt, '127.0.0.1', 10081))
 	-- msg = nil  -- setting to nil in attempt to debug why message queue seems to grow
 end
@@ -78,10 +78,10 @@ end
 
 -- Mission Start announcement done by a function right in the script as the S_EVENT_MISSION_START event is
 -- nearly impossible to catch in a script as it gets sent the moment the mission is unpaused
-if HypeManAnnounceMissionStart then		
-	local theDate = mist.getDateString(true, true)	
-	local theTime = mist.getClockString()	
-	local theatre = env.mission.theatre	
+if HypeManAnnounceMissionStart then
+	local theDate = mist.getDateString(true, true)
+	local theTime = mist.getClockString()
+	local theatre = env.mission.theatre
 	HypeMan.sendBotMessage('$SERVERNAME - Mission restarted.  TrapBot standing by.  Local mission time is ' .. theTime .. ', ' .. theDate)
 end
 
@@ -89,126 +89,126 @@ local function HypeManGetName(initiator)
 	if initiator == nil then
 		return false, nil;
 	end
-	
+
 	local statusflag, name = pcall(Unit.getPlayerName, initiator)
-	
+
 	if statusflag == false then
 		return false, nil;
 	end
-	
+
 	return true, name;
 end
 
-local function HypeManTakeOffHandler(event) 
+local function HypeManTakeOffHandler(event)
 
 	-- TODO move this check below the timing code
 	if HypeManAnnounceTakeoffs ~= true then
 		return true
 	end
-	
-    if event.id == world.event.S_EVENT_TAKEOFF then 
-	
+
+    if event.id == world.event.S_EVENT_TAKEOFF then
+
 		-- mist.utils.tableShow(event)
-		
+
 		--local name = Unit.getPlayerName(event.initiator)
 		local statusflag, name = HypeManGetName(event.initiator)
-		
+
 		if statusflag == false then
 			return
 		end
-		
+
 		-- for debugging get the AI plane names
 		if HypeManAnnounceAIPlanes and name == nil then
 			name = Unit.getName(event.initiator)
 		end
-		
+
 		if name == nil then
 			return
 		end
-		
+
 		--   env.info(_event.initiator:getPlayerName().."HIT! ".._event.target:getName().." with ".._event.weapon:getTypeName())
-		
+
 		local airfieldName = Airbase.getName(event.place)
-		
+
 		if airfieldName == nil then
 			airfieldName = 'Unknown Airstrip'
 		end
-	
-		HypeMan.sendBotMessage(name .. " took off from " .. airfieldName .. " in a " .. Unit.getTypeName(event.initiator))
-		
-		HypeManTakeOffTime[Unit.getID(event.initiator)]=timer.getAbsTime()
-    end 
-end 
 
-local function HypeManLandingHandler(event) 
-    if event.id == world.event.S_EVENT_LAND then 
-	
+		HypeMan.sendBotMessage(name .. " took off from " .. airfieldName .. " in a " .. Unit.getTypeName(event.initiator))
+
+		HypeManTakeOffTime[Unit.getID(event.initiator)]=timer.getAbsTime()
+    end
+end
+
+local function HypeManLandingHandler(event)
+    if event.id == world.event.S_EVENT_LAND then
+
 		-- mist.utils.tableShow(event)
-		
+
 		-- local name = Unit.getPlayerName(event.initiator)
 		local statusflag, name = HypeManGetName(event.initiator)
-		
+
 		if statusflag == false then
 			return
 		end
-		
+
 		-- for debugging get the AI plane names
-		if HypeManAnnounceAIPlanes and name == nil then		
+		if HypeManAnnounceAIPlanes and name == nil then
 			name = Unit.getName(event.initiator)
 		end
-		
+
 		if name == nil then
 			return
 		end
-				
+
 		--   env.info(_event.initiator:getPlayerName().."HIT! ".._event.target:getName().." with ".._event.weapon:getTypeName())
-		
+
 		local airfieldName = Airbase.getName(event.place)
-		
+
 		if airfieldName == nil then
 			airfieldName = 'Unknown Airfield'
 		end
-		
+
 		local t = HypeManTakeOffTime[Unit.getID(event.initiator)]
-		
+
 		HypeManTakeOffTime[Unit.getID(event.initiator)] = nil
-		
+
 		if t == nil then
 			-- HypeMan.sendBotMessage("local t = TakeOffTime[Unit.getID(event.initiator)]  was nil... wtf")
 			HypeMan.sendBotMessage(name .. " landed their " ..  Unit.getTypeName(event.initiator) .. " at " .. airfieldName)
 			return
 		end
-			
+
 		local cur = timer.getAbsTime()
-		
+
 		local tduration = cur - t
-		local theTime = mist.getClockString(tduration)	
-		
+		local theTime = mist.getClockString(tduration)
+
 		if tduration > HypeManMinimumFlightTime then
 			HypeMan.sendBotMessage(name .. " landed their " ..  Unit.getTypeName(event.initiator) .. " at " .. airfieldName .. ". Total flight time was " .. theTime)
 		end
-    end 
-end 
+    end
+end
 
 local function HypeManMissionEndHandler(event)
 	if event.id == world.event.S_EVENT_MISSION_END then
-		local theDate = mist.getDateString(true, true)	
+		local theDate = mist.getDateString(true, true)
 		local theTime = mist.getClockString()
 		-- HypeMan.sendBotMessage('Server shutting down, Hypeman going watch some porn and hit the hay.  Local time is ' .. theTime .. ', ' .. theDate)
-		
+
 		local timeInSec = mist.utils.round(timer.getAbsTime(), 0)
-				
-		-- local theTimeString = mist.getClockString(timeInSec)		
+
+		-- local theTimeString = mist.getClockString(timeInSec)
 		local DHMS =  mist.time.getDHMS(mist.time.relativeToStart(timeInSec))
-		local dayStr 
+		local dayStr
 		if DHMS.d == 0 then
 			dayStr = ''  -- leave days portion blank
 		else
-			dayStr = DHMS.d .. ' days '			
+			dayStr = DHMS.d .. ' days '
 		end
-		
-		local theTimeString  = dayStr .. DHMS.h .. ' hours and ' .. DHMS.m .. ' minutes.'		
-		
+
+		local theTimeString  = dayStr .. DHMS.h .. ' hours and ' .. DHMS.m .. ' minutes.'
+
 		HypeMan.sendBotMessage('$SERVERNAME shutting down, mission ran for ' .. theTimeString);
 	end
 end
@@ -216,79 +216,79 @@ end
 local function HypeManBirthHandler(event)
 	if event.id == world.event.S_EVENT_BIRTH then
 		-- local name = Unit.getPlayerName(event.initiator)
-		
+
 		local statusflag, name = HypeManGetName(event.initiator)
-		
+
 		if statusflag == false then
 			return
 		end
-		
+
 		if name == nil then
 			name = Unit.getName(event.initiator)
 		end
-		
+
 		HypeManTakeOffTime[Unit.getID(event.initiator)]=nil
-		
+
 		-- HypeMan.sendBotMessage('S_EVENT_BIRTH UNIT.name = ' .. name)
 	end
 end
 
 local function HypeManPilotDeadHandler(event)
 	if event.id == world.event.S_EVENT_PILOT_DEAD then
-		
+
 		-- local name = Unit.getPlayerName(event.initiator)
 		local statusflag, name = HypeManGetName(event.initiator)
-		
+
 		if statusflag == false then
 			return
 		end
-		
+
 		-- for debugging get the AI plane names
 		if HypeManAnnounceAIPlanes and name == nil then
 			name = Unit.getName(event.initiator)
 		end
-		
+
 		if name == nil then
 			return
 		end
-		
+
 		-- if name == nil then
 --			name = Unit.getName(event.initiator)
 		-- end
-		
+
 		local unitid = Unit.getID(event.initiator)
-		
+
 		if unitid ~= nil and event.iniator ~= nil then
 			HypeManTakeOffTime[Unit.getID(event.initiator)]=nil
 		end
-		
-		HypeMan.sendBotMessage('RIP ' .. name)		
+
+		HypeMan.sendBotMessage('RIP ' .. name)
 	end
-end 
-	
-	
+end
+
+
 local function HypeManPilotEjectHandler(event)
 	if event.id == world.event.S_EVENT_EJECTION then
-	
+
 		-- local name = Unit.getPlayerName(event.initiator)
 		local statusflag, name = HypeManGetName(event.initiator)
-		
+
 		if statusflag == false then
 			return
 		end
-		
+
 		-- for debugging get the AI plane names
 		if HypeManAnnounceAIPlanes and name == nil then
 			name = Unit.getName(event.initiator)
 		end
-		
-		if name == nil then			
+
+		if name == nil then
 			return
 		end
-		
-		HypeManTakeOffTime[Unit.getID(event.initiator)]=nil		
-		
-		HypeMan.sendBotMessage(name .. ' has ejected from their ' ..  Unit.getTypeName(event.initiator))		
+
+		HypeManTakeOffTime[Unit.getID(event.initiator)]=nil
+
+		HypeMan.sendBotMessage(name .. ' has ejected from their ' ..  Unit.getTypeName(event.initiator))
 	end
 end
 
@@ -296,7 +296,7 @@ local function HypeManRefuelingHandler(event)
 	if event.id == world.event.	S_EVENT_REFUELING then
 
 		local statusflag, name = HypeManGetName(event.initiator)
-		
+
 		if statusflag == false then
 			return
 		end
@@ -304,30 +304,30 @@ local function HypeManRefuelingHandler(event)
 		if HypeManAnnounceAIPlanes and name == nil then
 			name = Unit.getName(event.initiator)
 		end
-	
-		if name == nil then		
+
+		if name == nil then
 			return
-		end	
-		
-		
+		end
+
+
 		local t = HypeManRefuelingTable[Unit.getID(event.initiator)]
-		
+
 		local sendMessage = false
 		if t == nil then
-			sendMessage = true			
-		else			
-			local cur = timer.getAbsTime()			
+			sendMessage = true
+		else
+			local cur = timer.getAbsTime()
 			local tduration = cur - t
-	
+
 			if tduration < 600 then
 				sendMessage = false
 			else
 				sendMessage = true
-			end		
+			end
 		end
-		
+
 		HypeManRefuelingTable[Unit.getID(event.initiator)] = cur
-		
+
 	end
 end
 
@@ -346,7 +346,7 @@ mist.addEventHandler(HypeManBirthHandler)
 --	mist.addEventHandler(HypeManHitHandler)
 --	mist.addEventHandler(HypeManDeadHandler)
 --end
-	
+
 if HypeManAnnounceTakeoffs then
 	mist.addEventHandler(HypeManTakeOffHandler)
 end
@@ -354,11 +354,11 @@ end
 if HypeManAnnounceLandings then
 	mist.addEventHandler(HypeManLandingHandler)
 end
-	
+
 if HypeManAnnouncePilotEject then
 	mist.addEventHandler(HypeManPilotEjectHandler)
 end
-	
+
 if HypeManAnnouncePilotDead then
 	mist.addEventHandler(HypeManPilotDeadHandler)
 end
