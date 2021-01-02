@@ -260,7 +260,7 @@ for _, base in pairs(ContestedBases) do
 end
 
 utils.log("Spawning CTLD units from state")
-utils.restoreCtldUnits(_STATE, ctld_config, false)
+utils.restoreCtldUnits(_STATE, ctld_config, true)
 
 utils.log("Initializing blue awacs units..")
 SPAWN:New("awacs-Carrier")
