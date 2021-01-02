@@ -7,7 +7,17 @@
 
 -- HypeMan requires JSON.lua from here http://regex.info/blog/lua/json in C:\HypeMan
 -- TODO - can this be loaded with loadfile()?
-JSON = (loadfile "C:/Users/mcdel/hypeman/JSON.lua")() -- one-time load of the routines
+
+-- JSON = (loadfile "C:/Users/mcdel/hypeman/JSON.lua")() -- one-time load of the routines
+
+local io = require("io")
+local lfs = require("lfs")
+MODULE_FOLDER = lfs.writedir()..[[Scripts\syr-miz\]]
+package.path = MODULE_FOLDER .. "?.lua;" .. package.path
+
+local jsonlib = lfs.writedir() .. "Scripts\\syr-miz\\json.lua"
+local json = loadfile(jsonlib)()
+
 
 HypeMan = {}
 -- Configuration Options
