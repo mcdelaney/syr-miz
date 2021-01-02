@@ -256,9 +256,9 @@ ctld.transportPilotNames = {
     "Abu al-Duhur-Huey-4",
 
     "Hama-Huey-1",
-    "Hama-Huey-2",
-    "Hama-Huey-3",
-    "Hama-Huey-4",
+    "Hama-Huey-2-1",
+    "Hama-Huey-3-1",
+    "Hama-Huey-4-1",
 
     "Bassel Al-Assad-Huey-1",
     "Bassel Al-Assad-Huey-2",
