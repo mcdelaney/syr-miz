@@ -447,23 +447,25 @@ RedSamRepair = SCHEDULER:New( nil, utils.attemptSamRepair, {}, 25*60, 10*60, 0.2
 -- AIRBOSS
 -- "CVN-71", "Stennis"
 local airbossCVN73 = AIRBOSS:New("CVN-73", "CVN-73")
+airbossCVN73:Load(lfs.writedir() .."Scripts\\syr-miz\\traps", "cvn-73")
 airbossCVN73:SetDefaultPlayerSkill("TOPGUN Graduate")
 airbossCVN73:SetWelcomePlayers(false)
 airbossCVN73:AddRecoveryWindow("2:30", "22:00", 1)
 airbossCVN73:SetTACAN(73, "X", "TRK")
 airbossCVN73:SetICLS(11, "TRK")
-airbossCVN73:SetAutoSave(lfs.writedir() .."Scripts\\syr-miz\\traps", "summary.csv")
+airbossCVN73:SetAutoSave(lfs.writedir() .."Scripts\\syr-miz\\traps", "cvn-73")
 airbossCVN73:SetTrapSheet(lfs.writedir() .."Scripts\\syr-miz\\trapsheets")
 airbossCVN73:Start()
 
 
 local airbossCVN75 = AIRBOSS:New("CVN-75", "CVN-75")
+airbossCVN75:Load(lfs.writedir() .."Scripts\\syr-miz\\traps", "cvn-75")
 airbossCVN75:SetDefaultPlayerSkill("TOPGUN Graduate")
 airbossCVN75:SetWelcomePlayers(false)
 airbossCVN75:AddRecoveryWindow("2:30", "22:00", 1)
 airbossCVN75:SetTACAN(75, "X", "TRZ")
 airbossCVN75:SetICLS(12, "TRZ")
-airbossCVN75:SetAutoSave(lfs.writedir() .."Scripts\\syr-miz\\traps", "summary.csv")
+airbossCVN75:SetAutoSave(lfs.writedir() .."Scripts\\syr-miz\\traps", "cvn-75")
 airbossCVN75:SetTrapSheet(lfs.writedir() .."Scripts\\syr-miz\\trapsheets")
 airbossCVN75:Start()
 
