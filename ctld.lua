@@ -256,14 +256,24 @@ ctld.transportPilotNames = {
     "Abu al-Duhur-Huey-4",
 
     "Hama-Huey-1",
-    "Hama-Huey-2-1",
-    "Hama-Huey-3-1",
-    "Hama-Huey-4-1",
+    "Hama-Huey-2",
+    "Hama-Huey-3",
+    "Hama-Huey-4",
 
     "Bassel Al-Assad-Huey-1",
     "Bassel Al-Assad-Huey-2",
     "Bassel Al-Assad-Huey-3",
     "Bassel Al-Assad-Huey-4",
+
+    "Incirlik-Huey-1",
+    "Incirlik-Huey-2",
+    "Incirlik-Huey-3",
+    "Incirlik-Huey-4",
+
+    "Ramat David-Huey-1",
+    "Ramat David-Huey-2",
+    "Ramat David-Huey-3",
+    "Ramat David-Huey-4",
 
     "Beirut-Rafic Hariri-Huey-1",
     "Beirut-Rafic Hariri-Huey-2",
@@ -276,6 +286,7 @@ ctld.transportPilotNames = {
     "Bassel Al-Assad-Hercules-1",
     "Ramat David-Hercules-1",
     "Beirut-Rafic Hariri-Hercules-1",
+    "Beirut-Rafic Hariri-Hercules-2",
 }
 
 -- *************** Optional Extractable GROUPS *****************
