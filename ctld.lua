@@ -281,6 +281,7 @@ ctld.transportPilotNames = {
     "Beirut-Rafic Hariri-Huey-4",
 
     "Aleppo-Hercules-1",
+    "Abu al-Duhur-Hercules-1",
     "Incirlik-Hercules-1",
     "Hatay-Hercules-1",
     "Bassel Al-Assad-Hercules-1",
