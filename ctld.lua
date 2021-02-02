@@ -288,6 +288,11 @@ ctld.transportPilotNames = {
     "Ramat David-Hercules-1",
     "Beirut-Rafic Hariri-Hercules-1",
     "Beirut-Rafic Hariri-Hercules-2",
+
+    "King-Hussein-Air-College-Hercules-1",
+    "King-Hussein-Air-College-Huey-1",
+    "King-Hussein-Air-College-Huey-2",
+    "King-Hussein-Air-College-Huey-3",
 }
 
 -- *************** Optional Extractable GROUPS *****************
