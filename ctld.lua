@@ -472,6 +472,7 @@ ctld.spawnableCrates = {
         { weight = 552, desc = "HAWK Repair", unit = "HAWK Repair" , side = 2 },
         -- End of HAWK
         { weight = 400, desc = "M1097 Avenger", unit = "M1097 Avenger", side = 2, cratesRequired = 1 },
+        { weight = 800, desc = "Tunguska", unit = "2S6 Tunguska", side = 2 },
     },
 }
 
@@ -4501,7 +4502,7 @@ function ctld.dropSmokeRGB(_args)
 
         end
 
-            trigger.action.outTextForCoalition(_heli:getCoalition(), ctld.getPlayerNameOrType(_heli) .. " dropped RGB smoke!) ", 10)
+            trigger.action.outTextForCoalition(_heli:getCoalition(), ctld.getPlayerNameOrType(_heli) .. " dropped RGB smoke! ", 10)
 end
 
 function ctld.unitCanCarryVehicles(_unit)
