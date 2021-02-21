@@ -25,6 +25,7 @@ _STATE["marks"] = {}
 _STATE["repairable"] = {}
 _STATE["deadgroups"] = {}
 _STATE["fobs"] = {}
+_STATE["hercules_drops"] = {}
 
 local INIT = true
 local ENABLE_RED_AIR = true
@@ -597,6 +598,7 @@ function EH1:OnEventDead(EventData)
     utils.saveTable(_STATE, BASE_FILE)
     return
   end
+
 
   if EventData.IniUnit and EventData.IniObjectCategory==Object.Category.SCENERY then
     if EventData.IniUnitName ~= nil then
