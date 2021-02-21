@@ -96,8 +96,16 @@ ctld_config.unit_config = {
 		["name"] = "CTLD_IFV #",
 		["playerCanDrive"] = false,
 		["skill"] = "Excellent",
-	}
+	},
+	["Tunguska"] = {
+		["type"] = "2S6 Tunguska",
+		["name"] = "CTLD_Tunguska #",
+		["playerCanDrive"] = true,
+		["uncontrollable"] = false,
+		["skill"] = "Excellent",
+	}	
 }
+
 
 
 ctld.addCallback(function(_args)
