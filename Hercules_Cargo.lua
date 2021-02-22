@@ -319,6 +319,7 @@ function Hercules_Cargo.Cargo_SpawnGroup(Cargo_Drop_Position, Cargo_Type_name, C
 		["name"] = "Cargo Group "..CargoUnitID,
 		["start_time"] = 0,
 	}
+	table.insert(_STATE['hercules_drops'], Herc_Cargo_Spawn)
 	coalition.addGroup(Cargo_Country, Group.Category.GROUND, Herc_Cargo_Spawn)
 end
 
