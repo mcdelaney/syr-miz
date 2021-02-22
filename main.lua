@@ -6,7 +6,7 @@ package.path = MODULE_FOLDER .. "?.lua;" .. package.path
 local slotblock = require("slotblock")
 local ctld_config = require("ctld_config")
 local logging = require("logging")
-local utils = require("utils")
+local miz_utils = require("utils")
 local blue_ground = require("blue_ground")
 local red_menus = require("red_menus")
 local blue_menus = require("blue_menus")
@@ -99,11 +99,11 @@ local _NumAirbaseDefenders = 1
 
 
 local function setBaseRed(baseName, init_ground)
-  utils.log("Setting "..baseName.." as red...")
+  miz_utils.log("Setting "..baseName.." as red...")
   local logUnitName = "logistic-"..baseName
   local logZone = 'logizone-'..baseName
   ctld.deactivatePickupZone(logZone)
-  utils.destroyIfExists(logUnitName, true)
+  miz_utils.destroyIfExists(logUnitName, true)
 
   slotblock.configureSlotsForBase(baseName, "red")
   pcall(function()
@@ -127,7 +127,7 @@ end
 
 
 local function setBaseBlue(baseName, startup)
-  utils.log("Setting "..baseName.." as blue...")
+  miz_utils.log("Setting "..baseName.." as blue...")
   local logUnitName = "logistic-"..baseName
   local logZone = 'logizone-'..baseName
   local logisticCoordZone = ZONE:FindByName(logZone, false)
@@ -140,7 +140,7 @@ local function setBaseBlue(baseName, startup)
     table.insert(ctld.logisticUnits, logUnitName)
     ctld.activatePickupZone(logZone)
     if logisticUnit == nil then
-      utils.log("Could not find base logistic unit")
+      miz_utils.log("Could not find base logistic unit")
     end
   else
     MESSAGE:New("Trigger zone does not exist for "..logZone.."!", 5):ToAll()
@@ -184,40 +184,40 @@ SAMS["SA10sam"] = SET_GROUP:New():FilterPrefixes("SAM-SA10"):FilterActive(true):
 SAMS["EWR"] = SET_GROUP:New():FilterPrefixes("EWR"):FilterActive(true):FilterStart()
 
 
-if utils.file_exists(BASE_FILE) then
-  utils.readState(BASE_FILE)
+if miz_utils.file_exists(BASE_FILE) then
+  miz_utils.readState(BASE_FILE)
   if _STATE ~= nil then
     MESSAGE:New("State file found... restoring...", 5):ToAll()
     INIT = false
   end
 else
-  utils.log("No state file exists..")
+  miz_utils.log("No state file exists..")
 end
 
 if INIT and MISSION_VERSION == "" then
 
   for k, sam in pairs(SAMS) do
-    pcall(function(_args) utils.prune_enemies(sam, k) end)
+    pcall(function(_args) miz_utils.prune_enemies(sam, k) end)
   end
 else
   for _, unit in pairs(_STATE["dead"]) do
     local smoke = true
     if _STATE["deadgroups"] ~= nil then
       for _, group in pairs(_STATE["deadgroups"]) do
-        if utils.startswith(unit, group) then
+        if miz_utils.startswith(unit, group) then
           smoke = false
         end
       end
     end
-    utils.removeUnit(unit, true)
+    miz_utils.removeUnit(unit, true)
   end
 
-  utils.log( "Destroying previously killed scenery...")
+  miz_utils.log( "Destroying previously killed scenery...")
   for i, obj in pairs(_STATE["scenery"]) do
     if obj then
       local unit = Unit.getByName(tostring(obj.id))
       if unit then
-        utils.log("Destrying object: "..obj.id)
+        miz_utils.log("Destrying object: "..obj.id)
         unit:destroy(false)
       end
     end
@@ -259,10 +259,10 @@ for _, base in pairs(ContestedBases) do
   end
 end
 
-utils.log("Spawning CTLD units from state")
-utils.restoreCtldUnits(_STATE, ctld_config, true)
+miz_utils.log("Spawning CTLD units from state")
+miz_utils.restoreCtldUnits(_STATE, ctld_config, true)
 
-utils.log("Initializing blue awacs units..")
+miz_utils.log("Initializing blue awacs units..")
 SPAWN:New("awacs-Carrier")
   :InitLimit(1, 0)
   :InitRepeatOnLanding()
@@ -279,7 +279,7 @@ SPAWN:New("awacs-Incirlik")
 TexacoStennis = RECOVERYTANKER:New(UNIT:FindByName("CVN-71"), "Texaco")
 TexacoStennis:Start()
 
-utils.log("Iads configuration start...")
+miz_utils.log("Iads configuration start...")
 redIADS = SkynetIADS:create('SYRIA')
 
 commandCenter1 = StaticObject.getByName('RED-HQ-2')
@@ -364,7 +364,7 @@ end
 
 -- blue_ground.InitBlueGroundPlaneDeployer()
 blue_ground.InitBlueGroundHeliDeployer()
-utils.log("Restoring base ownership...")
+miz_utils.log("Restoring base ownership...")
 for _, base in pairs(ContestedBases) do
 
   if ENABLE_RED_AIR and _STATE.bases[base] == coalition.side.RED then
@@ -374,7 +374,7 @@ for _, base in pairs(ContestedBases) do
       zone = ZONE_AIRBASE:New(base, 150000):SetName(zone_name)
     end
 
-    utils.log("Creating A2A Cap group from base: "..base)
+    miz_utils.log("Creating A2A Cap group from base: "..base)
     local sqd_cap = base.."-cap"
     local cap_grp = 1
     if base == "Damascus" then
@@ -389,7 +389,7 @@ for _, base in pairs(ContestedBases) do
     A2ADispatcher:SetSquadronCapInterval( sqd_cap, cap_grp, 60*5, 60*7, 1)
     A2ADispatcher:SetSquadronCapRacetrack(sqd_cap, 5000, 10000, 90, 180, 5*60, 10*60)
 
-    utils.log("Creating A2A GCI group from base: "..base)
+    miz_utils.log("Creating A2A GCI group from base: "..base)
     local sqd_gci = base.."-gci"
     A2ADispatcher:SetSquadron( sqd_gci, base, {"su-30-gci"} )
     A2ADispatcher:SetSquadronGrouping( sqd_gci, 1 )
@@ -400,7 +400,7 @@ for _, base in pairs(ContestedBases) do
     for _, agBase in pairs(AG_BASES) do
       if agBase == base then
 
-        utils.log("Creating A2G SEAD squadron from base: "..base)
+        miz_utils.log("Creating A2G SEAD squadron from base: "..base)
         local sqd_sead = base.."-sead"
         A2GDispatcher:SetSquadron(sqd_sead, base,  { "su-34-sead-b", "jf-17-sead" }, 14 ) --"su-34-sead"
         A2GDispatcher:SetSquadronGrouping( sqd_sead, 2 )
@@ -431,7 +431,7 @@ for _, base in pairs(ContestedBases) do
       end
     end
   end
-  utils.saveTable(_STATE, BASE_FILE)
+  miz_utils.saveTable(_STATE, BASE_FILE)
 end
 BLUEHQ = GROUP:FindByName("BLUEHQ")
 BLUECC = COMMANDCENTER:New( BLUEHQ, "BLUEHQ" )
@@ -440,8 +440,8 @@ blue_recon.InitBlueReconGroup(BLUECC)
 blue_menus.Init()
 red_menus.Init()
 
-RedSamRepair = SCHEDULER:New( nil, utils.attemptSamRepair, {}, 10*60, 10*60, 0.25 )
--- BaseCapAttempt = SCHEDULER:New( nil, utils.attemptBaseCap, {}, 10*60, 30*60, 0.25 )
+RedSamRepair = SCHEDULER:New( nil, miz_utils.attemptSamRepair, {}, 10*60, 10*60, 0.25 )
+-- BaseCapAttempt = SCHEDULER:New( nil, miz_utils.attemptBaseCap, {}, 10*60, 30*60, 0.25 )
 
 
 -- AIRBOSS
@@ -483,7 +483,7 @@ if DEBUG_IADS then
   redIADS:addRadioMenu()
 end
 
-utils.log("Initializing event handlers...")
+miz_utils.log("Initializing event handlers...")
 local num_spawns = 1
 EH1 = EVENTHANDLER:New()
 
@@ -496,11 +496,11 @@ end
 
 EH1:HandleEvent(EVENTS.MarkRemoved)
 function EH1:OnEventMarkRemoved(EventData)
-  utils.log("Destroying markpoint target...")
+  miz_utils.log("Destroying markpoint target...")
   if EventData.text == "tgt" then
     EventData.MarkCoordinate:Explosion(1000)
     return
-  elseif utils.startswith(EventData.text, "test-") then
+  elseif miz_utils.startswith(EventData.text, "test-") then
     local grp = GROUP:FindByName(string.sub(EventData.text, 6))
     local unit = grp:GetFirstUnitAlive()
     env.info("Destroying unit: "..unit:GetName())
@@ -513,20 +513,20 @@ function EH1:OnEventMarkRemoved(EventData)
       stc:SpawnFromCoordinate(unitPoint)
     end
     return
-  elseif utils.startswith(EventData.text, "kill-") then
+  elseif miz_utils.startswith(EventData.text, "kill-") then
     local unit_name = string.sub(EventData.text, 6)
-    utils.destroyIfExists(unit_name)
+    miz_utils.destroyIfExists(unit_name)
     return
   elseif EventData.text == "smoke" then
     env.info("Smoking coordinate")
     EventData.MarkCoordinate:BigSmokeHuge(0.75)
     return
   elseif EventData.text == "respawn" then
-    utils.attemptSamRepair()
+    miz_utils.attemptSamRepair()
     return
-  elseif utils.startswith(EventData.text, "respawn-") then
+  elseif miz_utils.startswith(EventData.text, "respawn-") then
     local grp_name = string.sub(EventData.text, 9)
-    utils.respawnGroup(grp_name)
+    miz_utils.respawnGroup(grp_name)
     return
   end
 
@@ -569,7 +569,7 @@ function EH1:OnEventBaseCaptured(EventData)
   else
     setBaseBlue(EventData.PlaceName)
   end
-  utils.saveTable(_STATE, BASE_FILE)
+  miz_utils.saveTable(_STATE, BASE_FILE)
 end
 
 
@@ -577,7 +577,7 @@ EH1:HandleEvent(EVENTS.Dead)
 function EH1:OnEventDead(EventData)
   if EventData.IniCoalition == coalition.side.RED then
     if EventData.IniGroupName ~= nil then
-      utils.log("Marking object dead: "..EventData.IniGroupName.." - "..EventData.IniUnitName)
+      miz_utils.log("Marking object dead: "..EventData.IniGroupName.." - "..EventData.IniUnitName)
     end
     if _STATE["dead"] == nil then
       _STATE["dead"] = { EventData.IniUnitName }
@@ -589,12 +589,12 @@ function EH1:OnEventDead(EventData)
 
     if deadGroup == nil or deadGroup:CountAliveUnits() == 0 then
       -- Add to deadgroups table if not already added
-     utils.addDeadGroup(EventData.IniGroupName)
+     miz_utils.addDeadGroup(EventData.IniGroupName)
     else
-      utils.addRepairable(EventData.IniGroupName)
+      miz_utils.addRepairable(EventData.IniGroupName)
       env.info("Not removing group.."..deadGroup:GetName().." from table.. has "..deadGroup:CountAliveUnits().." remaining units...")
     end
-    utils.saveTable(_STATE, BASE_FILE)
+    miz_utils.saveTable(_STATE, BASE_FILE)
     return
   end
 
@@ -608,7 +608,7 @@ function EH1:OnEventDead(EventData)
       else
         _STATE["scenery"] = insdata
       end
-      utils.saveTable(_STATE, BASE_FILE)
+      miz_utils.saveTable(_STATE, BASE_FILE)
       return
     end
     for id, name in pairs(SceneryTargets) do
@@ -617,7 +617,7 @@ function EH1:OnEventDead(EventData)
         table.remove(SceneryTargets, id)
       end
     end
-    utils.saveTable(_STATE, BASE_FILE)
+    miz_utils.saveTable(_STATE, BASE_FILE)
     return
   end
 end
