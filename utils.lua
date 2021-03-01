@@ -648,17 +648,19 @@ local function attemptSamRepair()
     log("Checking for blue units around group: "..group)
     local grp = GROUP:FindByName(group)
     local zone = ZONE_GROUP:New(group, grp, 7500)
-    zone:Scan( {Object.Category.UNIT, Object.Category.BASE }, {Unit.Category.AIRPLANE, Unit.Category.GROUND_UNIT, Unit.Category.HELICOPTER})
-    if zone:CountScannedCoalitions() == 1 then
-      local close_base = RedBases:FindNearestAirbaseFromPointVec2(grp:GetPointVec2())
-      if close_base:GetCoordinate():Get2DDistance(grp:GetCoordinate()) < 75000 then
-        routeHelo(grp:GetCoordinate(), close_base:GetName(), group)
-        return
+    if grp ~= nil and zone ~= nil then 
+      zone:Scan( {Object.Category.UNIT, Object.Category.BASE }, {Unit.Category.AIRPLANE, Unit.Category.GROUND_UNIT, Unit.Category.HELICOPTER})
+      if zone:CountScannedCoalitions() == 1 then
+        local close_base = RedBases:FindNearestAirbaseFromPointVec2(grp:GetPointVec2())
+        if close_base:GetCoordinate():Get2DDistance(grp:GetCoordinate()) < 75000 then
+          routeHelo(grp:GetCoordinate(), close_base:GetName(), group)
+          return
+        else
+          log("Closest base is "..close_base:GetName().." but is farther than 25 miles.")
+        end
       else
-        log("Closest base is "..close_base:GetName().." but is farther than 25 miles.")
+        log("Scanned coaltions include blue")
       end
-    else
-      log("Scanned coaltions include blue")
     end
   end
   log("No sams found without blue units nearby...")
