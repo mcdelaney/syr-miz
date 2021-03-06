@@ -133,7 +133,7 @@ function Hercules_Cargo.Soldier_SpawnGroup(Cargo_Drop_Position, Cargo_Type_name,
 				["x"] = Cargo_Drop_Position.x + 0.5 + GroupSpacing,
 				["name"] = "Soldier Unit "..SoldierUnitID,
 				["heading"] = CargoHeading,
-				["playerCanDrive"] = false,
+				["playerCanDrive"] = true,
 			}, -- end of [1]
 			[2] =
 			{
@@ -148,7 +148,7 @@ function Hercules_Cargo.Soldier_SpawnGroup(Cargo_Drop_Position, Cargo_Type_name,
 				["x"] = Cargo_Drop_Position.x + 1.0 + GroupSpacing,
 				["name"] = "Soldier Unit "..SoldierUnitID,
 				["heading"] = CargoHeading,
-				["playerCanDrive"] = false,
+				["playerCanDrive"] = true,
 			}, -- end of [2]
 			[3] =
 			{
@@ -163,7 +163,7 @@ function Hercules_Cargo.Soldier_SpawnGroup(Cargo_Drop_Position, Cargo_Type_name,
 				["x"] = Cargo_Drop_Position.x + 1.0 + GroupSpacing,
 				["name"] = "Soldier Unit "..SoldierUnitID,
 				["heading"] = CargoHeading,
-				["playerCanDrive"] = false,
+				["playerCanDrive"] = true,
 			}, -- end of [3]
 			[4] =
 			{
@@ -178,7 +178,7 @@ function Hercules_Cargo.Soldier_SpawnGroup(Cargo_Drop_Position, Cargo_Type_name,
 				["x"] = Cargo_Drop_Position.x + 2.0 + GroupSpacing,
 				["name"] = "Soldier Unit "..SoldierUnitID,
 				["heading"] = CargoHeading,
-				["playerCanDrive"] = false,
+				["playerCanDrive"] = true,
 			}, -- end of [4]
 			[5] =
 			{
@@ -193,7 +193,7 @@ function Hercules_Cargo.Soldier_SpawnGroup(Cargo_Drop_Position, Cargo_Type_name,
 				["x"] = Cargo_Drop_Position.x + 2.5 + GroupSpacing,
 				["name"] = "Soldier Unit "..SoldierUnitID,
 				["heading"] = CargoHeading,
-				["playerCanDrive"] = false,
+				["playerCanDrive"] = true,
 			}, -- end of [5]
 			[6] =
 			{
@@ -208,7 +208,7 @@ function Hercules_Cargo.Soldier_SpawnGroup(Cargo_Drop_Position, Cargo_Type_name,
 				["x"] = Cargo_Drop_Position.x + 3.0 + GroupSpacing,
 				["name"] = "Soldier Unit "..SoldierUnitID,
 				["heading"] = CargoHeading,
-				["playerCanDrive"] = false,
+				["playerCanDrive"] = true,
 			}, -- end of [6]
 			[7] =
 			{
@@ -223,7 +223,7 @@ function Hercules_Cargo.Soldier_SpawnGroup(Cargo_Drop_Position, Cargo_Type_name,
 				["x"] = Cargo_Drop_Position.x + 3.5 + GroupSpacing,
 				["name"] = "Soldier Unit "..SoldierUnitID,
 				["heading"] = CargoHeading,
-				["playerCanDrive"] = false,
+				["playerCanDrive"] = true,
 			}, -- end of [7]
 			[8] =
 			{
@@ -238,7 +238,7 @@ function Hercules_Cargo.Soldier_SpawnGroup(Cargo_Drop_Position, Cargo_Type_name,
 				["x"] = Cargo_Drop_Position.x + 4.0 + GroupSpacing,
 				["name"] = "Soldier Unit "..SoldierUnitID,
 				["heading"] = CargoHeading,
-				["playerCanDrive"] = false,
+				["playerCanDrive"] = true,
 			}, -- end of [8]
 			[9] =
 			{
@@ -253,7 +253,7 @@ function Hercules_Cargo.Soldier_SpawnGroup(Cargo_Drop_Position, Cargo_Type_name,
 				["x"] = Cargo_Drop_Position.x + 4.5 + GroupSpacing,
 				["name"] = "Soldier Unit "..SoldierUnitID,
 				["heading"] = CargoHeading,
-				["playerCanDrive"] = false,
+				["playerCanDrive"] = true,
 			}, -- end of [9]
 			[10] =
 			{
@@ -268,7 +268,7 @@ function Hercules_Cargo.Soldier_SpawnGroup(Cargo_Drop_Position, Cargo_Type_name,
 				["x"] = Cargo_Drop_Position.x + 5.0 + GroupSpacing,
 				["name"] = "Soldier Unit "..SoldierUnitID,
 				["heading"] = CargoHeading,
-				["playerCanDrive"] = false,
+				["playerCanDrive"] = true,
 			}, -- end of [10]
 		}, -- end of ["units"]
 		["y"] = Cargo_Drop_Position.z,

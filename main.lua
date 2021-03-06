@@ -90,6 +90,7 @@ ReCapBases = {
   "Beirut-Rafic Hariri",
   "Al Qusayr",
   "Hama",
+  "Hatay",
   "Bassel Al-Assad",
   "Abu al-Duhur",
 }
