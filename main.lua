@@ -72,7 +72,7 @@ else
     "Ramat David",
     "Incirlik",
     "Aleppo",
-    "Abu al-Duhur",
+    -- "Abu al-Duhur",
     "Hatay",
     "Haifa",
     "Bassel Al-Assad",
