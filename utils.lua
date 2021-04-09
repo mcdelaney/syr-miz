@@ -377,12 +377,12 @@ local function restoreCtldUnits(_STATE, ctld_config, include_ammo_and_avenger)
           ctld.JTACAutoLase(_spawnedGroup:getName(), _code)
       end
 
-      
+
       if include_ammo_and_avenger and startswith(data.name, 'm 818') then
         local key = "M818_Index"
         init_ctld_units(ctld_config.unit_config["M818 Transport"], coords2D, country, ctld_unitIndex, key)
       end
-    
+
 
       if data.name == 'm818' then
         local key = "M818_Index"
@@ -648,11 +648,11 @@ local function attemptSamRepair()
     log("Checking for blue units around group: "..group)
     local grp = GROUP:FindByName(group)
     local zone = ZONE_GROUP:New(group, grp, 7500)
-    if grp ~= nil and zone ~= nil then 
+    if grp ~= nil and zone ~= nil then
       zone:Scan( {Object.Category.UNIT, Object.Category.BASE }, {Unit.Category.AIRPLANE, Unit.Category.GROUND_UNIT, Unit.Category.HELICOPTER})
       if zone:CountScannedCoalitions() == 1 then
         local close_base = RedBases:FindNearestAirbaseFromPointVec2(grp:GetPointVec2())
-        if close_base:GetCoordinate():Get2DDistance(grp:GetCoordinate()) < 75000 then
+        if close_base:GetCoordinate():Get2DDistance(grp:GetCoordinate()) < 55000 then
           routeHelo(grp:GetCoordinate(), close_base:GetName(), group)
           return
         else

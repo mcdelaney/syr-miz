@@ -345,7 +345,7 @@ if AG_BASES ~= nil then
   A2GDispatcher:AddDefenseCoordinate( "ag-base", AIRBASE:FindByName( "Damascus" ):GetCoordinate() )
   A2GDispatcher:SetDefenseReactivityHigh()
   A2GDispatcher:SetDefaultEngageLimit(3)
-  A2GDispatcher:SetDefenseRadius( 100000 )
+  A2GDispatcher:SetDefenseRadius( 200000 )
 
   A2GDispatcher:SetCommandCenter(RedCommand_AA)
   A2GDispatcher:SetDefaultTakeoffInAir(  )
@@ -567,7 +567,11 @@ function EH1:OnEventBaseCaptured(EventData)
   end
   _STATE.bases[EventData.PlaceName] = EventData.IniCoalition
   if EventData.IniCoalition == coalition.side.RED then
-    setBaseRed(EventData.PlaceName, false)
+    for i, b in pairs(ContestedBases) do
+      if b == EventData.PlaceName then
+        setBaseRed(EventData.PlaceName, false)
+      end
+    end
   else
     setBaseBlue(EventData.PlaceName)
   end
