@@ -447,29 +447,29 @@ RedSamRepair = SCHEDULER:New( nil, miz_utils.attemptSamRepair, {}, 10*60, 10*60,
 
 
 -- AIRBOSS
--- "CVN-71", "Stennis"
-local airbossCVN73 = AIRBOSS:New("CVN-73", "CVN-73")
-airbossCVN73:Load(lfs.writedir() .."Scripts\\syr-miz\\traps", "cvn-73")
-airbossCVN73:SetDefaultPlayerSkill("TOPGUN Graduate")
-airbossCVN73:SetWelcomePlayers(false)
-airbossCVN73:AddRecoveryWindow("2:30", "22:00", 1)
-airbossCVN73:SetTACAN(73, "X", "TRK")
-airbossCVN73:SetICLS(11, "TRK")
-airbossCVN73:SetAutoSave(lfs.writedir() .."Scripts\\syr-miz\\traps", "cvn-73")
-airbossCVN73:SetTrapSheet(lfs.writedir() .."Scripts\\syr-miz\\trapsheets")
-airbossCVN73:Start()
+-- -- "CVN-71", "Stennis"
+-- local airbossCVN73 = AIRBOSS:New("CVN-73", "CVN-73")
+-- airbossCVN73:Load(lfs.writedir() .."Scripts\\syr-miz\\traps", "cvn-73")
+-- airbossCVN73:SetDefaultPlayerSkill("TOPGUN Graduate")
+-- airbossCVN73:SetWelcomePlayers(false)
+-- airbossCVN73:AddRecoveryWindow("2:30", "22:00", 1)
+-- airbossCVN73:SetTACAN(73, "X", "TRK")
+-- airbossCVN73:SetICLS(11, "TRK")
+-- airbossCVN73:SetAutoSave(lfs.writedir() .."Scripts\\syr-miz\\traps", "cvn-73")
+-- airbossCVN73:SetTrapSheet(lfs.writedir() .."Scripts\\syr-miz\\trapsheets")
+-- airbossCVN73:Start()
 
 
-local airbossCVN75 = AIRBOSS:New("CVN-75", "CVN-75")
-airbossCVN75:Load(lfs.writedir() .."Scripts\\syr-miz\\traps", "cvn-75")
-airbossCVN75:SetDefaultPlayerSkill("TOPGUN Graduate")
-airbossCVN75:SetWelcomePlayers(false)
-airbossCVN75:AddRecoveryWindow("2:30", "22:00", 1)
-airbossCVN75:SetTACAN(75, "X", "TRZ")
-airbossCVN75:SetICLS(12, "TRZ")
-airbossCVN75:SetAutoSave(lfs.writedir() .."Scripts\\syr-miz\\traps", "cvn-75")
-airbossCVN75:SetTrapSheet(lfs.writedir() .."Scripts\\syr-miz\\trapsheets")
-airbossCVN75:Start()
+-- local airbossCVN75 = AIRBOSS:New("CVN-75", "CVN-75")
+-- airbossCVN75:Load(lfs.writedir() .."Scripts\\syr-miz\\traps", "cvn-75")
+-- airbossCVN75:SetDefaultPlayerSkill("TOPGUN Graduate")
+-- airbossCVN75:SetWelcomePlayers(false)
+-- airbossCVN75:AddRecoveryWindow("2:30", "22:00", 1)
+-- airbossCVN75:SetTACAN(75, "X", "TRZ")
+-- airbossCVN75:SetICLS(12, "TRZ")
+-- airbossCVN75:SetAutoSave(lfs.writedir() .."Scripts\\syr-miz\\traps", "cvn-75")
+-- airbossCVN75:SetTrapSheet(lfs.writedir() .."Scripts\\syr-miz\\trapsheets")
+-- airbossCVN75:Start()
 
 -- CleanUpAirports = CLEANUP_AIRBASE:New( { AIRBASE.Syria.Bassel_Al_Assad, AIRBASE.Syria.Damscus, AIRBASE.Syria.Hama } )
 
