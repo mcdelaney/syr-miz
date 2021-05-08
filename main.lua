@@ -471,7 +471,7 @@ airbossCVN75:SetAutoSave(lfs.writedir() .."Scripts\\syr-miz\\traps", "cvn-75")
 airbossCVN75:SetTrapSheet(lfs.writedir() .."Scripts\\syr-miz\\trapsheets")
 airbossCVN75:Start()
 
-CleanUpAirports = CLEANUP_AIRBASE:New( { AIRBASE.Syria.Bassel_Al_Assad, AIRBASE.Syria.Damscus, AIRBASE.Syria.Hama } )
+-- CleanUpAirports = CLEANUP_AIRBASE:New( { AIRBASE.Syria.Bassel_Al_Assad, AIRBASE.Syria.Damscus, AIRBASE.Syria.Hama } )
 
 if DEBUG_IADS then
   local iadsDebug = redIADS:getDebugSettings()
