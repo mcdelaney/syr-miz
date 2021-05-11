@@ -646,20 +646,27 @@ local function attemptSamRepair()
 
   for i, group in pairs(_STATE["repairable"]) do
     log("Checking for blue units around group: "..group)
+    
     local grp = GROUP:FindByName(group)
-    local zone = ZONE_GROUP:New(group, grp, 7500)
-    if grp ~= nil and zone ~= nil then
-      zone:Scan( {Object.Category.UNIT, Object.Category.BASE }, {Unit.Category.AIRPLANE, Unit.Category.GROUND_UNIT, Unit.Category.HELICOPTER})
-      if zone:CountScannedCoalitions() == 1 then
-        local close_base = RedBases:FindNearestAirbaseFromPointVec2(grp:GetPointVec2())
-        if close_base:GetCoordinate():Get2DDistance(grp:GetCoordinate()) < 55000 then
-          routeHelo(grp:GetCoordinate(), close_base:GetName(), group)
-          return
+    if grp ~= nil then
+      env.info("Group not nil... checking in zone...")
+      local zone = ZONE_GROUP:New(group, grp, 7500)
+      if grp ~= nil and zone ~= nil then
+        zone:Scan( {Object.Category.UNIT, Object.Category.BASE }, {Unit.Category.AIRPLANE, Unit.Category.GROUND_UNIT, Unit.Category.HELICOPTER})
+        if zone:CountScannedCoalitions() == 1 then
+          env.info("Looking for closest base...")
+          local close_base = RedBases:FindNearestAirbaseFromPointVec2(grp:GetPointVec2())
+          if close_base:GetCoordinate():Get2DDistance(grp:GetCoordinate()) < 55000 then
+            pcall(function() routeHelo(grp:GetCoordinate(), close_base:GetName(), group) end)
+            return
+          else
+            log("Closest base is "..close_base:GetName().." but is farther than 25 miles.")
+          end
         else
-          log("Closest base is "..close_base:GetName().." but is farther than 25 miles.")
+          env.info("Scanned coaltions include blue")
         end
       else
-        log("Scanned coaltions include blue")
+        env.info("Group is nil... skipping...")
       end
     end
   end

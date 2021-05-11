@@ -447,7 +447,7 @@ blue_recon.InitBlueReconGroup(BLUECC)
 blue_menus.Init()
 red_menus.Init()
 
-RedSamRepair = SCHEDULER:New( nil, miz_utils.attemptSamRepair, {}, 10*60, 10*60, 0.25 )
+RedSamRepair = SCHEDULER:New( nil, miz_utils.attemptSamRepair, {}, 2*60, 10*60, 0.25 )
 -- BaseCapAttempt = SCHEDULER:New( nil, miz_utils.attemptBaseCap, {}, 10*60, 30*60, 0.25 )
 
 
@@ -529,7 +529,7 @@ function EH1:OnEventMarkRemoved(EventData)
     EventData.MarkCoordinate:BigSmokeHuge(0.75)
     return
   elseif EventData.text == "respawn" then
-    miz_utils.attemptSamRepair()
+    pcall(function() miz_utils.attemptSamRepair() end)
     return
   elseif miz_utils.startswith(EventData.text, "respawn-") then
     local grp_name = string.sub(EventData.text, 9)
@@ -596,7 +596,12 @@ function EH1:OnEventDead(EventData)
       table.insert(_STATE["dead"], EventData.IniUnitName)
     end
 
-    local deadGroup = UNIT:FindByName(EventData.IniUnitName):GetGroup()
+    local deadGroup = UNIT:FindByName(EventData.IniUnitName)
+    if deadGroup ~= nil then 
+      deadGroup = deadGroup:GetGroup()
+    else
+      return
+    end
 
     if deadGroup == nil or deadGroup:CountAliveUnits() == 0 then
       -- Add to deadgroups table if not already added
@@ -612,6 +617,7 @@ function EH1:OnEventDead(EventData)
 
   if EventData.IniUnit and EventData.IniObjectCategory==Object.Category.SCENERY then
     if EventData.IniUnitName ~= nil then
+      env.info("Recording scenery damage...")
       local Scenery_Point = EventData.initiator:getPoint()
       local Scenery_Coordinate = COORDINATE:NewFromVec3(Scenery_Point)
       local insdata = { x=Scenery_Coordinate.x, y=Scenery_Coordinate.y, z=Scenery_Coordinate.z, id=EventData.IniDCSUnit }
