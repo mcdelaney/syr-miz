@@ -101,7 +101,7 @@ local _NumAirbaseDefenders = 1
 
 
 local function setBaseRed(baseName, init_ground)
-  miz_utils.log("Setting "..baseName.." as red...")
+  env.info("Setting "..baseName.." as red...")
   local logUnitName = "logistic-"..baseName
   local logZone = 'logizone-'..baseName
   ctld.deactivatePickupZone(logZone)
@@ -129,7 +129,7 @@ end
 
 
 local function setBaseBlue(baseName, startup)
-  miz_utils.log("Setting "..baseName.." as blue...")
+  env.info("Setting "..baseName.." as blue...")
   local logUnitName = "logistic-"..baseName
   local logZone = 'logizone-'..baseName
   local logisticCoordZone = ZONE:FindByName(logZone, false)
@@ -142,7 +142,7 @@ local function setBaseBlue(baseName, startup)
     table.insert(ctld.logisticUnits, logUnitName)
     ctld.activatePickupZone(logZone)
     if logisticUnit == nil then
-      miz_utils.log("Could not find base logistic unit")
+      env.info("Could not find base logistic unit")
     end
   else
     MESSAGE:New("Trigger zone does not exist for "..logZone.."!", 5):ToAll()
@@ -193,7 +193,7 @@ if miz_utils.file_exists(BASE_FILE) then
     INIT = false
   end
 else
-  miz_utils.log("No state file exists..")
+  env.info("No state file exists..")
 end
 
 if INIT and MISSION_VERSION == "" then
@@ -214,23 +214,28 @@ else
     miz_utils.removeUnit(unit, true)
   end
 
-  miz_utils.log( "Destroying previously killed scenery...")
+  env.info( "Destroying previously killed scenery...")
   for i, obj in pairs(_STATE["scenery"]) do
     if obj then
       local unit = Unit.getByName(tostring(obj.id))
       if unit then
-        miz_utils.log("Destrying object: "..obj.id)
+        env.info("Destrying object: "..obj.id)
         unit:destroy(false)
-      end
-    end
-    local vec3 = COORDINATE:New(obj.x, obj.y, obj.z)
-    local searchZone = ZONE_RADIUS:New(tostring(i), vec3:GetVec2(), 1)
-    searchZone:Scan( Object.Category.SCENERY )
-    for _, SceneryData in pairs( searchZone:GetScannedScenery() ) do
-      for _, SceneryObject in pairs( SceneryData ) do
-
-        SceneryObject:GetDCSObject():destroy()
-        vec3:Explosion(200)
+      -- end
+        local vec3 = COORDINATE:New(obj.x, obj.y, obj.z)
+        local searchZone = ZONE_RADIUS:New(tostring(i), vec3:GetVec2(), 1)
+        searchZone:Scan( Object.Category.SCENERY )
+        env.info("Searching zone near obj: "..obj.id)
+        for _, SceneryData in pairs( searchZone:GetScannedScenery() ) do
+          for _, SceneryObject in pairs( SceneryData ) do
+            local obj = SceneryObject:GetDCSObject()
+            if obj ~= nil then
+              
+              SceneryObject:GetDCSObject():destroy()
+              vec3:Explosion(200)
+            end
+          end
+        end
       end
     end
   end
@@ -261,10 +266,10 @@ for _, base in pairs(ContestedBases) do
   end
 end
 
-miz_utils.log("Spawning CTLD units from state")
+env.info("Spawning CTLD units from state")
 miz_utils.restoreCtldUnits(_STATE, ctld_config, true)
 
-miz_utils.log("Initializing blue awacs units..")
+env.info("Initializing blue awacs units..")
 SPAWN:New("awacs-Carrier")
   :InitLimit(1, 0)
   :InitRepeatOnLanding()
@@ -281,7 +286,7 @@ SPAWN:New("awacs-Incirlik")
 TexacoStennis = RECOVERYTANKER:New(UNIT:FindByName("CVN-71"), "Texaco")
 TexacoStennis:Start()
 
-miz_utils.log("Iads configuration start...")
+env.info("Iads configuration start...")
 redIADS = SkynetIADS:create('SYRIA')
 
 commandCenter1 = StaticObject.getByName('RED-HQ-2')
@@ -366,7 +371,7 @@ end
 
 -- blue_ground.InitBlueGroundPlaneDeployer()
 blue_ground.InitBlueGroundHeliDeployer()
-miz_utils.log("Restoring base ownership...")
+env.info("Restoring base ownership...")
 for _, base in pairs(ContestedBases) do
 
   if ENABLE_RED_AIR and _STATE.bases[base] == coalition.side.RED then
@@ -376,7 +381,7 @@ for _, base in pairs(ContestedBases) do
       zone = ZONE_AIRBASE:New(base, 150000):SetName(zone_name)
     end
 
-    miz_utils.log("Creating A2A Cap group from base: "..base)
+    env.info("Creating A2A Cap group from base: "..base)
     local sqd_cap = base.."-cap"
     local cap_grp = 1
     if base == "Damascus" then
@@ -391,7 +396,7 @@ for _, base in pairs(ContestedBases) do
     A2ADispatcher:SetSquadronCapInterval( sqd_cap, cap_grp, 60*5, 60*7, 1)
     A2ADispatcher:SetSquadronCapRacetrack(sqd_cap, 5000, 10000, 90, 180, 5*60, 10*60)
 
-    miz_utils.log("Creating A2A GCI group from base: "..base)
+    env.info("Creating A2A GCI group from base: "..base)
     local sqd_gci = base.."-gci"
     A2ADispatcher:SetSquadron( sqd_gci, base, {"su-30-gci"} )
     A2ADispatcher:SetSquadronGrouping( sqd_gci, 1 )
@@ -402,7 +407,7 @@ for _, base in pairs(ContestedBases) do
     for _, agBase in pairs(AG_BASES) do
       if agBase == base then
 
-        miz_utils.log("Creating A2G SEAD squadron from base: "..base)
+        env.info("Creating A2G SEAD squadron from base: "..base)
         local sqd_sead = base.."-sead"
         A2GDispatcher:SetSquadron(sqd_sead, base,  { "su-34-sead-b", "jf-17-sead" }, 14 ) --"su-34-sead"
         A2GDispatcher:SetSquadronGrouping( sqd_sead, 2 )
@@ -485,7 +490,7 @@ if DEBUG_IADS then
   redIADS:addRadioMenu()
 end
 
-miz_utils.log("Initializing event handlers...")
+env.info("Initializing event handlers...")
 local num_spawns = 1
 EH1 = EVENTHANDLER:New()
 
@@ -498,7 +503,7 @@ end
 
 EH1:HandleEvent(EVENTS.MarkRemoved)
 function EH1:OnEventMarkRemoved(EventData)
-  miz_utils.log("Destroying markpoint target...")
+  env.info("Destroying markpoint target...")
   if EventData.text == "tgt" then
     EventData.MarkCoordinate:Explosion(1000)
     return
@@ -583,7 +588,7 @@ EH1:HandleEvent(EVENTS.Dead)
 function EH1:OnEventDead(EventData)
   if EventData.IniCoalition == coalition.side.RED then
     if EventData.IniGroupName ~= nil then
-      miz_utils.log("Marking object dead: "..EventData.IniGroupName.." - "..EventData.IniUnitName)
+      env.info("Marking object dead: "..EventData.IniGroupName.." - "..EventData.IniUnitName)
     end
     if _STATE["dead"] == nil then
       _STATE["dead"] = { EventData.IniUnitName }
