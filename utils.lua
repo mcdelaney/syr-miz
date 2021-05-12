@@ -644,6 +644,10 @@ local function attemptSamRepair()
     return
   end
 
+  route_base = nil
+  grp_coord = nil
+  repair_target_group = nil
+  closest_dist = 999999999
   for i, group in pairs(_STATE["repairable"]) do
     log("Checking for blue units around group: "..group)
     
@@ -656,11 +660,14 @@ local function attemptSamRepair()
         if zone:CountScannedCoalitions() == 1 then
           env.info("Looking for closest base...")
           local close_base = RedBases:FindNearestAirbaseFromPointVec2(grp:GetPointVec2())
-          if close_base:GetCoordinate():Get2DDistance(grp:GetCoordinate()) < 55000 then
-            pcall(function() routeHelo(grp:GetCoordinate(), close_base:GetName(), group) end)
-            return
+          local base_dist =  close_base:GetCoordinate():Get2DDistance(grp:GetCoordinate())
+          if base_dist < 55000 and base_dist < closest_dist then
+            grp_coord = grp:GetCoordinate()
+            route_base = close_base:GetName()
+            closest_dist = base_dist
+            repair_target_group = group
           else
-            log("Closest base is "..close_base:GetName().." but is farther than 25 miles.")
+            log("Closest base is "..close_base:GetName().." but is "..tostring(base_dist/1609).." miles and closest repairable is "..tostring(closest_dist/1609).."...")
           end
         else
           env.info("Scanned coaltions include blue")
@@ -670,7 +677,12 @@ local function attemptSamRepair()
       end
     end
   end
-  log("No sams found without blue units nearby...")
+
+  if route_base ~= nil and grp_coord ~= nil then
+    pcall(function() routeHelo(grp_coord, route_base, repair_target_group) end)
+  else
+    log("No sams found without blue units nearby...")
+  end
 end
 
 
