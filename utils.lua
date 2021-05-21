@@ -300,7 +300,7 @@ end
 local function removeUnit (unitName, smoke)
   local grp = GROUP:FindByName(unitName)
   if grp ~= nil then
-    grp:Destroy()
+    grp:Destroy(false)
   else
     local unit = UNIT:FindByName(unitName)
     if unit then
@@ -310,7 +310,11 @@ local function removeUnit (unitName, smoke)
       local unit_cat = unit:GetCategoryName()
       local stc = SPAWNSTATIC:NewFromType(unit_type, unit_cat, unit_country)
       unit:Destroy(false)
-      unitPoint:BigSmokeSmall(0.75)
+
+      local rnd = math.random()
+      if rnd <= 0.25 then
+        unitPoint:BigSmokeSmall(0.75)
+      end
       -- env.info("Spawning dead type "..unit:GetTypeName().." - "..unit:GetCategoryName())
       if stc ~= nil then
         -- stc.InitDead = true
@@ -473,13 +477,18 @@ end
 local function respawnGroup(grp_name)
   env.info("Respawning group: "..grp_name)
   local group = GROUP:FindByName(grp_name)
+  group:Destroy(false)
   group:Respawn()
   local DeadGroups = mist.utils.deepCopy(_STATE["dead"])
   for _, Dead in pairs(DeadGroups) do
-    if startswith(Dead, grp_name) then
-      env.info("Removing dead entry for unit: "..Dead)
+    if startswith(Dead, grp_name) or startswith(Dead, "dead"..grp_name) then
       for i, Name in pairs(_STATE["dead"]) do
         if Name == Dead then
+          local stc1 = STATIC:FindByName("dead"..Name)
+          if stc1 ~= nil then
+            stc1.Destroy(false)
+          end
+          env.info("Removing dead entry for unit: "..Dead)
           table.remove(_STATE["dead"], i)
         end
       end
@@ -650,7 +659,7 @@ local function attemptSamRepair()
   closest_dist = 999999999
   for i, group in pairs(_STATE["repairable"]) do
     log("Checking for blue units around group: "..group)
-    
+
     local grp = GROUP:FindByName(group)
     if grp ~= nil then
       env.info("Group not nil... checking in zone...")

@@ -198,9 +198,9 @@ end
 
 if INIT and MISSION_VERSION == "" then
 
-  for k, sam in pairs(SAMS) do
-    pcall(function(_args) miz_utils.prune_enemies(sam, k) end)
-  end
+  -- for k, sam in pairs(SAMS) do
+  --   pcall(function(_args) miz_utils.prune_enemies(sam, k) end)
+  -- end
 else
   for _, unit in pairs(_STATE["dead"]) do
     local smoke = true
