@@ -174,7 +174,7 @@ local function setBaseBlue(baseName, startup)
 
 end
 
-RedBases = SET_AIRBASE:New():FilterCoalitions("red"):FilterStart()
+RedBases = SET_AIRBASE:New() --:FilterCoalitions("red"):FilterStart()
 BlueBases = SET_AIRBASE:New()
 AllBases = SET_AIRBASE:New():FilterStart()
 
@@ -230,7 +230,7 @@ else
           for _, SceneryObject in pairs( SceneryData ) do
             local obj = SceneryObject:GetDCSObject()
             if obj ~= nil then
-              
+
               SceneryObject:GetDCSObject():destroy()
               vec3:Explosion(200)
             end
@@ -597,7 +597,7 @@ function EH1:OnEventDead(EventData)
     end
 
     local deadGroup = UNIT:FindByName(EventData.IniUnitName)
-    if deadGroup ~= nil then 
+    if deadGroup ~= nil then
       deadGroup = deadGroup:GetGroup()
     else
       return
