@@ -484,10 +484,10 @@ local function respawnGroup(grp_name)
     if startswith(Dead, grp_name) or startswith(Dead, "dead"..grp_name) then
       for i, Name in pairs(_STATE["dead"]) do
         if Name == Dead then
-          local stc1 = STATIC:FindByName("dead"..Name)
-          if stc1 ~= nil then
-            stc1.Destroy(false)
-          end
+          -- local stc1 = STATIC:FindByName("dead"..Name)
+          -- if stc1 ~= nil then
+          --   stc1.Destroy(false)
+          -- end
           env.info("Removing dead entry for unit: "..Dead)
           table.remove(_STATE["dead"], i)
         end

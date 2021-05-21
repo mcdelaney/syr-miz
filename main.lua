@@ -174,7 +174,7 @@ local function setBaseBlue(baseName, startup)
 
 end
 
-RedBases = SET_AIRBASE:New() --:FilterCoalitions("red"):FilterStart()
+RedBases = SET_AIRBASE:New():FilterCoalitions("red"):FilterStart()
 BlueBases = SET_AIRBASE:New()
 AllBases = SET_AIRBASE:New():FilterStart()
 
