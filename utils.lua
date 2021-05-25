@@ -544,7 +544,9 @@ local function addDeadGroup(group_name)
       _MARKERS[Mark["name"]]:Remove()
     end
   end
-  MESSAGE:New(group_name.." has been permanently destroyed!" ,10):ToAll()
+  if not startswith(group_name, "manpad") then
+    MESSAGE:New(group_name.." has been permanently destroyed!" ,10):ToAll()
+  end
 end
 
 local function findGoodLanding(Zone, tries)
