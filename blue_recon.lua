@@ -30,17 +30,20 @@ local function InitBlueReconGroup(CC)
             end
             local DetectedCoord = DetectedUnitGroup:GetCoordinate():GetRandomCoordinateInRadius(150, 30)
             local DetectedVec3 = DetectedCoord:GetVec3()
-            _MARKERS[DetectedName] = MARKER:New(DetectedCoord, DetectedName):ToAll()
-            table.insert(
-                _STATE["marks"], {
-                    name = DetectedName,
-                    x = DetectedVec3.x,
-                    y = DetectedVec3.y,
-                    z = DetectedVec3.z,
-                }
-            )
-            env.info( "New Detection: "..DetectedName)
-            CC:MessageToAll( "New Detection: "..DetectedName.." at: "..DetectedCoord:ToStringLLDDM(), 15, "" )
+
+            if not utils.startswith(DetectedName, "manpad") then
+                _MARKERS[DetectedName] = MARKER:New(DetectedCoord, DetectedName):ToAll()
+                table.insert(
+                    _STATE["marks"], {
+                        name = DetectedName,
+                        x = DetectedVec3.x,
+                        y = DetectedVec3.y,
+                        z = DetectedVec3.z,
+                    }
+                )
+                env.info( "New Detection: "..DetectedName)
+                CC:MessageToAll( "New Detection: "..DetectedName.." at: "..DetectedCoord:ToStringLLDDM(), 15, "" )
+            end
             utils.saveTable(_STATE, BASE_FILE)
         end
     end
