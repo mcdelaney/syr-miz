@@ -46,12 +46,12 @@ if MISSION_VERSION == "South" then
 
   ContestedBases = {
     "Ramat David",
-    "Haifa",
-    "Beirut-Rafic Hariri",
-    "Damascus",
+    "Paphos",
+    -- "Beirut-Rafic Hariri",
+    -- "Damascus",
     -- "Mezzeh",
   }
-  AG_BASES = { "Damascus" }
+  AG_BASES = nil --{ "Paphos" }
 
 elseif MISSION_VERSION == "North" then
 
@@ -70,34 +70,34 @@ elseif MISSION_VERSION == "North" then
 else
   ContestedBases = {
     "Ramat David",
-    "Incirlik",
-    "Aleppo",
-    -- "Abu al-Duhur",
-    "Hatay",
-    "Haifa",
-    "Bassel Al-Assad",
-    "Beirut-Rafic Hariri",
-    "Damascus",
-    "Al Qusayr",
-    "Hama"
+    "Paphos",
+    -- "Incirlik",
+    -- "Aleppo",
+    -- -- "Abu al-Duhur",
+    -- "Hatay",
+    -- "Haifa",
+    -- "Bassel Al-Assad",
+    -- "Beirut-Rafic Hariri",
+    -- "Damascus",
+    -- "Al Qusayr",
+    -- "Hama"
   }
 
-  AG_BASES = { "Damascus" }
+  AG_BASES = { "Paphos" }
 
 end
 
 ReCapBases = {
-  "Beirut-Rafic Hariri",
-  "Al Qusayr",
-  "Hama",
-  "Hatay",
-  "Bassel Al-Assad",
-  "Abu al-Duhur",
+  "Paphos",
+  -- "Al Qusayr",
+  -- "Hama",
+  -- "Hatay",
+  -- "Bassel Al-Assad",
+  -- "Abu al-Duhur",
 }
 
 SceneryTargets = {"damascus-target-1", "damascus-target-2", "damascus-target-3"}
 local _NumAirbaseDefenders = 1
-
 
 
 local function setBaseRed(baseName, init_ground)
@@ -283,7 +283,7 @@ SPAWN:New("awacs-Incirlik")
   :SpawnScheduled(15, 0)
 
 
-TexacoStennis = RECOVERYTANKER:New(UNIT:FindByName("CVN-71"), "Texaco")
+TexacoStennis = RECOVERYTANKER:New(UNIT:FindByName("Stennis"), "Texaco")
 TexacoStennis:Start()
 
 env.info("Iads configuration start...")
@@ -300,19 +300,19 @@ redIADS:getSAMSitesByPrefix("SA-10"):setActAsEW(true)
 redIADS:setupSAMSitesAndThenActivate()
 -- redIADS:activate()
 
-SPAWN:New("red-recce")
-  :InitLimit(1, 50)
-  :InitRepeat()
-  :OnSpawnGroup(
-    function(groupName)
-      local reconZone = ZONE:New("Damascus-reconzone")
-      local reconPatrol = AI_PATROL_ZONE:New( reconZone, 12000, 18000, 150, 400 )
-      reconPatrol:SetControllable( groupName )
-      reconPatrol:__Start( 2 )
-    end)
-  :InitAirbase("Damascus", SPAWN.Takeoff.Air)
-  :SpawnScheduled(5, 0.5)
-  :SpawnScheduleStart()
+-- SPAWN:New("red-recce")
+--   :InitLimit(1, 50)
+--   :InitRepeat()
+--   :OnSpawnGroup(
+--     function(groupName)
+--       local reconZone = ZONE:New("Damascus-reconzone")
+--       local reconPatrol = AI_PATROL_ZONE:New( reconZone, 12000, 18000, 150, 400 )
+--       reconPatrol:SetControllable( groupName )
+--       reconPatrol:__Start( 2 )
+--     end)
+--   :InitAirbase("Damascus", SPAWN.Takeoff.Air)
+--   :SpawnScheduled(5, 0.5)
+--   :SpawnScheduleStart()
 
 DetectionSetGroup = SET_GROUP:New()
   :FilterPrefixes({ "EWR", "redAWACS" })
