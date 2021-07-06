@@ -372,74 +372,91 @@ end
 -- blue_ground.InitBlueGroundPlaneDeployer()
 blue_ground.InitBlueGroundHeliDeployer()
 env.info("Restoring base ownership...")
-for _, base in pairs(ContestedBases) do
+-- for _, base in pairs(ContestedBases) do
 
-  if ENABLE_RED_AIR and _STATE.bases[base] == coalition.side.RED then
-    local zone_name = base.."-capzone"
-    local zone = ZONE:FindByName(zone_name)
-    if zone == nil then
-      zone = ZONE_AIRBASE:New(base, 150000):SetName(zone_name)
-    end
+--   if ENABLE_RED_AIR and _STATE.bases[base] == coalition.side.RED then
+--     local zone_name = base.."-capzone"
+--     local zone = ZONE:FindByName(zone_name)
+--     if zone == nil then
+--       zone = ZONE_AIRBASE:New(base, 150000):SetName(zone_name)
+--     end
 
-    env.info("Creating A2A Cap group from base: "..base)
-    local sqd_cap = base.."-cap"
-    local cap_grp = 1
-    if base == "Damascus" then
-      cap_grp = 2
-    end
-    A2ADispatcher:SetSquadron( sqd_cap, base, { "su-30-cap", "mig-31-cap", "jf-17-cap" } ) --, 10)
-    A2ADispatcher:SetSquadronGrouping( sqd_cap, 2 )
-    A2ADispatcher:SetSquadronTakeoffFromParkingHot(sqd_cap)
-    A2ADispatcher:SetSquadronLandingNearAirbase( sqd_cap )
-    A2ADispatcher:SetSquadronCap( sqd_cap, zone, 5000, 10000, 500, 800, 600, 1200, "BARO")
+--     env.info("Creating A2A Cap group from base: "..base)
+--     local sqd_cap = base.."-cap"
+--     local cap_grp = 1
+--     if base == "Damascus" then
+--       cap_grp = 2
+--     end
+--     A2ADispatcher:SetSquadron( sqd_cap, base, { "su-30-cap", "mig-31-cap", "jf-17-cap" } ) --, 10)
+--     A2ADispatcher:SetSquadronGrouping( sqd_cap, 2 )
+--     A2ADispatcher:SetSquadronTakeoffFromParkingHot(sqd_cap)
+--     A2ADispatcher:SetSquadronLandingNearAirbase( sqd_cap )
+--     A2ADispatcher:SetSquadronCap( sqd_cap, zone, 5000, 10000, 500, 800, 600, 1200, "BARO")
 
-    A2ADispatcher:SetSquadronCapInterval( sqd_cap, cap_grp, 60*5, 60*7, 1)
-    A2ADispatcher:SetSquadronCapRacetrack(sqd_cap, 5000, 10000, 90, 180, 5*60, 10*60)
+--     A2ADispatcher:SetSquadronCapInterval( sqd_cap, cap_grp, 60*5, 60*7, 1)
+--     A2ADispatcher:SetSquadronCapRacetrack(sqd_cap, 5000, 10000, 90, 180, 5*60, 10*60)
 
-    env.info("Creating A2A GCI group from base: "..base)
-    local sqd_gci = base.."-gci"
-    A2ADispatcher:SetSquadron( sqd_gci, base, {"su-30-gci"} )
-    A2ADispatcher:SetSquadronGrouping( sqd_gci, 1 )
-    A2ADispatcher:SetSquadronOverhead( sqd_gci, 0.5 )
-    A2ADispatcher:SetSquadronTakeoffFromParkingHot(sqd_gci)
-    A2ADispatcher:SetSquadronGci( sqd_gci, 600, 900 )
+--     env.info("Creating A2A GCI group from base: "..base)
+--     local sqd_gci = base.."-gci"
+--     A2ADispatcher:SetSquadron( sqd_gci, base, {"su-30-gci"} )
+--     A2ADispatcher:SetSquadronGrouping( sqd_gci, 1 )
+--     A2ADispatcher:SetSquadronOverhead( sqd_gci, 0.5 )
+--     A2ADispatcher:SetSquadronTakeoffFromParkingHot(sqd_gci)
+--     A2ADispatcher:SetSquadronGci( sqd_gci, 600, 900 )
 
-    for _, agBase in pairs(AG_BASES) do
-      if agBase == base then
+--     for _, agBase in pairs(AG_BASES) do
+--       if agBase == base then
 
-        env.info("Creating A2G SEAD squadron from base: "..base)
-        local sqd_sead = base.."-sead"
-        A2GDispatcher:SetSquadron(sqd_sead, base,  { "su-34-sead-b", "jf-17-sead" }, 14 ) --"su-34-sead"
-        A2GDispatcher:SetSquadronGrouping( sqd_sead, 2 )
-        A2GDispatcher:SetSquadronSead(sqd_sead, 400, 600, 5000, 10000)
-        A2GDispatcher:SetSquadronOverhead(sqd_sead, 0.25 )
-        A2GDispatcher:SetSquadronLandingNearAirbase( sqd_sead )
+--         env.info("Creating A2G SEAD squadron from base: "..base)
+--         local sqd_sead = base.."-sead"
+--         A2GDispatcher:SetSquadron(sqd_sead, base,  { "su-34-sead-b", "jf-17-sead" }, 14 ) --"su-34-sead"
+--         A2GDispatcher:SetSquadronGrouping( sqd_sead, 2 )
+--         A2GDispatcher:SetSquadronSead(sqd_sead, 400, 600, 5000, 10000)
+--         A2GDispatcher:SetSquadronOverhead(sqd_sead, 0.25 )
+--         A2GDispatcher:SetSquadronLandingNearAirbase( sqd_sead )
 
-        -- A2GDispatcher:SetSquadronSeadPatrol( sqd_sead, ZONE_AIRBASE:New("Ramat David", 50000), 5000, 7500, 400, 800, 400, 1200 )
-        -- A2GDispatcher:SetSquadronSeadPatrolInterval( sqd_sead, 2, 30, 250 )
+--         -- A2GDispatcher:SetSquadronSeadPatrol( sqd_sead, ZONE_AIRBASE:New("Ramat David", 50000), 5000, 7500, 400, 800, 400, 1200 )
+--         -- A2GDispatcher:SetSquadronSeadPatrolInterval( sqd_sead, 2, 30, 250 )
 
-        -- local sqd_cas = base.."-cas"
-        -- A2GDispatcher:SetSquadron(sqd_cas, base,  { "su-25-cas" },  10)
-        -- A2GDispatcher:SetSquadronGrouping( sqd_cas, 2 )
-        -- A2GDispatcher:SetSquadronCas(sqd_cas, 250, 600)
-        -- A2GDispatcher:SetSquadronOverhead(sqd_cas, 0.15)
-        -- A2GDispatcher:SetDefaultTakeoffFromRunway( sqd_cas )
-        -- A2GDispatcher:SetSquadronLandingNearAirbase( sqd_cas )
+--         -- local sqd_cas = base.."-cas"
+--         -- A2GDispatcher:SetSquadron(sqd_cas, base,  { "su-25-cas" },  10)
+--         -- A2GDispatcher:SetSquadronGrouping( sqd_cas, 2 )
+--         -- A2GDispatcher:SetSquadronCas(sqd_cas, 250, 600)
+--         -- A2GDispatcher:SetSquadronOverhead(sqd_cas, 0.15)
+--         -- A2GDispatcher:SetDefaultTakeoffFromRunway( sqd_cas )
+--         -- A2GDispatcher:SetSquadronLandingNearAirbase( sqd_cas )
 
-        local sqd_bai = base.."-bai"
-        A2GDispatcher:SetSquadron(sqd_bai, base,  { "su-25-cas" },  10)
-        A2GDispatcher:SetSquadronGrouping( sqd_bai, 1 )
-        A2GDispatcher:SetSquadronBai(sqd_bai, 250, 600)
-        A2GDispatcher:SetSquadronOverhead(sqd_bai, 0.25)
-        -- A2GDispatcher:SetSquadronEngageLimit( sqd_bai, 2 )
-        -- A2GDispatcher:SetDefaultTakeoffFromParkingHot( sqd_bai )
-        A2GDispatcher:SetSquadronLandingNearAirbase( sqd_bai )
+--         local sqd_bai = base.."-bai"
+--         A2GDispatcher:SetSquadron(sqd_bai, base,  { "su-25-cas" },  10)
+--         A2GDispatcher:SetSquadronGrouping( sqd_bai, 1 )
+--         A2GDispatcher:SetSquadronBai(sqd_bai, 250, 600)
+--         A2GDispatcher:SetSquadronOverhead(sqd_bai, 0.25)
+--         -- A2GDispatcher:SetSquadronEngageLimit( sqd_bai, 2 )
+--         -- A2GDispatcher:SetDefaultTakeoffFromParkingHot( sqd_bai )
+--         A2GDispatcher:SetSquadronLandingNearAirbase( sqd_bai )
 
-      end
-    end
-  end
-  miz_utils.saveTable(_STATE, BASE_FILE)
-end
+--       end
+--     end
+--   end
+--   miz_utils.saveTable(_STATE, BASE_FILE)
+-- end
+
+env:info("Creating a2a carrier dispatcher for red...")
+local base = "Kuz"
+local sqd_cap = "kuz-cap"
+local zone_name = base.."-capzone"
+local cap_grp = 1
+local zone = ZONE:FindByName(zone_name)
+
+A2ADispatcher:SetSquadron( sqd_cap, base, { "su-33-cap" } ) --, 10)
+A2ADispatcher:SetSquadronGrouping( sqd_cap, 2 )
+A2ADispatcher:SetSquadronTakeoffFromParkingHot(sqd_cap)
+A2ADispatcher:SetSquadronLandingNearAirbase( sqd_cap )
+A2ADispatcher:SetSquadronCap( sqd_cap, zone, 5000, 10000, 500, 800, 600, 1200, "BARO")
+A2ADispatcher:SetSquadronCapInterval( sqd_cap, cap_grp, 60*5, 60*7, 1)
+A2ADispatcher:SetSquadronCapRacetrack(sqd_cap, 5000, 10000, 90, 180, 5*60, 10*60)
+env:info("Carrier dispatcher for red created...")
+
 BLUEHQ = GROUP:FindByName("BLUEHQ")
 BLUECC = COMMANDCENTER:New( BLUEHQ, "BLUEHQ" )
 blue_recon.InitBlueReconGroup(BLUECC)
