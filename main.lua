@@ -148,20 +148,20 @@ local function setBaseBlue(baseName, startup)
     MESSAGE:New("Trigger zone does not exist for "..logZone.."!", 5):ToAll()
   end
 
-  local reconZone = ZONE:FindByName(baseName.."-reconzone")
-  if reconZone ~= nil then
-    local spwn = SPAWN:NewWithAlias("blue-recon", "blue-recon-"..baseName)
-      :InitLimit(1, 50)
-      :InitRepeat()
-      :SpawnAtAirbase( AIRBASE:FindByName(baseName), SPAWN.Takeoff.Air, 12000)
+  -- local reconZone = ZONE:FindByName(baseName.."-reconzone")
+  -- if reconZone ~= nil then
+  --   local spwn = SPAWN:NewWithAlias("blue-recon", "blue-recon-"..baseName)
+  --     :InitLimit(1, 50)
+  --     :InitRepeat()
+  --     :SpawnAtAirbase( AIRBASE:FindByName(baseName), SPAWN.Takeoff.Air, 12000)
 
-    if spwn ~= nil then
-      local reconPatrol = AI_PATROL_ZONE:New( reconZone, 12000, 18000, 150, 400 )
-      reconPatrol:SetControllable( spwn )
-      reconPatrol:__Start( 2 )
-      MESSAGE:New("Spawning reaper drone to patrol from "..baseName, 5):ToAll()
-    end
-  end
+  --   if spwn ~= nil then
+  --     local reconPatrol = AI_PATROL_ZONE:New( reconZone, 12000, 18000, 150, 400 )
+  --     reconPatrol:SetControllable( spwn )
+  --     reconPatrol:__Start( 2 )
+  --     MESSAGE:New("Spawning reaper drone to patrol from "..baseName, 5):ToAll()
+  --   end
+  -- end
 
   slotblock.configureSlotsForBase(baseName, "blue")
   pcall(function()
