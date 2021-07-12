@@ -47,6 +47,7 @@ if MISSION_VERSION == "South" then
   ContestedBases = {
     "Ramat David",
     "Paphos",
+    "Akrotiri",
     -- "Beirut-Rafic Hariri",
     -- "Damascus",
     -- "Mezzeh",
@@ -71,6 +72,7 @@ else
   ContestedBases = {
     "Ramat David",
     "Paphos",
+    "Akrotiri",
     -- "Incirlik",
     -- "Aleppo",
     -- -- "Abu al-Duhur",
@@ -276,11 +278,11 @@ SPAWN:New("awacs-Carrier")
   :InitDelayOff()
   :SpawnScheduled(200, 0)
 
-SPAWN:New("awacs-Incirlik")
-  :InitLimit(1, 50)
-  :InitRepeatOnLanding()
-  :InitDelayOff()
-  :SpawnScheduled(15, 0)
+-- SPAWN:New("awacs-Incirlik")
+--   :InitLimit(1, 50)
+--   :InitRepeatOnLanding()
+--   :InitDelayOff()
+--   :SpawnScheduled(15, 0)
 
 
 TexacoStennis = RECOVERYTANKER:New(UNIT:FindByName("Stennis"), "Texaco")
