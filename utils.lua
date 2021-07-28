@@ -544,7 +544,7 @@ local function addDeadGroup(group_name)
       _MARKERS[Mark["name"]]:Remove()
     end
   end
-  if not startswith(group_name, "manpad") then
+  if not startswith(group_name, "manpad") and not startswith(group_name, "ground") and not startswith(group_name, "Ground") then
     MESSAGE:New(group_name.." has been permanently destroyed!" ,10):ToAll()
   end
 end
