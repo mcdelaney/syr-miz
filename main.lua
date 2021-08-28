@@ -78,6 +78,7 @@ else
     "Bassel Al-Assad",
     "Beirut-Rafic Hariri",
     "Damascus",
+    "Taftanaz",
     "Al Qusayr",
     "Hama"
   }
