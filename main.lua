@@ -448,7 +448,7 @@ blue_recon.InitBlueReconGroup(BLUECC)
 blue_menus.Init()
 red_menus.Init()
 
-RedSamRepair = SCHEDULER:New( nil, miz_utils.attemptSamRepair, {}, 2*60, 20*60, 0.25 )
+RedSamRepair = SCHEDULER:New( nil, miz_utils.attemptSamRepair, {}, 5*60, 35*60, 0.25 )
 -- BaseCapAttempt = SCHEDULER:New( nil, miz_utils.attemptBaseCap, {}, 10*60, 30*60, 0.25 )
 
 
