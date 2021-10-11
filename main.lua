@@ -392,10 +392,10 @@ for _, base in pairs(ContestedBases) do
     A2ADispatcher:SetSquadronGrouping( sqd_cap, 2 )
     A2ADispatcher:SetSquadronTakeoffFromParkingHot(sqd_cap)
     A2ADispatcher:SetSquadronLandingNearAirbase( sqd_cap )
-    A2ADispatcher:SetSquadronCap( sqd_cap, zone, 5000, 10000, 500, 800, 600, 1200, "BARO")
+    A2ADispatcher:SetSquadronCap( sqd_cap, zone, 5000, 10000, 400, 500, 400, 900, "BARO")
 
-    A2ADispatcher:SetSquadronCapInterval( sqd_cap, cap_grp, 60*5, 60*7, 1)
-    A2ADispatcher:SetSquadronCapRacetrack(sqd_cap, 5000, 10000, 90, 180, 5*60, 10*60)
+    A2ADispatcher:SetSquadronCapInterval( sqd_cap, cap_grp, 60*5, 60*15, 1)
+    A2ADispatcher:SetSquadronCapRacetrack(sqd_cap, 5000, 10000, 90, 180, 5*60, 15*60)
 
     env.info("Creating A2A GCI group from base: "..base)
     local sqd_gci = base.."-gci"
@@ -403,7 +403,7 @@ for _, base in pairs(ContestedBases) do
     A2ADispatcher:SetSquadronGrouping( sqd_gci, 1 )
     A2ADispatcher:SetSquadronOverhead( sqd_gci, 0.5 )
     A2ADispatcher:SetSquadronTakeoffFromParkingHot(sqd_gci)
-    A2ADispatcher:SetSquadronGci( sqd_gci, 600, 900 )
+    A2ADispatcher:SetSquadronGci( sqd_gci, 500, 600 )
 
     for _, agBase in pairs(AG_BASES) do
       if agBase == base then
@@ -448,7 +448,7 @@ blue_recon.InitBlueReconGroup(BLUECC)
 blue_menus.Init()
 red_menus.Init()
 
-RedSamRepair = SCHEDULER:New( nil, miz_utils.attemptSamRepair, {}, 2*60, 10*60, 0.25 )
+RedSamRepair = SCHEDULER:New( nil, miz_utils.attemptSamRepair, {}, 2*60, 20*60, 0.25 )
 -- BaseCapAttempt = SCHEDULER:New( nil, miz_utils.attemptBaseCap, {}, 10*60, 30*60, 0.25 )
 
 
