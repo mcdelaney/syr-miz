@@ -79,7 +79,7 @@ else
     "Beirut-Rafic Hariri",
     "Damascus",
     "Taftanaz",
-    "Al Qusayr",
+    -- "Al Qusayr",
     "Hama"
   }
 
