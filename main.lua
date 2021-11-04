@@ -11,6 +11,10 @@ local blue_ground = require("blue_ground")
 local red_menus = require("red_menus")
 local blue_menus = require("blue_menus")
 local blue_recon = require("blue_recon")
+
+local ewrs_script = lfs.writedir() .. "Scripts\\syr-miz\\EWRS.lua"
+dofile(ewrs_script)
+
 -- local red_ground = require("red_ground")
 
 _MARKERS = {}
