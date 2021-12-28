@@ -296,6 +296,7 @@ ctld.transportPilotNames = {
     "King-Hussein-Air-College-Huey-1",
     "King-Hussein-Air-College-Huey-2",
     "King-Hussein-Air-College-Huey-3",
+    "Hatay-C130-1",
 }
 
 -- *************** Optional Extractable GROUPS *****************
@@ -371,6 +372,8 @@ ctld.vehicleTransportEnabled = {
     "L-39C",
     "F-5E-3",
     "Hercules",
+    "C130J",
+    "C-130J",
 }
 
 
