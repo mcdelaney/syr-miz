@@ -287,8 +287,11 @@ ctld.transportPilotNames = {
     "Abu al-Duhur-Hercules-1",
     "Incirlik-Hercules-1",
     "Hatay-Hercules-1",
-    "Bassel Al-Assad-Hercules-1",
-    "Ramat David-Hercules-1",
+    "Bassel Al-Assad-C130-1",
+
+    "Ramat David-C130-1",
+    "Ramat David-C130-2",
+
     "Beirut-Rafic Hariri-Hercules-1",
     "Beirut-Rafic Hariri-Hercules-2",
 
@@ -297,6 +300,17 @@ ctld.transportPilotNames = {
     "King-Hussein-Air-College-Huey-2",
     "King-Hussein-Air-College-Huey-3",
     "Hatay-C130-1",
+    "Hatay-C130-2",
+
+    "Incirlik-C130-1",
+    "Incirlik-C130-2",
+    "Incirlik-C130-3",
+    "Incirlik-C130-4",
+
+    "Hatay-Hind-1",
+    "Hatay-Hind-2",
+    "Hatay-Hind-3",
+    "Hatay-Hind-4",
 }
 
 -- *************** Optional Extractable GROUPS *****************
@@ -374,6 +388,7 @@ ctld.vehicleTransportEnabled = {
     "Hercules",
     "C130J",
     "C-130J",
+    "Mi-24P"
 }
 
 
@@ -476,6 +491,11 @@ ctld.spawnableCrates = {
         { weight = 552, desc = "HAWK Repair", unit = "HAWK Repair" , side = 2 },
         -- End of HAWK
         { weight = 400, desc = "M1097 Avenger", unit = "M1097 Avenger", side = 2, cratesRequired = 1 },
+
+        { weight = 500, desc = "SAM NASAMS LN AIM-120C", unit = "SAM NASAMS LN AIM-120C", side = 2, cratesRequired = 1 },
+        { weight = 500, desc = "SAM NASAMS SR MPQ64F1", unit = "SAM NASAMS SR MPQ64F1", side = 2, cratesRequired = 1 },
+        { weight = 500, desc = "SAM NASAMS C2", unit = "SAM NASAMS C2", side = 2, cratesRequired = 1 },
+        { weight = 500, desc = "SAM NASAMS Repair", unit = "NASAMS Repair", side = 2, cratesRequired = 1 },
     },
 }
 
@@ -1259,6 +1279,19 @@ ctld.AASystemTemplate = {
         },
         repair = "HAWK Repair",
     },
+
+    {
+        name = "NASAMS AA System",
+        count = 4,
+        parts = {
+            {name = "SAM NASAMS LN AIM-120C", desc = "SAM NASAMS LN AIM-120C", launcher = true},
+            {name = "SAM NASAMS SR MPQ64F1", desc = "SAM NASAMS SR MPQ64F1"},
+            {name = "SAM NASAMS C2", desc = "SAM NASAMS C2"},
+        },
+        repair = "NASAMS Repair",
+    },
+
+
     {
         name = "BUK AA System",
         count = 3,

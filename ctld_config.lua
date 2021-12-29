@@ -96,6 +96,13 @@ ctld_config.unit_config = {
 		["name"] = "CTLD_IFV #",
 		["playerCanDrive"] = false,
 		["skill"] = "Excellent",
+	},
+	["SAM NASAMS LN AIM-120C"] = {
+		["type"] = "SAM NASAMS LN AIM-120C",
+		["name"] = "CTLD_NASAMS #",
+		["playerCanDrive"] = true,
+		["uncontrollable"] = false,
+		["skill"] = "Excellent",
 	}
 }
 
@@ -136,6 +143,7 @@ ctld_config.unit_index = {
     Roland_Index = 1,
 	Stinger_Index = 1,
 	IFV_Index = 1,
+	NASAMS_Index = 1,
 }
 
 return ctld_config
