@@ -492,9 +492,9 @@ ctld.spawnableCrates = {
         -- End of HAWK
         { weight = 400, desc = "M1097 Avenger", unit = "M1097 Avenger", side = 2, cratesRequired = 1 },
 
-        { weight = 500, desc = "SAM NASAMS LN AIM-120C", unit = "SAM NASAMS LN AIM-120C", side = 2, cratesRequired = 1 },
-        { weight = 500, desc = "SAM NASAMS SR MPQ64F1", unit = "SAM NASAMS SR MPQ64F1", side = 2, cratesRequired = 1 },
-        { weight = 500, desc = "SAM NASAMS C2", unit = "SAM NASAMS C2", side = 2, cratesRequired = 1 },
+        { weight = 500, desc = "SAM NASAMS LN AIM-120C", unit = "NASAMS_LN_C", side = 2, cratesRequired = 1 },
+        { weight = 500, desc = "SAM NASAMS SR MPQ64F1", unit = "NASAMS_Radar_MPQ64F1", side = 2, cratesRequired = 1 },
+        { weight = 500, desc = "SAM NASAMS C2", unit = "NASAMS_Command_Post", side = 2, cratesRequired = 1 },
         { weight = 500, desc = "SAM NASAMS Repair", unit = "NASAMS Repair", side = 2, cratesRequired = 1 },
     },
 }
@@ -1282,11 +1282,11 @@ ctld.AASystemTemplate = {
 
     {
         name = "NASAMS AA System",
-        count = 4,
+        count = 3,
         parts = {
-            {name = "SAM NASAMS LN AIM-120C", desc = "SAM NASAMS LN AIM-120C", launcher = true},
-            {name = "SAM NASAMS SR MPQ64F1", desc = "SAM NASAMS SR MPQ64F1"},
-            {name = "SAM NASAMS C2", desc = "SAM NASAMS C2"},
+            {name = "NASAMS_LN_C", desc = "SAM NASAMS LN AIM-120C", launcher = true},
+            {name = "NASAMS_Radar_MPQ64F1", desc = "SAM NASAMS SR MPQ64F1"},
+            {name = "NASAMS_Command_Post", desc = "SAM NASAMS C2"},
         },
         repair = "NASAMS Repair",
     },
